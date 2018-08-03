@@ -72,13 +72,22 @@ The help subcommand included provides:
 		* e.g. `groan.commands.topic.sh`# lists the available commands
 	* `<name>.<topicname>.topic.rb` #evaled
 
+
 #### Help Meta Data
 
-Commands are implemented expecting that they may be run with the METADATAONLY flag, in which case they populate variables and exit prior to doing anything:
+Shell commands are implemented expecting that they may be run with the METADATAONLY flag, in which case they populate variables and exit prior to doing anything:
 
 * `$command`
 * `$description`
 * `$usage`
+
+Other language sub-commands supply their metadata in magic comments that are evaluated by bash e.g.
+
+	# meta-data (sourced by bash)
+	#m# command="ruby-test"
+	#m# description="testing ruby invocation"
+	#m# usage="usage:
+	#m# $scriptName ruby-test"
 
 ### Subcommand - environment
 

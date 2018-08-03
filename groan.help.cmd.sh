@@ -20,8 +20,7 @@ usage="usage:
 $scriptName help <command|topic>
 $scriptName help topics
 $scriptName help commands
-$scriptName help --help      #this text
-"
+$scriptName help --help      #this text"
 
 $SHOWHELP && printf "$command - $description\n\n$scriptName $commonOptions\n$usage"
 $METADATAONLY && return 

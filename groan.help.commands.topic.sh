@@ -23,11 +23,14 @@ for loc in ${locations[@]} ; do
 		if [[ -f "$found" ]]; then
 			$DEBUG && echo "found #$count : $found"
 			
-			source $found
-						
+			if [[ "$found" = *".sh" ]]; then
+				source $found
+			else
+				eval "$(sed -n 's|^#m# \(.*\)$|\1|p' $found)"
+			fi
+								
 			printf "%-17s" $command
 			echo "$description"
-
 		fi
 	done
 done
@@ -46,9 +49,13 @@ for loc in ${locations[@]} ; do
 
 			$DEBUG && echo "found #$count : $found"
 			
-			source $found
-						
-			echo "$command $usage"	
+			if [[ "$found" = *".sh" ]]; then
+				source $found
+			else
+				eval "$(sed -n 's|^#m# \(.*\)$|\1|p' $found)"
+			fi
+								
+			printf "$command $usage\n\n"	
 		fi
 	done
 done

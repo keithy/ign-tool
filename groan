@@ -103,9 +103,11 @@ source "$scriptDir/$scriptName.locations"
 
 for configFile in ${configFileLocations[@]}
 do
+	if [[ -f $configFile ]]; then
 		$VERBOSE && echo "using configuration: $configFile"
 		source "$configFile"
 		break
+	fi
 done
 
 # no command provided default to subcommmand help --help
@@ -152,6 +154,9 @@ do
 			;;
 			*)
 				$DEBUG && echo "running eval: $found $arg_str"
+				#evaluate meta-data first
+				eval "$(sed -n 's|^#m# \(.*\)$|\1|p' $found)"
+				
 				eval "$found" "${args[@]:+${args[@]}}"
 			;;
 		esac

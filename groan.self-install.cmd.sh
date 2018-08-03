@@ -7,8 +7,7 @@ command="self-install"
 description="install in system"
 usage="usage:
 $scriptName self-install /usr/local/bin --link
-$scriptName self-install --unlink
-"
+$scriptName self-install --unlink"
 
 $SHOWHELP && printf "$command - $description\n\n$usage"
 $METADATAONLY && return

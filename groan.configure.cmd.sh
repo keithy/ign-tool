@@ -12,8 +12,7 @@ $scriptName configure --show        # default behaviour
 $scriptName configure --options     # list available options
 $scriptName configure someones.conf # view file
 $scriptName configure someones.conf --install 1 # install at option 1
-$scriptName configure --help        # this message
-"
+$scriptName configure --help        # this message"
 
 $SHOWHELP && printf "$command - $description\n\n$usage"
 $METADATAONLY && return

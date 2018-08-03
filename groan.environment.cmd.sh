@@ -10,8 +10,7 @@ usage="usage:
 $scriptName environment 
 $scriptName environment [--all|-a]
 $scriptName environment [--eval "expr"] - evaluate expression in script context
-$scriptName environment --help
-"
+$scriptName environment --help"
 
 $SHOWHELP && printf "$command - $description\n\n$usage"
 $METADATAONLY && return
