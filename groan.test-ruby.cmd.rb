@@ -1,15 +1,15 @@
 #!/usr/bin/env ruby
-# groan.ruby-test.cmd.rb
+# groan.test-ruby.cmd.rb
 #
 # by Keith Hodges 2017
 #
 # A Test
 
 # meta-data (sourced by bash)
-#m# command="ruby-test"
+#m# command="test-ruby"
 #m# description="testing ruby invocation"
 #m# usage="usage:
-#m# $scriptName ruby-test"
+#m# $scriptName test-ruby"
 
 puts "Hello its ruby!"
 

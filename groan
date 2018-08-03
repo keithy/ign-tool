@@ -118,6 +118,7 @@ if [[ "$command" = "" ]]; then
 fi
 
 target="$scriptName.${command}*.cmd.*"
+exact="$scriptName.${command}.cmd.*"
 
 count=0
 previous=""
@@ -127,6 +128,11 @@ do
 	previous="$loc"
 	
 	$DEBUG && echo "looking in: $loc"
+
+	for found in $loc/$exact
+	do
+		target=$exact
+	done
 
 	for found in $loc/$target
 	do

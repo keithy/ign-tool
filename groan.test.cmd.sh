@@ -4,10 +4,10 @@
 #
 # A Dummy
 
-command="con"
+command="test"
 description="dummy (test for duplication)"
 usage="usage:
-$scriptName conf --help"
+$scriptName --help"
 
 $SHOWHELP && printf "$command - $description\n\n$usage"
 $METADATAONLY && return

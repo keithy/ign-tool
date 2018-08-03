@@ -51,7 +51,9 @@ Groan subcommands are called after having:
 
 ## Make Your own
 
-Download the __groan__ project, rename its directory and all "groan" files to that of your own chosen script name, e.g. "[grow](https://launchpad.net/grow)". 
+1. Download/clone the __groan__ project.
+2. Rename its directory and all "groan" files to that of your own chosen script name, e.g. "[grow](https://launchpad.net/grow)". 
+3. All files with "test" in the filename can be deleted, as they are only for testing or demonstration purposes.
 
 ## Config Files
 
@@ -133,7 +135,7 @@ To verify all is well try:
     groan help test
     groan help commands
     groan help topics
-    groan con #outputs> Warning: Command 'con' is ambiguous (use --debug for more info)
+    groan tes #outputs> Warning: Command 'tes' is ambiguous (use --debug for more info)
     groan env
     groan env -a
     groan env --eval "echo $PATH"
@@ -147,6 +149,6 @@ To verify all is well try:
     groan self-install /usr/local/bin --link --confirm
     groan self-install /usr/local/bin --link --unlink 
     groan self-install /usr/local/bin --link --unlink --confirm
-    groan ruby-test
+    groan test-ruby
     
     
