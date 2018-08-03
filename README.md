@@ -5,6 +5,14 @@ for creating a suite of scripts that have similar usage style to bzr/git.
 
 ## History
 
+__groan__
+
+/ɡrəʊn/
+
+_noun_
+	
+1. the noise that emits from a smalltalker forced to code in bash. 
+
 This incarnation of groan was conceived in about 2009, in 2017 I used 'sub' extensively and then fed that experience back into groan (in 2018), rather than port existing groan based projects. I also want to use groan as a base for incorporating "fish" based scripts if I should ever develop any.
 
 ## Groan vs sub
