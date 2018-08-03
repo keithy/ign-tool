@@ -63,10 +63,10 @@ Grown looks for config files in a number of places. This is configured in groan.
 
 The help subcommand included provides:
 
-* Display text file giving information on a topic
+* Display text file giving information on a topic e.g. `groan help test`
 	* `<name>.<topicname>.topic.txt`
-		* e.g. `groan.test.topics.txt`
-* Generate topic information via code
+		* e.g. `groan.test.topic.txt`    
+* Generate topic information via code e.g. `groan help topics`
 	* `<name>.<topicname>.topic.sh` #sourced
 		* e.g. `groan.topics.topic.sh` # lists the available topics
 		* e.g. `groan.commands.topic.sh`# lists the available commands
@@ -74,7 +74,7 @@ The help subcommand included provides:
 
 #### Help Meta Data
 
-Commands are implemented expecting to be run with the METADATAONLY flag, in which case they populate variables and exit prior to doing anything:
+Commands are implemented expecting that they may be run with the METADATAONLY flag, in which case they populate variables and exit prior to doing anything:
 
 * `$command`
 * `$description`
