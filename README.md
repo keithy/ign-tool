@@ -3,15 +3,23 @@
 Groan is a simple extensible bash framework (similar to [sub](https://github.com/basecamp/sub))
 for creating a suite of scripts that have similar usage style to bzr/git. 
 
+## History
+
+This incarnation of groan was conceived in about 2009, in 2017 I used 'sub' extensively and then fed that experience back into groan (in 2018), rather than port existing groan based projects. I also want to use groan as a base for incorporating "fish" based scripts if I should ever develop any.
+
 ## Groan vs sub
 
-* is simpler than sub, 
-* does not yet support command completion.
+* Is much simpler than sub
+* Sub-commands provide usage and documentation
+* Support for additional documentation topics/reporting
+* Demonstrates simple implementation conventions and patterns (e.g. options handling)
+* Adopts the informal [bash "strict" mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/) which considerably aids debugging.
+* (does not yet support command completion.)
 
 ## Features
 
 * supports default option flags (--verbose --quiet --help --debug --dry-run --confirm)
-* finds sub-commands via a configurable search path
+* finds sub-commands via a configurable search path (allows local overides)
 * finds config files via a configurable search path
 * reads a config file (to set environment vars) before running sub-commands
 * sub-commands may be written in any shell or language
@@ -22,16 +30,16 @@ for creating a suite of scripts that have similar usage style to bzr/git.
 
 ## General Principles
 
-Groan will always:
+Groan subcommands are called after having:
 
-* process the standard set of flags.
+* processed and filtered out the standard set of flags.
 	* --verbose
 	* --debug
 	* --quiet
 	* --dry-run  # enabled by default
 	* --confirm  # disables --dry-run flag for destructive operations
-* attempt to work out what platform it is running on. 
-* find and 'source' a config-file, prior to executing sub-commands.
+* attempted to work out what platform it is running on. 
+* found and 'sourced' a config-file.
 
 ## Make Your own
 
@@ -89,13 +97,17 @@ A number of template conf files can be provided, the user can choose a file and 
     3) global config : /Users/bob/.local/bin/groan/groan.conf
        
     Available templates:
-        groan.conf
+        default.conf
+        
+    Install configuration with:
+    
+    ./groan config default.conf --install 3 --confirm 
         
 ### Subcommand - self-install
 
-    groan self-install --link --confirm
+    groan self-install /usr/local/bin --link --confirm
 
-## Testing
+## Test Suite
 
 To verify all is well try:
 
