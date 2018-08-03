@@ -1,13 +1,15 @@
-# grow.help.sh
+# grow.help.cmd.sh
 #
 # by Keith Hodges 2010
 #
 # General Help On Commands
 
+# may have been invoked with a partial name
+# so set the full command name
 command="help"
 
 description="show topical help"
-commonOptions="$scriptName common options:
+commonOptions="common options:
 --help    | -h | -?  Usage help for a command
 --quiet   | -q       Quiet mode - say nothing
 --verbose | -V       Verbose
@@ -15,65 +17,73 @@ commonOptions="$scriptName common options:
 "
 
 usage="usage:
-$scriptName help <command>
+$scriptName help <command|topic>
+$scriptName help topics
 $scriptName help commands
 $scriptName help --help      #this text
 "
 
-if $SHOWHELP; then
-	echo "$command - $description\n\n$commonOptions\n$usage"
-fi
-if $METADATAONLY; then
-	return 
-fi
+$SHOWHELP && printf "$command - $description\n\n$scriptName $commonOptions\n$usage"
+$METADATAONLY && return 
 
+helpRequest=""
 for arg in $@
 do
 	case $arg in
     	--all | -a)
 	   	VERBOSE=true
 		;;
+		*)
+		if [[ "$helpRequest" = "" ]]; then
+		   helpRequest=$arg
+		fi
+	    ;;
 	esac
 done
 
+$DEBUG && echo "Help request: $helpRequest"
+
 #check user has given us a file reference
-helpRequest=$1
-if [[ -z $helpRequest || "${helpRequest:0:1}" = "-" ]]; then
-	echo "$scriptName $commonOptions\nPlease give me a help topic\n\n$usage"
+if [[ "$helpRequest" = "" ]]; then
+	printf "$scriptName $commonOptions\n$usage\nPlease give me a help topic\n"
 	exit 1
 fi
 
+helpFile=""
 target="$scriptName.help.$helpRequest*.topic.*"
-for loc in ${locations[@]}
-do
-	for found in $loc/$target
-	do
-		if [ -e "$found" ]; then
-			if $DEBUG; then
-				echo "found: $found"
-			fi
+
+previous=""
+for loc in ${locations[@]} ; do
+
+	[[ "$previous" == "$loc" ]] && break
+	previous="$loc"
+	
+	$DEBUG && echo "looking in: $loc"
+
+	for found in $loc/$target; do
+		if [ -f "$found" ]; then
+			$DEBUG && echo "found: $found"
 			helpFile="$found"
-			break 2
+			break
 		fi
 	done
-done
 
-if [ ! -e $helpFile ]; then
-	if $LOUD; then
-		echo "Warning: help for '$helpRequest' not found"
+	if [[ "$helpFile" = "" ]]; then
+		$LOUD && echo "Warning: help for '$helpRequest' not found"
+		exit 1
 	fi
-	exit 1
-fi
-
-
+done
 
 case ${helpFile##*.} in
     	txt | text)
 		   	cat $helpFile
-		   	echo "\n"
+		   	echo  
 		;;
 	  	sh)
 		   	source $helpFile
+	    ;;
+	    *)
+		   	eval $helpFile
 	    ;;
 esac
 

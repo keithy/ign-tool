@@ -6,83 +6,96 @@
 command="self-install"
 description="install in system"
 usage="usage:
-$scriptName self-install --link 
-$scriptName self-install <dest */bin directory> --link
-$scriptName self-install --unlink  
+$scriptName self-install /usr/local/bin --link
+$scriptName self-install --unlink
 "
 
-if $SHOWHELP; then
-	echo "$command - $description\n\n$usage"
-fi
-if $METADATAONLY; then
-	return
-fi
+$SHOWHELP && printf "$command - $description\n\n$usage"
+$METADATAONLY && return
 
-what="none"
-for arg in $@
+ADDACTION=false
+ADDLINK=false
+UNLINK=false
+FULLINSTALL=false
+installPath=""
+
+for arg in "$@"
 do
 	case $arg in
     	--link)
-	   	what="link"
+	   	 	ADDLINK=true
+	   	 	ADDACTION=true
 		;;
     	--unlink)
-	   	what="unlink"
+	   		UNLINK=true
 		;;
-	  	--full)
-	   	what="full"
-	    ;;	 
+#	  	--full)
+#			FULLINSTALL=true
+#			ADDACTION=true	
+#	    ;;
+	    -*)
+	        # ignore other options
+	  	;;
+	    *)
+	  		installPath="$arg"
+   	    ;;
 	esac
 done
 
-if [ "$what" = "unlink" ]; then
-	theInstalledLink=`which "$scriptName"`
+if $UNLINK; then
+	theInstalledLink=$(which "$scriptName")
 	if [ -z "$theInstalledLink" ]; then
 		echo "$scriptFile appears not to be installed"
 		return
 	fi
+	
 	if [ ! -L "$theInstalledLink" ]; then
 		echo "Not a link: $theInstalledLink - leaving well alone"
 		return
 	fi
-	theInstalled=`readlink -n $theInstalledLink`
+	
+	theInstalled=$(readlink -n $theInstalledLink)
 	if [ "$theInstalled" != "$scriptFile" ]; then
 		echo "This link does not point to me: $theInstalledLink - leaving well alone"
 		return
 	fi
-	rm "$theInstalledLink"
-	echo "Removed installed symbolic link $theInstalledLink"
-	return
+
+	$LOUD && echo "rm $theInstalledLink"
+	$DRYRUN && echo "  --confirm required to proceed"
+	$CONFIRM && rm "$theInstalledLink"
+	$CONFIRM && echo "Removed installed symbolic link $theInstalledLink"
+
+	exit
 fi
 
-#user giving us a destination
-destDir=$1
+if ! $ADDACTION; then
+	echo "No action specified ( --link )"
+fi
 
-if [[ -z $destDir || "${destDir:0:1}" = "-" ]]; then
+#no destination specified
+
+if [[ "$installPath" = "" ]]; then
+	echo "No destination specified, try (/usr/local/bin)"
+	exit
+fi
+
+#user gave us a destination is it on the $PATH
+
+if [ "$searchablePath" = "${searchablePath/:$installPath:/:}" ]; then
+	echo "Your PATH does not include $installPath, please specify a valid path."
+	exit
+fi
 	
-	destDir="/usr/local/bin"
-
-	#no destination specified
-	if $LOUD; then
-		echo "No destination specified, using: $destDir"
-	fi
-		
-	if [ "$searchablePath" = "${searchablePath/:$destDir:/:}" ]; then
-		echo "Your PATH does not include $destDir, please specify an explicit path."
-		return
-	fi
-	
+if [[ ! -d "$installPath" ]]; then
+	echo "Directory $installPath does not exist"
+	exit
 fi
 
-if [ $what = "none" ]; then
-	if $LOUD; then
-		echo "No option specified, \n\n$usage"
-		return
-	fi
-fi
-
-if [ $what = "link" ]; then
-	ln -s "$scriptFile" "$destDir/$scriptName" 
-	echo "Installed symbolic link from $destDir/$scriptName to $scriptFile"
+if $ADDLINK; then
+	$LOUD && echo "ln -s $scriptFile $installPath/$scriptName"
+	$DRYRUN && echo "  --confirm required to proceed"
+	$CONFIRM && ln -s "$scriptFile" "$installPath/$scriptName" 
+	$CONFIRM && echo "Installed symbolic link from $destDir/$scriptName to $scriptFile"
 fi
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 

@@ -2,54 +2,58 @@ echo "Help commands - $scriptName <command>"
 echo
 
 preamble="$scriptName.help.commands.preamble.txt"
-postscript="$scriptName.help.commands.postfix.txt"
+postscript="$scriptName.help.commands.postscript.txt"
 
-if [ -e $preamble ]; then
+if [ -f $preamble ]; then
 	cat $preamble
 fi
 
 METADATAONLY=true
 
-target="$scriptName.*.cmd.sh"
- 	
-for loc in ${locations[@]}
-do
+target="$scriptName.*.cmd.*"
+
+previous=""
+for loc in ${locations[@]} ; do
+
+	[[ "$previous" == "$loc" ]] && break
+	previous="$loc"
+	
 	for found in $loc/$target
 	do
-		if [[ -e "$found" ]]; then
-			if $DEBUG; then
-				echo "found #$count : $found"
-			fi
+		if [[ -f "$found" ]]; then
+			$DEBUG && echo "found #$count : $found"
 			
 			source $found
 						
 			printf "%-17s" $command
 			echo "$description"
-			
+
 		fi
 	done
 done
 
 echo
 
-for loc in ${locations[@]}
-do
+previous=""
+for loc in ${locations[@]} ; do
+
+	[[ "$previous" == "$loc" ]] && break
+	previous="$loc"
+	
 	for found in $loc/$target
 	do
-		if [ -e "$found" ]; then
-			if $DEBUG; then
-				echo "found #$count : $found"
-			fi
+		if [ -f "$found" ]; then
+
+			$DEBUG && echo "found #$count : $found"
 			
 			source $found
 						
-			echo "$command $usage"
-			
+			echo "$command $usage"	
 		fi
 	done
 done
 
-if [ -e $postscript ]; then
+if [ -f $postscript ]; then
 	cat $postscript
 fi
 

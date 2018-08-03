@@ -1,10 +1,15 @@
 #locations to search for configuration *.conf files
-configlocations=(
-	"$workingDir"
-	"$HOME"
-	"$scriptDir"
+
+configOptions=("local" "user" "global")
+
+configFileLocations=(
+	"$workingDir/groan.conf" # --local
+	"$HOME/.groan.conf"      # --user
+	"$scriptDir/groan.conf"  # --global
 )
+
 #locations to search for commands
+
 locations=(
 	"$workingDir"
 	"$scriptDir"

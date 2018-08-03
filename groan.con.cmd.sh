@@ -10,12 +10,8 @@ usage="usage:
 $scriptName conf --help
 "
 
-if $SHOWHELP; then
-	echo "$command - $description\n\n$usage"
-fi
-if $METADATAONLY; then
-	return
-fi
+$SHOWHELP && printf "$command - $description\n\n$usage"
+$METADATAONLY && return
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 #Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."

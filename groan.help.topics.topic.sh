@@ -12,20 +12,22 @@ METADATAONLY=true
 
 target="$scriptName.help.*.topic.*"
 
+previous="" 	
 for loc in ${locations[@]}
 do
+	[[ "$previous" == "$loc" ]] && break
+	previous="$loc"
+
 	for found in $loc/$target
 	do
-		if [[ -e "$found" ]]; then
-			if $DEBUG; then
-				echo "found #$count : $found"
-			fi
+		if [[ -f "$found" ]]; then
+			$DEBUG && echo "found #$count : $found"
 			
 			topic=${found%.*}
 			topic=${topic%.*}
 			topic=${topic##*.}
 			
-			printf "%-17s\n" $topic
+			printf "$scriptName $command %-17s\n" $topic
 			
 		fi
 	done

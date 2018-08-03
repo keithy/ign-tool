@@ -9,35 +9,36 @@ description="show script/environment variables"
 usage="usage:
 $scriptName environment 
 $scriptName environment [--all|-a]
-$scriptName environment expr [--exec]
+$scriptName environment [--eval "expr"] - evaluate expression in script context
 $scriptName environment --help
 "
 
-if $SHOWHELP; then
-	echo "$command - $description\n\n$usage"
-fi
-if $METADATAONLY; then
-	return
-fi
+$SHOWHELP && printf "$command - $description\n\n$usage"
+$METADATAONLY && return
 
+GETEXEC=false
 what="env"
-for arg in $@
+for arg in "$@"  
 do
+	$DEBUG && echo "Arg: $arg"
+	if $GETEXEC; then
+		what=$arg
+		GETEXEC=false
+		continue
+	fi
 	case $arg in
     	--all | -a)
-	   	what="set"
+	   		what="set"
 		;;
-	  	--exec)
-	   	what=$1
+	  	--eval | -e)
+	   		GETEXEC=true
 	    ;;
 	esac
 done
 
-for each in `$what`
-do
-	echo $each
-done
+$VERBOSE && echo $what
 
+eval $what
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 #Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."

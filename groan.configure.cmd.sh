@@ -3,119 +3,129 @@
 # by Keith Hodges 2010
 #
 #
+
+
 command="configure"
 description="select configuration file"
 usage="usage:
-$scriptName configure someones.conf #view file
-$scriptName configure someones.conf --local
-$scriptName configure someones.conf --user
-$scriptName configure someones.conf --global
-$scriptName configure someones.conf --list
-$scriptName configure --help  
+$scriptName configure --show        # default behaviour
+$scriptName configure --options     # list available options
+$scriptName configure someones.conf # view file
+$scriptName configure someones.conf --install 1 # install at option 1
+$scriptName configure --help        # this message
 "
 
-if $SHOWHELP; then
-	echo "$command - $description\n\n$usage"
-fi
-if $METADATAONLY; then
-	return
-fi
+$SHOWHELP && printf "$command - $description\n\n$usage"
+$METADATAONLY && return
 
-destDir=""
-destDesc=""
-list=false
-for arg in $@
+option=""
+configureName=""
+SHOWCONFIG=true
+SHOWOPTIONS=false		    
+LISTTEMPLATES=false
+INSTALL=false
+GETOPTION=false
+
+for arg in "$@"
 do
+	if $GETOPTION; then
+		option="$arg"
+		GETOPTION=false
+		continue
+	fi
 	case $arg in
-	  --local | --here)
-	    	destDir="$workingDir"
-			destDesc="working directory: $workingDir"
+	  --show)
+	  	SHOWCONFIG=true
 	    ;;
-	  --user)
-	    	destDir="$HOME"
-			destDesc="users home directory: $destDir"
+	  --options)
+		    SHOWOPTIONS=true
+		    SHOWCONFIG=false
 	    ;;
-	  --global)
-	    	destDir="$scriptDir"
-			destDesc="$scriptName installation in: $destDir"
+	  --install)
+		    INSTALL=true
+		    SHOWCONFIG=false
+		    GETOPTION=true
 	    ;;
-	  --list)
-	  	list=true
-	    ;;
+	  -*)
+	  # ignore other options
+	  	;;
+	  *)
+	  	configureName="$arg"
+	  	SHOWCONFIG=false
+	  ;;	
 	esac
 done
 
-if $list; then
-	for loc in ${locations[@]}
+if $SHOWCONFIG; then
+	for i in "${!configOptions[@]}"
 	do
-		for found in $loc/*.conf
-		do 
-			echo "$found"
-		done
+		if [ -f ${configFileLocations[$i]} ]; then
+			echo "${configOptions[$i]} config found: ${configFileLocations[$i]}"
+			echo "["
+			cat "${configFileLocations[$i]}"
+			printf "\n]\n"
+		fi
 	done
 	return 1
 fi
 
-if $LOUD; then
-	echo "configuring $destDesc"
-fi
-
-#check user has given us a file reference
-configureName=$1
-if [[ -z "$configureName" || "${configureName:0:1}" = "-" ]]; then
-	echo "Using Configuration: $configFile\n"
-	cat "$configFile"
-	exit 1
-fi
-
-
-#append the extension if it is not present
-if [ ${configureName##*.} != "conf" ]; then
- configureName="$configureName.conf"
-fi
-
-#if the file referenced by name we have been given exists, then use it.
-if [ -e "$configureName" ]; then
-	configureFile="$configureName"
-	if $DEBUG; then
-		echo "using configuration file given: $configureFile"
-	fi
-else
-
-	for loc in ${locations[@]}
+if $SHOWOPTIONS; then
+	printf "\nAvailable options:\n"
+	for i in "${!configOptions[@]}"
 	do
-		for found in $loc/$configureName
-		do 
-			if [ -e "$found" ]; then
-				if $DEBUG; then
-					echo "found: $found"
-				fi
-				configureFile="$found"
-				break 2
-			fi
-		done
+		j=$(( $i + 1 ))
+		echo "  $j) ${configOptions[$i]} config : ${configFileLocations[$i]}"
 	done
+
+	printf "\nAvailable templates:\n"
+	for found in *.conf
+	do
+		echo "    $found"
+	done
+	return 1
+fi
+ 
+# check for .conf extension
+if [ ${configureName##*.} != "conf" ]; then
+	echo "Not a recognised *.conf file"
+	exit
 fi
 
-if [ -e $configureFile ]; then
-
-	if [ -z "$destDir" ]; then
-		cat "$configureFile"
-		return 0
-	fi
-	
-	cp $configureFile "$destDir/.$scriptName.conf"
-	if $LOUD; then
-		echo "copied $configureFile to $destDir/.$scriptName.conf"
-		if $VERBOSE; then
-			cat "$configureFile"
-		fi
-	fi
-else
-	if $LOUD; then
-		echo "Warning: $configureFile not found"
-	fi
+if [[ ! -f "$configureName" ]]; then
+	echo "$configureName not found"
+	exit
 fi
+
+# check file exists
+if ! $INSTALL; then
+		echo "Showing configuration in: $configureName"
+		echo "["
+		cat "$configureName"
+		printf "\n]\n"
+		exit 1
+fi
+
+# INSTALL
+
+if [[ "$option" = "" ]]; then
+	echo "Provide an option: --install <n>"
+ 
+	for i in "${!configOptions[@]}"
+	do
+		j=$(( $i + 1 ))
+		echo "  $j) ${configOptions[$i]}"
+	done
+	exit
+fi
+
+# INSTALL GO AHEAD
+
+j=$(( $option - 1 ))
+
+$LOUD && echo "cp"  "$configureName" "${configFileLocations[$j]}"
+$DRYRUN && echo "  --confirm required to proceed"
+$CONFIRM && cp  "$configureName" "${configFileLocations[$j]}"
+$CONFIRM && echo "done"
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 #Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."
