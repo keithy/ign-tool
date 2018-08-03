@@ -10,7 +10,7 @@ for creating a suite of scripts that have similar usage style to bzr/git.
 
 ## Features
 
-* supports default option flags (--verbose --quiet --help --debug --dry-run)
+* supports default option flags (--verbose --quiet --help --debug --dry-run --confirm)
 * finds sub-commands via a configurable search path
 * finds config files via a configurable search path
 * reads a config file (to set environment vars) before running sub-commands
@@ -28,7 +28,8 @@ Groan will always:
 	* --verbose
 	* --debug
 	* --quiet
-	* --dry-run 
+	* --dry-run  # enabled by default
+	* --confirm  # disables --dry-run flag for destructive operations
 * attempt to work out what platform it is running on. 
 * find and 'source' a config-file, prior to executing sub-commands.
 
@@ -38,7 +39,7 @@ Download the __groan__ project, rename its directory and all "groan" files to th
 
 ## Config Files
 
-Grown looks for config files in a number of places. This is configured in groan.locations Edit this locations file to use your own project name for it's own config files.
+Grown looks for config files in a number of places. This is configured in groan.locations. Edit the groan.locations file to use your own project name for it's own config files.
 
 ## Sub-Commands
 
@@ -91,6 +92,8 @@ A number of template conf files can be provided, the user can choose a file and 
         groan.conf
         
 ### Subcommand - self-install
+
+    groan self-install --link --confirm
 
 ## Testing
 
