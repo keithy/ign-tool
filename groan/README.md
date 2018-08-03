@@ -5,15 +5,15 @@ for creating a suite of scripts that have similar usage style to bzr/git.
 
 ## History
 
-This incarnation of groan was conceived in about 2009, in 2017 I used 'sub' extensively 
-and then fed that experience back into groan (in 2018), rather than port existing groan
-based projects. I also want to use groan as a base for incorporating "fish" based scripts
-if I should ever develop any.
+__groan__
 
-## How to fork and roll your own command
+/ɡrəʊn/
 
-Fork keithy/groan, to yourrepo/groan then create your working branch with the name of your new command
-then you can pull-request your enhancements, and others can see what you are using it for.
+_noun_
+	
+1. the noise that emits from a smalltalker forced to code in bash. 
+
+This incarnation of groan was conceived in about 2009, in 2017 I used 'sub' extensively and then fed that experience back into groan (in 2018), rather than port existing groan based projects. I also want to use groan as a base for incorporating "fish" based scripts if I should ever develop any.
 
 ## Groan vs sub
 
@@ -34,7 +34,8 @@ then you can pull-request your enhancements, and others can see what you are usi
 * sub-commands can run as source, exec, or eval
 * help subcommand included provides:
 	* list of help topics - `groan help topics`
-	* list of commands and their usage - `groan help commands` 
+	* list of commands and their usage - `groan help commands`
+	* markdown viewer support
 
 ## General Principles
 
@@ -51,7 +52,9 @@ Groan subcommands are called after having:
 
 ## Make Your own
 
-Download the __groan__ project, rename its directory and all "groan" files to that of your own chosen script name, e.g. "[grow](https://launchpad.net/grow)". 
+1. Download/clone the __groan__ project.
+2. Rename its directory and all "groan" files to that of your own chosen script name, e.g. "[grow](https://launchpad.net/grow)". 
+3. All files with "test" in the filename can be deleted, as they are only for testing or demonstration purposes.
 
 ## Config Files
 
@@ -80,13 +83,22 @@ The help subcommand included provides:
 		* e.g. `groan.commands.topic.sh`# lists the available commands
 	* `<name>.<topicname>.topic.rb` #evaled
 
+
 #### Help Meta Data
 
-Commands are implemented expecting that they may be run with the METADATAONLY flag, in which case they populate variables and exit prior to doing anything:
+Shell commands are implemented expecting that they may be run with the METADATAONLY flag, in which case they populate variables and exit prior to doing anything:
 
 * `$command`
 * `$description`
 * `$usage`
+
+Other language sub-commands supply their metadata in magic comments that are evaluated by bash e.g.
+
+	# meta-data (sourced by bash)
+	#m# command="ruby-test"
+	#m# description="testing ruby invocation"
+	#m# usage="usage:
+	#m# $scriptName ruby-test"
 
 ### Subcommand - environment
 
@@ -124,7 +136,8 @@ To verify all is well try:
     groan help test
     groan help commands
     groan help topics
-    groan con #outputs> Warning: Command 'con' is ambiguous (use --debug for more info)
+    groan help test-markdown
+    groan tes #outputs> Warning: Command 'tes' is ambiguous (use --debug for more info)
     groan env
     groan env -a
     groan env --eval "echo $PATH"
@@ -138,5 +151,6 @@ To verify all is well try:
     groan self-install /usr/local/bin --link --confirm
     groan self-install /usr/local/bin --link --unlink 
     groan self-install /usr/local/bin --link --unlink --confirm
+    groan test-ruby
     
     
