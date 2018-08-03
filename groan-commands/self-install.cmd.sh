@@ -12,6 +12,8 @@ $scriptName self-install --unlink"
 $SHOWHELP && printf "$command - $description\n\n$usage"
 $METADATAONLY && return
 
+$DEBUG && echo "Command: '$command'"
+
 ADDACTION=false
 ADDLINK=false
 UNLINK=false

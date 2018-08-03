@@ -34,7 +34,8 @@ This incarnation of groan was conceived in about 2009, in 2017 I used 'sub' exte
 * sub-commands can run as source, exec, or eval
 * help subcommand included provides:
 	* list of help topics - `groan help topics`
-	* list of commands and their usage - `groan help commands` 
+	* list of commands and their usage - `groan help commands`
+	* markdown viewer support
 
 ## General Principles
 
@@ -135,6 +136,7 @@ To verify all is well try:
     groan help test
     groan help commands
     groan help topics
+    groan help test-markdown
     groan tes #outputs> Warning: Command 'tes' is ambiguous (use --debug for more info)
     groan env
     groan env -a

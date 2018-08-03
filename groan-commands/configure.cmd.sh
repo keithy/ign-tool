@@ -17,6 +17,8 @@ $scriptName configure --help        # this message"
 $SHOWHELP && printf "$command - $description\n\n$usage"
 $METADATAONLY && return
 
+$DEBUG && echo "Command: '$command'"
+
 option=""
 configureName=""
 SHOWCONFIG=true

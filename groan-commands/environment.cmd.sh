@@ -15,6 +15,8 @@ $scriptName environment --help"
 $SHOWHELP && printf "$command - $description\n\n$usage"
 $METADATAONLY && return
 
+$DEBUG && echo "Command: '$command'"
+
 GETEXEC=false
 what="env"
 for arg in "$@"  

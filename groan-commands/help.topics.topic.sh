@@ -1,27 +1,30 @@
 echo "Help topics - $scriptName help <topic>"
 echo
 
-preamble="$scriptName.help.topics-preamble.txt"
-postscript="$scriptName.help.topics-postfix.txt"
+preamble="help.topics.pre-script.md"
+postscript="help.topics.post-script.md"
 
-if [ -e $preamble ]; then
-	cat $preamble
+if [ -f $preamble ]; then
+	${markdownViewerUtility%% *} ${markdownViewerUtility#* } $preamble
 fi
 
 METADATAONLY=true
 
-target="$scriptName.help.*.topic.*"
+target="help.*.topic.*"
 
 previous="" 	
 for loc in ${locations[@]}
 do
-	[[ "$previous" == "$loc" ]] && break
+	[[ "$previous" == "$loc" ]] && continue
 	previous="$loc"
 
 	for found in $loc/$target
 	do
+	
+		$DEBUG && echo "Looking for $target in: $loc"
+
 		if [[ -f "$found" ]]; then
-			$DEBUG && echo "found #$count : $found"
+			$DEBUG && echo "Found topic: $found"
 			
 			topic=${found%.*}
 			topic=${topic%.*}
@@ -33,8 +36,8 @@ do
 	done
 done
 
-if [ -e $postscript ]; then
-	cat $postscript
+if [ -f $preamble ]; then
+	${markdownViewerUtility%% *} ${markdownViewerUtility#* } $postscript
 fi
 
 echo

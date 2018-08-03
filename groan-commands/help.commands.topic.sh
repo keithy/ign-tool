@@ -1,31 +1,36 @@
 echo "Help commands - $scriptName <command>"
 echo
 
-preamble="$scriptName.help.commands.preamble.txt"
-postscript="$scriptName.help.commands.postscript.txt"
+preamble="help.commands.pre-script.md"
+postscript="help.commands.post-script.md"
 
 if [ -f $preamble ]; then
-	cat $preamble
+	${markdownViewerUtility%% *} ${markdownViewerUtility#* } $preamble
 fi
 
+# run all commands collecting metadata
 METADATAONLY=true
 
-target="$scriptName.*.cmd.*"
+target="*.cmd.*"
 
 previous=""
 for loc in ${locations[@]} ; do
 
-	[[ "$previous" == "$loc" ]] && break
+	[[ "$previous" == "$loc" ]] && continue
 	previous="$loc"
 	
+	$DEBUG && echo "Looking for $target in: $loc"
+
 	for found in $loc/$target
 	do
 		if [[ -f "$found" ]]; then
-			$DEBUG && echo "found #$count : $found"
 			
 			if [[ "$found" = *".sh" ]]; then
+				$DEBUG && echo "Sourcing for metadata: $found"
 				source $found
 			else
+				$DEBUG && echo "Evaluating magic comments for metadata in: $found"
+				$DEBUG && echo $(sed -n 's|^#m# \(.*\)$|\1|p' $found)
 				eval "$(sed -n 's|^#m# \(.*\)$|\1|p' $found)"
 			fi
 								
@@ -40,18 +45,25 @@ echo
 previous=""
 for loc in ${locations[@]} ; do
 
-	[[ "$previous" == "$loc" ]] && break
+	[[ "$previous" == "$loc" ]] && continue
 	previous="$loc"
+
+	$DEBUG && echo "Looking for $target in: $loc"
 	
 	for found in $loc/$target
 	do
 		if [ -f "$found" ]; then
 
-			$DEBUG && echo "found #$count : $found"
+			$DEBUG && echo "Found #$count : $found"
 			
 			if [[ "$found" = *".sh" ]]; then
+				$DEBUG && echo "Sourcing for metadata: $found"
 				source $found
+				
 			else
+				$DEBUG && echo "Evaluating magic comments for metadata in: $found"
+				$DEBUG && echo $(sed -n 's|^#m# \(.*\)$|\1|p' $found)
+				
 				eval "$(sed -n 's|^#m# \(.*\)$|\1|p' $found)"
 			fi
 								
@@ -61,7 +73,7 @@ for loc in ${locations[@]} ; do
 done
 
 if [ -f $postscript ]; then
-	cat $postscript
+		   	${markdownViewerUtility%% *} ${markdownViewerUtility#* } $postscript
 fi
 
 echo
