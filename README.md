@@ -139,5 +139,6 @@ To verify all is well try:
     groan self-install /usr/local/bin --link --confirm
     groan self-install /usr/local/bin --link --unlink 
     groan self-install /usr/local/bin --link --unlink --confirm
+    groan ruby-test
     
     
