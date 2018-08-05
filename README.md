@@ -1,7 +1,30 @@
 # Groan
 
+/ɡrəʊn/
+
+_noun_
+	
+1. the noise that emits from a smalltalk programmer forced to code in bash. 
+
 Groan is a simple extensible bash framework (similar to [sub](https://github.com/basecamp/sub))
-for creating a suite of scripts that have similar usage style to bzr/git. 
+for creating a suite of scripts that have similar command, sub-command usage style to git/bzr/hg etc. 
+
+## Highlights
+
+Groan is recursively merge-able/compose-able. Assemble a named suite of sub-command scripts in a folder, 
+that folder may become a sub-command within another suite, or be merged into another suite.
+
+Groan uses/demonstrates this internally to implement the help sub-command. 
+The `groan help` sub-command of `groan` is implemented by the nested command `helper`. 
+
+In the folder hierarchy yourcommandname/groan/helper there is a fully functioning suite of 
+bash commands called "helper", nested as a sub-command within another suite called "groan", 
+merged with another for you to customize called "yourcommandname". 
+
+## How to fork and roll your own command
+
+Fork to yourrepo/groan then create your working branch with the name of your new command suite
+then you can pull-request your enhancements, and others can see what you are using it for.
 
 ## History
 
@@ -10,13 +33,9 @@ and then fed that experience back into groan (in 2018), rather than port existin
 based projects. I also want to use groan as a base for incorporating "fish" based scripts
 if I should ever develop any.
 
-## How to fork and roll your own command
-
-Fork keithy/groan, to yourrepo/groan then create your working branch with the name of your new command
-then you can pull-request your enhancements, and others can see what you are using it for.
-
 ## Groan vs sub
 
+* Is recursively composeable and mergeable
 * Is much simpler than sub
 * Sub-commands provide usage and documentation
 * Support for additional documentation topics/reporting
@@ -34,8 +53,9 @@ then you can pull-request your enhancements, and others can see what you are usi
 * sub-commands can run as source, exec, or eval
 * help subcommand included provides:
 	* list of help topics - `groan help topics`
-	* list of commands and their usage - `groan help commands` 
-
+	* list of commands and their usage - `groan help commands`
+	* markdown viewer support
+	
 ## General Principles
 
 Groan subcommands are called after having:
@@ -124,6 +144,7 @@ To verify all is well try:
     groan help test
     groan help commands
     groan help topics
+    groan help test-markdown
     groan con #outputs> Warning: Command 'con' is ambiguous (use --debug for more info)
     groan env
     groan env -a

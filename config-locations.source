@@ -10,11 +10,14 @@ configFileLocations=(
 
 #locations to search for commands
 
-locations=(
+overidingLocations=(
 	"$workingDir"
 	"$scriptDir"
-	"$scriptDir/$scriptName-commands"
-	"$scriptDir/groan/groan-commands" # merge sub-commands with groan
+)
+
+locations=(
+	"$scriptDir/$scriptName-commands" # own sub-commands
+	"$scriptDir/groan/groan-commands" # merge with groan sub-commands 
 )
 
 markdownViewerUtility="mdv -t 715.1331"

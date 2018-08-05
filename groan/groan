@@ -18,8 +18,7 @@ commonOptions="common options:
 --verbose | -V       Verbose
 --debug   | -d | -D  Debug - tell all
 --dry-run            # default
---confirm            # not a dry run - perform action
-"
+--confirm            # not a dry run - perform action"
 
 #default flags
 DEBUG=false
@@ -95,6 +94,7 @@ if [ -L "$scriptFile" ]; then
 	scriptFile=`readlink -n $scriptFile`
 fi
 scriptName=${scriptFile##*/} # `basename $scriptFile` 
+breadcrumbs="$scriptName"
 scriptDir=${scriptFile%/*} # `dirname $scriptFile`
 configLocationsFile="$scriptDir/$configLocationsFileName"
 workingDir=$(pwd)
@@ -125,75 +125,11 @@ do
 	fi
 done
 
-# no command provided default to subcommmand help --help
-if [[ "$command" = "" ]]; then
-	echo
-	sh $scriptFile help --help
-	exit
-fi
+dispatchLocations=("${locations[@]}")   
 
-target="${command}*.cmd.*"
-exact="${command}.cmd.*"
+source "$scriptFile-commands/dispatch-command.sh"
 
-count=0
-previous=""
-for loc in ${locations[@]} 
-do
-	[[ "$previous" == "$loc" ]] && continue
-	previous="$loc"
-	
-	$DEBUG && echo "Looking for $target in: $loc"
+# "This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
+# Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed
+# subject to the same license."
 
-	# if an exact match is available - upgrade the target to prioritise the exact match
-	for found in $loc/$exact
-	do
-		target=$exact
-	done
-
-	for found in $loc/$target
-	do
-		count=$((count + 1))	
-		$DEBUG && echo "Found #$count : $found"
-	done
-
-	if [ $count -gt 1 ]; then
-		$LOUD && echo "Warning: Command '$command' is ambiguous (use --debug for more info)"
-		exit
-	fi
-
-	arg_str="${args[@]:+${args[@]}}" # needed bash<=4.1 when set -u is on
-	
-	for found in $loc/$target
-	do
-		case ${found##*.} in
-			sh)
-				$DEBUG && echo "Running source: $found $arg_str"
-				source "$found" "${args[@]:+${args[@]}}"
-				exit 0
-			;;
-			exec)
-				$DEBUG && echo "Running exec: $found $arg_str"
-				exec "$found" "${args[@]:+${args[@]}}"
-				exit 0
-			;;
-			*)
-				$DEBUG && echo "Extracting metadata from: $found"
-				$DEBUG && sed -n 's|^#m# \(.*\)$|\1|p' "$found"
-				
-				#evaluate meta-data first
-				eval "$(sed -n 's|^#m# \(.*\)$|\1|p' $found)"
-				
-				$DEBUG && echo "Running eval: $found $arg_str"				
-				eval "$found" "${args[@]:+${args[@]}}"
-			    exit 0
-			;;
-		esac
-		exit
-	done
-done
-
-$LOUD && echo "Warning: $scriptName sub-command $command not found"
-exit 1
-
-#"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
-#Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."

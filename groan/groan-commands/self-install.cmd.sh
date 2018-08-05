@@ -6,10 +6,10 @@
 command="self-install"
 description="install in system"
 usage="usage:
-$scriptName self-install /usr/local/bin --link
-$scriptName self-install --unlink"
+$breadcrumbs self-install /usr/local/bin --link
+$breadcrumbs self-install --unlink"
 
-$SHOWHELP && printf "$command - $description\n\n$usage"
+$SHOWHELP && printf "$command - $description\n\n$usage\n"
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"
@@ -71,6 +71,7 @@ fi
 
 if ! $ADDACTION; then
 	echo "No action specified ( --link )"
+	exit
 fi
 
 #no destination specified
@@ -96,7 +97,7 @@ if $ADDLINK; then
 	$LOUD && echo "ln -s $scriptFile $installPath/$scriptName"
 	$DRYRUN && echo "  --confirm required to proceed"
 	$CONFIRM && ln -s "$scriptFile" "$installPath/$scriptName" 
-	$CONFIRM && echo "Installed symbolic link from $destDir/$scriptName to $scriptFile"
+	$CONFIRM && echo "Installed symbolic link from $installPath/$scriptName to $scriptFile"
 fi
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 

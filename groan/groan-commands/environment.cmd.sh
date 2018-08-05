@@ -7,12 +7,12 @@
 command="environment"
 description="show script/environment variables"
 usage="usage:
-$scriptName environment 
-$scriptName environment [--all|-a]
-$scriptName environment [--eval "expr"] - evaluate expression in script context
-$scriptName environment --help"
+$breadcrumbs environment 
+$breadcrumbs environment [--all|-a]
+$breadcrumbs environment [--eval "expr"] - evaluate expression in script context
+$breadcrumbs environment --help"
 
-$SHOWHELP && printf "$command - $description\n\n$usage"
+$SHOWHELP && printf "$command - $description\n\n$usage\n"
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"

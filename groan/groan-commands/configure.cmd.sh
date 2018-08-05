@@ -4,17 +4,16 @@
 #
 #
 
-
 command="configure"
 description="select configuration file"
 usage="usage:
-$scriptName configure --show        # default behaviour
-$scriptName configure --options     # list available options
-$scriptName configure someones.conf # view file
-$scriptName configure someones.conf --install 1 # install at option 1
-$scriptName configure --help        # this message"
+$breadcrumbs configure --show        # default behaviour
+$breadcrumbs configure --options     # list available options
+$breadcrumbs configure someones.conf # view file
+$breadcrumbs configure someones.conf --install 1 # install at option 1
+$breadcrumbs configure --help        # this message"
 
-$SHOWHELP && printf "$command - $description\n\n$usage"
+$SHOWHELP && printf "$command - $description\n\n$usage\n"
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"

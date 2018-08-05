@@ -11,8 +11,8 @@ configFileLocations=(
 #locations to search for commands
 
 overidingLocations=(
-	"$workingDir"
-	"$scriptDir"
+ 	"$workingDir"
+ 	"$scriptDir"
 )
 
 locations=(
