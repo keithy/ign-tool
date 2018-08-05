@@ -12,7 +12,7 @@ for loc in ${locations[@]} ; do
 	previous="$loc"
 	
 	$DEBUG && echo "Looking for $target in: $loc"
-	
+		
 	len=$(( ${#scriptDir} - ${#scriptName} ))
 	breadcrumbs=${loc:$len:1000}
 	breadcrumbs=${breadcrumbs%/*}

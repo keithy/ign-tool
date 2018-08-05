@@ -14,5 +14,6 @@ $breadcrumbs $command --help      #this text"
 
 $METADATAONLY && return
 
+implemented_by="helper"
 source "$commandsLocation/dispatch-subcommand.sh"
 #source "$selfLocation/dispatch-subcommand.sh"

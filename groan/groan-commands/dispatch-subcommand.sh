@@ -4,12 +4,13 @@
 #
 # pass on to subcommand's dispatch-command.sh
 
-subcommandsLocation="${commandsLocation%/*}/$command/$command-commands"
+subcommandsLocation="${commandsLocation%/*}/$command/$implemented_by-commands"
 dispatchLocations=( "$subcommandsLocation" )
 locations+=("$subcommandsLocation")
 
 $DEBUG && echo "Breadcrumbs: $breadcrumbs"
 $DEBUG && echo "This command: $command"
+$DEBUG && echo "This implemented_by: $implemented_by"
 $DEBUG && echo "Args: ${args[*]:-}"
 
 newSubcommand=${args[0]:-}
