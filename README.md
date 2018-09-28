@@ -75,7 +75,7 @@ Download the __groan__ project, rename its directory and all "groan" files to th
 
 ## Config Files
 
-Grown looks for config files in a number of places. This is configured in groan.locations. Edit the groan.locations file to use your own project name for it's own config files.
+Groan looks for config files in a number of places. This is configured in groan.locations. Edit the groan.locations file to use your own project name for it's own config files.
 
 ## Sub-Commands
 
