@@ -16,8 +16,8 @@ overidingLocations=(
 )
 
 locations=(
-	"$scriptDir/$scriptName-commands" # own sub-commands
-	"$scriptDir/groan/groan-commands" # merge with groan sub-commands 
+	"$scriptDir/commands" # own commands
+	"$scriptDir/groan/commands" # merge with groan commands 
 )
 
 markdownViewerUtility="mdv -t 715.1331"

@@ -16,7 +16,7 @@ overidingLocations=(
 )
 
 locations=(
-	"$scriptDir/$scriptName-commands"
+	"$scriptDir/commands"
 )
 
 markdownViewerUtility="mdv -t 715.1331"
