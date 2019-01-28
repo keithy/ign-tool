@@ -10,18 +10,33 @@
 
 thisScriptName="${BASH_SOURCE##*/}"
 parentCommand="${thisScriptName%.*.*.*}"
-breadcrumbs+=($parentCommand)
-breadcrumbsStr=${breadcrumbs[*]// /|}
-scriptDir="${subcommandsLocation%/*}/$parentCommand"
-configLocationsFile="$scriptDir/$configLocationsFileName"
-command=${args[0]:-}
-args=("${args[@]:1}")
 
 $DEBUG && echo "This Script Name: $thisScriptName"
-$DEBUG && echo "Parent command: $parentCommand"
+$DEBUG && echo "Parent command '$parentCommand' Args(${#args[@]}): ${args[@]:+${args[@]}}"
+
+breadcrumbs+=($parentCommand)
+breadcrumbsStr=${breadcrumbs[*]// /|}
+
 $DEBUG && echo "Breadcrumbs: $breadcrumbsStr"
-$DEBUG && echo "Child command: $command"
-$DEBUG && echo "Args: $args"
+
+scriptDir="${subcommandsLocation%/*}/$parentCommand"
+configLocationsFile="$scriptDir/$configLocationsFileName"
+
+# Shift $args
+command=""
+params=()
+for arg in "${args[@]}"
+do 
+    if [ -z $command ]; then
+    	command="$arg"
+    else
+        params+=("$arg")
+    fi  
+done
+
+args=("${params[@]:+${params[@]}}")
+ 
+$DEBUG && echo "Child command: '$command' args(${#args[@]}): ${args[@]:+${args[@]}}"
 
 if [ "$command" = "" ]; then
 	command="help"
@@ -85,12 +100,13 @@ do
 	do
 		case ${found##*.} in
 			sh)
-				$DEBUG && echo "Running source: $found $arg_str"
-				source "$found" "${args[@]:+${args[@]}}"
+				$DEBUG && echo "Source: $found $arg_str"
+				set -- "${args[@]:+${args[@]}}"
+				source "$found"
 				exit 0
 			;;
 			exec)
-				$DEBUG && echo "Running exec: $found $arg_str"
+				$DEBUG && echo "Exec:: $found $arg_str"
 				exec "$found" "${args[@]:+${args[@]}}"
 				exit 0
 			;;
@@ -101,7 +117,7 @@ do
 				#evaluate meta-data first
 				eval "$(sed -n 's|^#m# \(.*\)$|\1|p' $found)"
 				
-				$DEBUG && echo "Running eval: $found $arg_str"				
+				$DEBUG && echo "Eval: $found $arg_str"				
 				eval "$found" "${args[@]:+${args[@]}}"
 			    exit 0
 			;;
