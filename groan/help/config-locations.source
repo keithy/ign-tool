@@ -3,21 +3,19 @@
 configOptions=("local" "user" "global")
 
 configFileLocations=(
-	"$workingDir/$scriptName.conf" # --local
-	"$HOME/.$scriptName.conf"      # --user
-	"$scriptDir/$scriptName.conf"  # --global
+	"$workingDir/$commandName.conf" # --local
+	"$HOME/.$commandName.conf"      # --user
+	"$commandDir/$commandName.conf"  # --global
 )
 
 #locations to search for commands
 
-overidingLocations=(
- 	"$workingDir"
- 	"$scriptDir"
+locations=(
+	"$configDir/help-commands"
 )
 
-locations=(
-	"$scriptDir/commands"
-)
+defaultDispatch="_help_dispatch.sh"
+defaultSubSubcommand="default"
 
 markdownViewerUtility="mdv -t 715.1331"
 

@@ -9,7 +9,7 @@
 #m# command="test-ruby"
 #m# description="testing ruby invocation"
 #m# usage="usage:
-#m# $scriptName test-ruby"
+#m# $commandName test-ruby"
 
 puts "Hello its ruby!"
 

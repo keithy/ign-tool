@@ -3,14 +3,14 @@
 configOptions=("local" "user" "global")
 
 configFileLocations=(
-	"$workingDir/$commandName.conf" # --local
-	"$HOME/.$commandName.conf"      # --user
-	"$commandDir/$commandName.conf"  # --global
+	"$workingDir/$scriptName.conf" # --local
+	"$HOME/.$scriptName.conf"      # --user
+	"$scriptDir/$scriptName.conf"  # --global
 )
 
 #locations to search for commands
 locations=(
-	"$configDir/groan-commands"
+	"$scriptDir/sub-commands"
 )
 
 defaultDispatch="_dispatch.sh"

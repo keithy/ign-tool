@@ -16,4 +16,4 @@ $SHOWHELP && printf "$scriptName $commonOptions\n\n"
 $SHOWHELP && printf "$breadcrumbsStr - $description\n\n$usage\n\n"
 $METADATAONLY && return 
 
-printf "here"
+printf "Help on help\n"

@@ -1,4 +1,4 @@
-# grow.configure.sh
+# groan configure.sub.sh
 #
 # by Keith Hodges 2010
 #

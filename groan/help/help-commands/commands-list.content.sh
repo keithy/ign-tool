@@ -3,7 +3,13 @@
 # by Keith Hodges 2018
 
 METADATAONLY=true
-target="*.cmd.*"
+target="*.sub.*"
+
+list=()
+
+readLocations $commandDir
+
+list+=("${locations[@]}")
 
 previous=""
 for loc in ${locations[@]} ; do

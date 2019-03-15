@@ -3,22 +3,19 @@
 configOptions=("local" "user" "global")
 
 configFileLocations=(
-	"$workingDir/$scriptName.conf" # --local
-	"$HOME/.$scriptName.conf"      # --user
-	"$scriptDir/$scriptName.conf"  # --global
+	"$workingDir/$commandName.conf" # --local
+	"$HOME/.$commandName.conf"      # --user
+	"$commandDir/$commandName.conf"  # --global
 )
 
 #locations to search for commands
-
-overidingLocations=(
-	"$workingDir"
-	"$scriptDir"
-)
-
 locations=(
-	"$scriptDir/commands" # own commands
-	"$scriptDir/groan/commands" # merge with groan commands 
+	"$configDir/sub-commands" # your own sub-commands
+	"$configDir/groan/groan-commands" # merge with groan sub-commands 
 )
+
+defaultDispatch="_dispatch.sh"
+defaultSubSubcommand="default"
 
 markdownViewerUtility="mdv -t 715.1331"
 

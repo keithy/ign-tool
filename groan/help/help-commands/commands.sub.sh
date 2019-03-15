@@ -1,4 +1,4 @@
-# grow help list-commands.cmd.sh
+# groan help -commands.cmd.sh
 #
 # by Keith Hodges 2018
 
@@ -10,21 +10,17 @@ $breadcrumbs $command"
 $SHOWHELP && printf "$command - $description\n\n$scriptName $commonOptions\n\n$usage\n"
 $METADATAONLY && return 
 
-echo "Help list - $scriptName <command>"
+commandOrientation "${BASH_SOURCE}"
+$DEBUG && commandOrientationDebug
+
+echo "Help list - commands"
 echo
 
-preamble="list.pre-script.md"
-postscript="list.post-script.md"
+ 
+$DEBUG && echo " Sourcing: $thisScriptDir/list-commands.content.sh"
+source $thisScriptDir/list-commands.content.sh
 
-if [ -f $preamble ]; then
-	${markdownViewerUtility%% *} ${markdownViewerUtility#* } $preamble
-fi
-
-source $dispatchLocation/list-commands.content.sh
-
-if [ -f $postscript ]; then
-		   	${markdownViewerUtility%% *} ${markdownViewerUtility#* } $postscript
-fi
+ 
 
 echo
 
