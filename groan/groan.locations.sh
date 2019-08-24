@@ -1,21 +1,21 @@
 #locations to search for configuration *.conf files
 
-configOptions=("local" "user" "global")
+configOptions=("--local" "--user" "--global")
 
 configFileLocations=(
-	"$workingDir/$scriptName.conf" # --local
-	"$HOME/.$scriptName.conf"      # --user
-	"$scriptDir/$scriptName.conf"  # --global
+	"$workingDir/$commandName.conf.sh"  # --local
+	"$HOME/.$commandName.conf.sh"       # --user
+	"$commandDir/$commandName.conf.sh"  # --global
 )
 
 #locations to search for commands
 locations=(
-	"$scriptDir/sub-commands"
+	"$configDir/../groan/groan-commands"
 )
 
 defaultDispatch="_dispatch.sh"
-defaultSubSubcommand="default"
-
+defaultSubcommand="help"
+ 
 markdownViewerUtility="mdv -t 715.1331"
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 

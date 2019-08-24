@@ -3,14 +3,14 @@
 configOptions=("local" "user" "global")
 
 configFileLocations=(
-	"$workingDir/$commandName.conf" # --local
-	"$HOME/.$commandName.conf"      # --user
+	"$workingDir/$commandName.conf"  # --local
+	"$HOME/.$commandName.conf"       # --user
 	"$commandDir/$commandName.conf"  # --global
 )
 
 #locations to search for commands
 locations=(
-	"$configDir/sub-commands" # your own sub-commands
+	"$configDir/sub-commands"         # your own sub-commands
 	"$configDir/groan/groan-commands" # merge with groan sub-commands 
 )
 

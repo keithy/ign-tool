@@ -1,11 +1,11 @@
 #locations to search for configuration *.conf files
 
-configOptions=("local" "user" "global")
+configOptions=("--local" "--user" "--global")
 
 configFileLocations=(
-	"$workingDir/$commandName.conf" # --local
-	"$HOME/.$commandName.conf"      # --user
-	"$commandDir/$commandName.conf"  # --global
+	"$workingDir/$commandName.conf.sh"  # --local
+	"$HOME/.$commandName.conf.sh"       # --user
+	"$commandDir/$commandName.conf.sh"  # --global
 )
 
 #locations to search for commands
@@ -15,8 +15,8 @@ locations=(
 )
 
 defaultDispatch="_help_dispatch.sh"
-defaultSubSubcommand="default"
-
+defaultSubcommand="default"
+ 
 markdownViewerUtility="mdv -t 715.1331"
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 

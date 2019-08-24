@@ -21,20 +21,20 @@ GETEXEC=false
 what="env"
 for arg in "$@"  
 do
-	$DEBUG && echo "Arg: $arg"
-	if $GETEXEC; then
-		what=$arg
-		GETEXEC=false
-		continue
-	fi
-	case $arg in
-    	--all | -a)
-	   		what="set"
-		;;
-	  	--eval | -e)
-	   		GETEXEC=true
-	    ;;
-	esac
+    $DEBUG && echo "Arg: $arg"
+    if $GETEXEC; then
+        what=$arg
+        GETEXEC=false
+        continue
+    fi
+    case $arg in
+    --all | -a)
+        what="set"
+    ;;
+    --eval | -e)
+        GETEXEC=true
+    ;;
+    esac
 done
 
 $VERBOSE && echo $what
