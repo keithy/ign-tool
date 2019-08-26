@@ -56,28 +56,30 @@ function readConfig
     done
 }
 
-# Passing In: $found $args_as_str
+# Args: "$found" "${args[@]:+${args[@]}}" # needed bash<=4.1 when set -u is on
+ 
 function executeScript {
-    case ${1##*.} in
+ 
+    case ${found##*.} in
         sh)
-            $DEBUG && echo "Running source: $1 ${2:-}"
-            source "$1" "${2:-}"
+            $DEBUG && echo "Running source: $found ${args[@]:+${args[@]}}"
+            source "$found" "${args[@]:+${args[@]}}"
             exit 0
         ;;
         exec)
-            $DEBUG && echo "Running exec: $found ${2:-}"
-            exec "$1" "${2:-}"
+            $DEBUG && echo "Running exec: $found ${args[@]:+${args[@]}}"
+            exec "$found" "${args[@]:+${args[@]}}"
             exit 0
         ;;
         *)
-            $DEBUG && echo "Extracting metadata from: $1"
-            $DEBUG && sed -n 's|^#m# \(.*\)$|\1|p' "$1"
+            $DEBUG && echo "Extracting metadata from: $found"
+            $DEBUG && sed -n 's|^#m# \(.*\)$|\1|p' "$found"
 
             #evaluate meta-data first
-            eval "$(sed -n 's|^#m# \(.*\)$|\1|p' $1)"
+            eval "$(sed -n 's|^#m# \(.*\)$|\1|p' $found)"
 
-            $DEBUG && echo "Running eval: $1 ${2:-}"				
-            eval "$1" "${2:-}"
+            $DEBUG && echo "Running eval: $found ${args[@]:+${args[@]}}"				
+            eval "$found" "${args[@]:+${args[@]}}"
             exit 0
         ;;
     esac

@@ -28,7 +28,7 @@ LISTTEMPLATES=false
 INSTALL=false
 GETFILE=false
 
-for arg in "${args[@]:+${args[@]}}"
+for arg in "$@"
 do
     case "$arg" in
         --current|--show)

@@ -35,7 +35,6 @@ subcommandsLocation="$loc"
 
 for found in $loc/$target
 do
-    executeScript "$found" "${args[@]:+${args[@]}}" # needed bash<=4.1 when set -u is on
-
+    executeScript 
     exit 1
 done

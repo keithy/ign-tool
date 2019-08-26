@@ -1,4 +1,4 @@
-# grow.self-install.sh
+# groan.self-install.sh
 #
 # by Keith Hodges 2010
 #
