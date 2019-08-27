@@ -13,7 +13,7 @@ $breadcrumbs configure --local       # view local config
 $breadcrumbs configure --local --install someones.conf # view file
 $breadcrumbs configure --help        # this message"
 
-$SHOWHELP && printf "$command - $description\n\n$usage\n"
+$SHOWHELP && executeHelp
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"

@@ -9,7 +9,7 @@ usage="usage:
 $breadcrumbs self-install /usr/local/bin --link
 $breadcrumbs self-install --unlink"
 
-$SHOWHELP && printf "$command - $description\n\n$usage\n"
+$SHOWHELP && executeHelp
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"

@@ -6,6 +6,7 @@
 # e.g. groan help topics
 # The help sub-command invokes the dispatcher: _help_dispatch.sh
 
+# This approach supports partial matching of subcommands
 target="${subcommand}*.sub.*"
 exact="${subcommand}.sub.*"
 

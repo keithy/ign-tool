@@ -9,7 +9,7 @@ description="dummy (test for duplication)"
 usage="usage:
 $breadcrumbs test"
 
-$SHOWHELP && printf "$command - $description\n\n$usage\n"
+$SHOWHELP && executeHelp
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"

@@ -12,7 +12,7 @@ $breadcrumbs environment [--all|-a]
 $breadcrumbs environment [--eval "expr"] - evaluate expression in script context
 $breadcrumbs environment --help"
 
-$SHOWHELP && printf "$command - $description\n\n$usage\n"
+$SHOWHELP && executeHelp
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"
