@@ -48,12 +48,27 @@ function readConfig
     for configFile in ${configFileLocations[@]}
     do
         $DEBUG && echo "Looked for config in: $configFile"
-        if [[ -f $configFile ]]; then
+        if [[ -f "$configFile" ]]; then
                 $VERBOSE && echo "Reading configuration: $configFile"
                 source "$configFile"
                 break
         fi
     done
+}
+
+function readThemes
+{
+    for themeFile in ${themePath[@]}
+    do
+        if [[ -f "$themeFile" ]]
+        then
+            $DEBUG && echo "Reading theme script: $themeFile"
+            source "$themeFile"
+        else
+            $DEBUG && echo "Theme script not found: $themeFile"
+        fi
+    done
+    return 0
 }
 
 # Args: "$found" "${args[@]:+${args[@]}}" # needed bash<=4.1 when set -u is on
@@ -114,7 +129,7 @@ D_INDENT=""
 function subcommandOrientationDebug {
 
     echo "$D_INDENT workingDir: $workingDir" 		
-    echo "$D_INDENT thisScriptName: $thisScriptName"
+    echo "$D_INDENT thisScriptName: ${bold}$thisScriptName${reset}"
     echo "$D_INDENT thisScriptDir: $thisScriptDir"
     echo "$D_INDENT parentDir: ${parentDir:-}"
     echo "$D_INDENT parentCommand: '${parentCommand:-}' Args(${#args[@]}): ${args[@]:+${args[@]}}"
@@ -142,7 +157,8 @@ commonOptions="common options:
 --verbose | -V       Verbose
 --debug   | -d | -D  Debug - tell all
 --dry-run            # default
---confirm            # not a dry run - perform action"
+--confirm            # not a dry run - perform action
+--theme=light        # select an alternate colour theme"
 
 #default flags
 
@@ -153,6 +169,7 @@ DRYRUN=true
 CONFIRM=false
 SHOWHELP=false     #exec command and only display the help metadata
 METADATAONLY=false #exec command only as far as the help metadata
+THEME=default
 
 # Options processing pattern - search through the arguments for the command and flags
 
@@ -188,31 +205,32 @@ do
             DRYRUN=false
             CONFIRM=true
       ;;
+      --theme=*)
+            THEME=${arg##--theme=}
+      ;;
+      -*)
+          args+=($arg)
+      ;;
       *)
-            if [[ "$subcommand" = "" ]]; then
-               subcommand=$arg
-            else
-               args+=($arg)
-            fi
+          if [[ "$subcommand" = "" ]]; then
+             subcommand=$arg
+          else
+             args+=($arg)
+          fi
       ;;
     esac
     shift
 done
-
+ 
 breadcrumbs=("$commandName")
 commandDir=$(dirname "$commandFile")
-searchablePath=":$PATH:"
-
-if $DEBUG; then
-    echo "workingDir: $workingDir" 		
-    echo "commandFile: $commandFile"
-    echo "commandName: $commandName"
-    echo "commandDir: $commandDir"
-fi
 
 readLocations "$commandDir" "$commandName"
-readConfig 
+readConfig
+readThemes
 
+$VERBOSE && echo "${bold}SCRIPT${reset}: $workingDir${dim}/${reset}${bold}$commandName${reset}"
+ 
 # handle the default empty case
 [ -z "$subcommand" ] && subcommand="$defaultSubcommand"
 

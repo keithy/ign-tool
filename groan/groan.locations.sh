@@ -16,6 +16,8 @@ locations=(
 defaultDispatch="_dispatch.sh"
 defaultSubcommand="help"
  
+themePath=( "$commandDir/groan.themes.sh" "$commandDir/groan.theme-$THEME.sh" )
+
 markdownViewerUtility="mdv -t 715.1331"
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
