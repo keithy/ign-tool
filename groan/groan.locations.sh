@@ -10,7 +10,7 @@ configFileLocations=(
 
 #locations to search for commands
 locations=(
-	"$configDir/../groan/groan.commands"
+	"$commandDir/../groan/groan.commands"
 )
 
 defaultDispatch="_dispatch.sh"

@@ -1,14 +1,16 @@
-# groan help -commands.cmd.sh
+# groan help commands.cmd.sh
 #
 # by Keith Hodges 2018
+
+$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 command="commands"
 description="list available commands"
 usage="usage:
-$breadcrumbs $command"
+$breadcrumbs"
 
-$SHOWHELP && printf "$command - $description\n\n$scriptName $commonOptions\n\n$usage\n"
-$METADATAONLY && return 
+$SHOWHELP && executeHelp
+$METADATAONLY && return
 
 commandOrientation "${BASH_SOURCE}"
 $DEBUG && commandOrientationDebug

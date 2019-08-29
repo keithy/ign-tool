@@ -7,35 +7,36 @@
 # The help sub-command invokes the dispatcher: _help_dispatch.sh
 
 # This approach supports partial matching of subcommands
+
+$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
+
 target="${subcommand}*.sub.*"
 exact="${subcommand}.sub.*"
 
-$DEBUG && echo "Looking for $target in: $loc"
+$DEBUG && echo "Looking for $target in: $scriptDir"
 
 # if an exact match is available - upgrade the target to prioritize the exact match
-for found in $loc/$exact
+for scriptPath in $scriptDir/$exact
 do
     target=$exact
 done
 
 list=()
-for found in $loc/$target
+for scriptPath in $scriptDir/$target
 do
-    cmd=${found##*/}
-    cmd=${cmd%*.sub.*}
-    list+=($cmd)
-    $DEBUG && echo "Found #${#list[@]} : $found"
+    scriptName="${scriptPath##*/}"
+    scriptSubcommand="${scriptName%*.sub.*}"
+    list+=($scriptSubcommand)
+    $DEBUG && echo "Found #${#list[@]} : $scriptPath"
 done
 
 if [ ${#list[@]} -gt 1 ]; then
-    $LOUD && echo "Multiple options exist for requested '$subcommand' (${list[@]})"
+    $LOUD && echo "Multiple options exist for requested '${subcommand}' (${list[@]})"
     exit 1
 fi
- 
-subcommandsLocation="$loc"
 
-for found in $loc/$target
+for scriptPath in $scriptDir/$target
 do
-    executeScript 
+    executeScript "$scriptPath" "$scriptDir" "$scriptName" "$scriptSubcommand"
     exit 1
 done

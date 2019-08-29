@@ -12,39 +12,46 @@
 #  it looks for commands in a folder with the same name 
 #  ../$name/commands
 
-scriptName="${BASH_SOURCE##*/}"
-scriptDir="${BASH_SOURCE%/*}"
-scriptSubcommand="${scriptName%%.*}" # should be the same as $subcommand
+$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
-implementingCommand="${scriptName%.cmd.sh}"
-implementingCommand="${implementingCommand#*.sub.}"
-implementingCommandDir="${scriptDir%/*}/$implementingCommand"
+commandName="${scriptName%.cmd.sh}"
+commandName="${commandName#*.sub.}"
+commandDir="${scriptDir%/*}/$commandName"
 
-$DEBUG && echo "scriptName: $scriptName"
-$DEBUG && echo "implementingCommandDir: $implementingCommandDir"
+$DEBUG && echo "scriptName: ${bold}$scriptName${reset}"
+$DEBUG && echo "commandDir: $commandDir"
 
-readLocations "$implementingCommandDir" "$implementingCommand" 
-readConfig 
+readLocations 
 
 shiftArgsIntoNext
 subcommand="$next"
-[ -z "$subcommand" ] && subcommand="$defaultSubcommand"
-breadcrumbs+=($subcommand)
+[ -z "$subcommand" ] && subcommand="$defaultSubcommand" 
 
-$DEBUG && echo "$scriptSubcommand($implementingCommand) sub-command: '$subcommand' args(${#args[@]}): ${args[@]:+${args[@]}}"
+$DEBUG && echo "$scriptSubcommand($commandName) sub-command: '$subcommand' args(${#args[@]}): ${args[@]:+${args[@]}}"
 
-### dispatch
-for loc in "${locations[@]}"
-do 
-	if [ -f "$loc/_${scriptSubcommand}_dispatch.sh" ]; then
-		source "$loc/_${scriptSubcommand}_dispatch.sh"
-	else 
-#		source "$loc/$defaultDispatch"
-        :
-	fi
+# if no argument get the default for this command
+# given the argument look for commands that match
+for scriptDir in "${locations[@]}"
+do
+
+    if [ -f "$scriptDir/$defaultDispatch" ]; then
+        source "$scriptDir/$defaultDispatch"
+    fi
 done
 
-$LOUD && echo "Warning: ${breadcrumbs[*]// /|} $command : command  not found"
+# So no commands match the argument...
+
+
+### dispatch
+#for scriptDir in "${locations[@]}"
+#do
+#	if [ -f "$scriptDir/_${scriptSubcommand}_dispatch.sh" ]; then
+#            source "$scriptDir/_${scriptSubcommand}_dispatch.sh"
+#	fi
+#done
+
+$LOUD && echo "Not Found: ${bold}${breadcrumbs}${reset} sub-command '${bold}${subcommand}${reset}'."
+ 
 exit 1
 
 # "This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 

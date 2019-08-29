@@ -2,6 +2,8 @@
 #
 # by Keith Hodges 2010
 #
+$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
+
 # General Help On Commands
 
 # may have been invoked with a partial name
@@ -16,13 +18,12 @@ commonOptions="common options:
 "
 
 usage="usage:
-$scriptName help <command|topic>
-$scriptName help topics
-$scriptName help commands
-$scriptName help --help      #this text"
+$breadcrumbs help <command|topic>
+$breadcrumbs help commands
+$breadcrumbs help --help      #this text"
 
-$SHOWHELP && printf "$command - $description\n\n$scriptName $commonOptions\n$usage"
-$METADATAONLY && return 
+$SHOWHELP && executeHelp
+$METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"
 

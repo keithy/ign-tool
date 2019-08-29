@@ -12,7 +12,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 shopt -s nullglob # make sure globs are empty arrays if nothing is found
- 
+set -o allexport
+
 # FUNCTIONS
 
 function identifyPlatform
@@ -33,12 +34,10 @@ function identifyPlatform
 
 function readLocations
 {
-    local dir="$1"
-    local name="$2"
-
-    configDir="$1" #global used within <name>.locations.sh file
-    $DEBUG && echo "Reading Locations: ${dir}/${name}.locations.sh"
-    source "${dir}/${name}.locations.sh"
+  
+    #commandDir commandName globals used within <name>.locations.sh file
+    $DEBUG && echo "Reading Locations: ${commandDir}/${commandName}.locations.sh"
+    source "${commandDir}/${commandName}.locations.sh"
 
     return 0
 }
@@ -71,37 +70,48 @@ function readThemes
     return 0
 }
 
-# Args: "$found" "${args[@]:+${args[@]}}" # needed bash<=4.1 when set -u is on
+# Args: "${args[@]:+${args[@]}}" # pattern needed when set -u is on bash<=4.1
  
 function executeScript {
- 
-    case ${found##*.} in
+
+    scriptPath="$1"
+    scriptDir="$2"
+    scriptName="$3"
+    scriptSubcommand="$4"
+    breadcrumbs="${breadcrumbs} $scriptSubcommand"
+
+    case ${scriptPath##*.} in
         sh)
-            $DEBUG && echo "Running source: $found ${args[@]:+${args[@]}}"
-            source "$found" "${args[@]:+${args[@]}}"
+            $DEBUG && echo "Running source: $scriptPath ${args[@]:+${args[@]}}"
+            sourceScript "${args[@]:+${args[@]}}"
             exit 0
         ;;
         exec)
-            $DEBUG && echo "Running exec: $found ${args[@]:+${args[@]}}"
-            exec "$found" "${args[@]:+${args[@]}}"
+            $DEBUG && echo "Running exec: $scriptPath ${args[@]:+${args[@]}}"
+            exec "$scriptPath" "${args[@]:+${args[@]}}"
             exit 0
         ;;
         *)
-            $DEBUG && echo "Running metadata file: ${found/.sub.*/.meta.sh}"
-            source "${found/.sub.*/.meta.sh}" "${args[@]:+${args[@]}}"
+            $DEBUG && echo "Running metadata file: ${scriptPath/.sub.*/.meta.sh}"
+            source "${scriptPath/.sub.*/.meta.sh}" ${args[@]:+${args[@]}}
 
             $SHOWHELP && executeHelp
             $METADATAONLY && return
 
-            $DEBUG && echo "Running eval: $found ${args[@]:+${args[@]}}"				
-            eval "$found" "${args[@]:+${args[@]}}"
+            $DEBUG && echo "Running eval: $scriptPath ${args[@]:+${args[@]}}"				
+            eval "$scriptPath" ${args[@]:+${args[@]}}
             exit 0
         ;;
     esac
 }
 
+function sourceScript
+{
+    source "$scriptPath"
+}
+
 function executeHelp {
-   printf "$command - $description\n\n$usage\n"
+   printf "${bold}${breadcrumbs}${reset} - $description\n\n$usage\n"
 }
 
 function checkMarkdownViewer {
@@ -138,7 +148,7 @@ function subcommandOrientationDebug {
     echo "$D_INDENT parentDir: ${parentDir:-}"
     echo "$D_INDENT parentCommand: '${parentCommand:-}' Args(${#args[@]}): ${args[@]:+${args[@]}}"
     echo "$D_INDENT thisSubcommand: '$thisSubcommand' Args(${#args[@]}): ${args[@]:+${args[@]}}"
-    echo "$D_INDENT breadcrumbs: ${breadcrumbs[*]// /|}"
+    echo "$D_INDENT breadcrumbs: ${breadcrumbs}"
     D_INDENT+="  "
 }
 
@@ -152,6 +162,7 @@ if [ -L "$commandFile" ]; then
   commandFile=`readlink -n $commandFile`
 fi
 commandName=${commandFile##*/} # `basename $commandFile` 
+rootCommandName="$commandName"
 
 # our contribution to help
 
@@ -226,10 +237,11 @@ do
     shift
 done
  
-breadcrumbs=("$commandName")
-commandDir=$(dirname "$commandFile")
+breadcrumbs="$commandName"
+rootCommandDir=$(dirname "$commandFile")
+commandDir="$rootCommandDir"
 
-readLocations "$commandDir" "$commandName"
+readLocations
 readConfig
 readThemes
 
@@ -242,9 +254,9 @@ if $DEBUG; then
     echo "Sub-command: '$subcommand'"
 fi
 
-for loc in ${locations[@]} 
+for scriptDir in ${locations[@]} 
 do
-    source $loc/$defaultDispatch
+    source "$scriptDir/$defaultDispatch"
 done
 
 $LOUD && echo "Not Found: $commandName sub-command '$subcommand'."

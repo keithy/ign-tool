@@ -3,6 +3,7 @@
 # by Keith Hodges 2010
 #
 #
+$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 command="configure"
 description="select or edit configuration file"
@@ -117,8 +118,6 @@ if $EDITCONFIG; then
     echo "No configuration file found"
     return 1
 fi
-
-
  
 # auto-append .conf extension
 [ "${configureName##*.}" != "conf" ] && configureName="${configureName}.conf"

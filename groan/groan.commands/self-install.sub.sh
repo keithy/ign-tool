@@ -2,6 +2,7 @@
 #
 # by Keith Hodges 2010
 #
+$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 command="self-install"
 description="install in system"

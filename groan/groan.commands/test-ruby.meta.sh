@@ -5,7 +5,10 @@
 #
 # A Test
 
+$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
+
 # meta-data (sourced by bash)
+
 command="test-ruby"
 description="testing ruby invocation"
 usage="usage:

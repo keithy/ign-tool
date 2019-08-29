@@ -4,6 +4,8 @@
 #
 # A Debugging tool
 
+$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
+
 command="environment"
 description="show script/environment variables"
 usage="usage:
