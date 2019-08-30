@@ -11,7 +11,7 @@ configFileLocations=(
 #locations to search for commands
 locations=(
 	"$commandDir/sub-commands"         # your own sub-commands
-	"$commandDir/groan/groan-commands" # merge with groan sub-commands 
+	"$commandDir/groan/groan.commands" # merge with groan sub-commands 
 )
 
 defaultDispatch="_dispatch.sh"

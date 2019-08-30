@@ -1,30 +1,50 @@
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
+[![Build Status](https://travis-ci.com/keithy/groan-dev.svg?branch=master)](https://travis-ci.com/keithy/groan-dev)
+[![GitHub issues](https://img.shields.io/github/issues/keithy/groan.svg)](https://github.com/keithy/groan/issues)
+
 # Groan
 
 /ɡrəʊn/
 
 _noun_
 	
-1. the noise that emits from a smalltalk programmer forced to code in bash. 
+1. the noise that emits from programmers forced to code in bash. 
 
-Groan is a simple extensible bash framework (similar to [sub](https://github.com/basecamp/sub))
-for creating a suite of scripts that have similar command, sub-command usage style to git/bzr/hg etc. 
+`Groan` is a simple extensible bash framework (similar to [sub](https://github.com/basecamp/sub))
+for creating a suite of scripts that have similar command, sub-command usage style to git/bzr/hg etc.
 
-## Highlights
+To use `groan`, you rename the command to be the name of your choice.
+
+## Commands with sub-commands and sub-sub-commands...
+
+Roll your own gitlike command suites, complete with help-documentation help-topics and auto-completion.
+Support for standard options like --debug, --quiet is also included.
+
+## Clever Stuff
 
 Groan is recursively merge-able/compose-able. Assemble a named suite of sub-command scripts in a folder, 
-that folder may become a sub-command within another suite, or be merged into another suite.
+that folder may be made available alongside commands of another suite or nested as sub-commands within another suite.
 
 Groan uses/demonstrates this internally to implement the help sub-command. 
 The `groan help` sub-command of `groan` is implemented by the nested command `helper`. 
 
-In the folder hierarchy yourcommandname/groan/helper there is a fully functioning suite of 
-bash commands called "helper", nested as a sub-command within another suite called "groan", 
-merged with another for you to customize called "yourcommandname". 
+In the folder hierarchy `yourcommand/groan/helper` there is a fully functioning suite of 
+bash commands called `helper`, nested as a sub-command within another suite called `groan`, 
+merged with another for you to customize called `rename_me`. 
 
 ## How to fork and roll your own command
 
-Fork to yourrepo/groan then create your working branch with the name of your new command suite
-then you can pull-request your enhancements, and others can see what you are using it for.
+Fork **keithy/groan** to **yourrepo/yourcommand** then create your working branch with the name of your
+new command suite then you can pull-request your enhancements, and others can see what you are using it for.
+
+Rename files and directories `rename_me`, `rename_me.locations.sh`
+
+Your subcommands go into `sub-commands` folder.
+
+Add another nested/merged command by adding the folder. For an example of the `help` sub-command calling
+the nested `helper` command's own dispatcher for its sub-commands look at `help.sub.helper.cmd._dispatch.sh`
+
+To use this feature copy the file as is and rename it to point to any other sub-sub-command.
 
 ## History
 
@@ -69,23 +89,21 @@ Groan subcommands are called after having:
 * attempted to work out what platform it is running on. 
 * found and 'sourced' a config-file.
 
-## Make Your own
-
-Download the __groan__ project, rename its directory and all "groan" files to that of your own chosen script name, e.g. "[grow](https://launchpad.net/grow)". 
-
 ## Config Files
 
-Groan looks for config files in a number of places. This is configured in groan.locations. Edit the groan.locations file to use your own project name for it's own config files.
+Groan looks for config files in a number of places. This is configured in `rename_me.locations.sh`
 
 ## Sub-Commands
 
-...follow the convention `<groan>.<subcommand>.cmd.sh`
+...follow the convention `sub-commands/<subcommand>.sub.sh`
 
-* `<name>.cmd.sh` will source the subcommand
-* `<name>.cmd.exec` will exec the subcommand
-* `<name>.cmd.*` will eval the subcommand
-	* `<name>.cmd.rb`
-	* `<name>.cmd.fish` ...etc
+* `<name>.sub.sh` will source the subcommand
+* `<name>.sub.exec` will exec the subcommand
+* `<name>.sub.*` will eval the subcommand
+	* `<name>.sub.rb`
+	* `<name>.sub.fish` ...etc
+
+Non-shell scripts provide their help metadata via `<name>.meta.sh`
 
 ### Subcommand - help topics
 
@@ -112,24 +130,24 @@ Commands are implemented expecting that they may be run with the METADATAONLY fl
 
 The environment subcommand prints out the environment variables (or evaluates a given expression) in the context of where scripts will run, after applying the config file.
 
-* groan environment --eval "echo $PATH"
+* `groan environment --eval "echo $PATH"`
 
 ### Subcommand - configure
 
 A number of template conf files can be provided, the user can choose a file and a place to install it. Out of the box, local, user and global config options are provided
 
-    ./groan config --options
+    ./groan configure --options
     Available options:
-    1) local config : /Users/coding/wip/groan.conf
-    2) user config : /Users/bob/.groan.conf
+    1) local config  : /Users/coding/wip/groan.conf
+    2) user config   : /Users/bob/.groan.conf
     3) global config : /Users/bob/.local/bin/groan/groan.conf
        
     Available templates:
-        default.conf
+        default.conf (preset)
         
     Install configuration with:
     
-    ./groan config default.conf --install 3 --confirm 
+    ./groan config default.conf --install --local --confirm 
         
 ### Subcommand - self-install
 
@@ -137,27 +155,4 @@ A number of template conf files can be provided, the user can choose a file and 
 
 ## Test Suite
 
-To verify all is well try:
-
-    groan
-    groan help
-    groan help test
-    groan help commands
-    groan help topics
-    groan help test-markdown
-    groan con #outputs> Warning: Command 'con' is ambiguous (use --debug for more info)
-    groan env
-    groan env -a
-    groan env --eval "echo $PATH"
-    groan configure
-    groan configure --options
-    groan configure groan.conf
-    groan configure groan.conf --install
-    groan configure groan.conf --install 1
-    groan configure groan.conf --install 3 --confirm
-    groan self-install /usr/local/bin --link 
-    groan self-install /usr/local/bin --link --confirm
-    groan self-install /usr/local/bin --link --unlink 
-    groan self-install /usr/local/bin --link --unlink --confirm
-    
-    
+The comprehensive test suite is here http://github.com/keithy/groan-dev

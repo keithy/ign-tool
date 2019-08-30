@@ -152,5 +152,7 @@ $DRYRUN && echo "dryrun:  --confirm required to proceed"
 $CONFIRM && cp  "$configureName" "${configFileLocations[$i]}"
 $CONFIRM && echo "$configureName installed as $configOption configuration"
 
+exit 0
+
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 #Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."

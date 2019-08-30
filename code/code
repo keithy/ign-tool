@@ -138,20 +138,6 @@ function shiftArgsIntoNext {
     args=("${params[@]:+${params[@]}}")
 }
 
-
-D_INDENT=""
-function subcommandOrientationDebug {
-
-    echo "$D_INDENT workingDir: $workingDir" 		
-    echo "$D_INDENT thisScriptName: ${bold}$thisScriptName${reset}"
-    echo "$D_INDENT thisScriptDir: $thisScriptDir"
-    echo "$D_INDENT parentDir: ${parentDir:-}"
-    echo "$D_INDENT parentCommand: '${parentCommand:-}' Args(${#args[@]}): ${args[@]:+${args[@]}}"
-    echo "$D_INDENT thisSubcommand: '$thisSubcommand' Args(${#args[@]}): ${args[@]:+${args[@]}}"
-    echo "$D_INDENT breadcrumbs: ${breadcrumbs}"
-    D_INDENT+="  "
-}
-
 # START
 
 workingDir=$(pwd)
