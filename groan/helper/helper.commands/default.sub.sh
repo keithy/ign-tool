@@ -8,19 +8,13 @@ $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 # may have been invoked with a partial name
 # so set the full command name
-command="help"
+command="default"
 description="show topical help"
-commonOptions="common options:
---help    | -h | -?  Usage help for a command
---quiet   | -q       Quiet mode - say nothing
---verbose | -V       Verbose
---debug   | -d | -D  Debug - tell all
-"
-
-usage="usage:
-$breadcrumbs help <command|topic>
-$breadcrumbs help commands
-$breadcrumbs help --help      #this text"
+#since help doesn't exec anything many common options don't apply
+commonOptions="--theme=light    # alternate theme"
+usage="$breadcrumbs <command|topic>
+$breadcrumbs commands
+$breadcrumbs --help    # this text"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return
@@ -43,11 +37,13 @@ do
 done
 
 $DEBUG && echo "Help request: '$helpRequest'"
+
 	
 #check user has given us a file reference
 if [[ "$helpRequest" = "" ]]; then
-	printf "$scriptName $commonOptions\n$usage\nPlease give me a help topic\n"
-	exit 1
+  executeHelp
+  printf "\nPlease give me a help topic\n"
+  exit 1
 fi
 
 helpFile=""

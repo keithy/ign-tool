@@ -6,8 +6,11 @@
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
+#note $subcommand requested may be partial and $scriptSubcommand is the matched result 
 target="${subcommand}*.sub.*"
 exact="${subcommand}.sub.*"
+
+commandFileList+=("$commandFile")
 
 $DEBUG && echo "Looking for $target in: $scriptDir"
 
@@ -21,7 +24,8 @@ list=()
 for scriptPath in $scriptDir/$target
 do
     scriptName="${scriptPath##*/}"
-    scriptSubcommand="${scriptName%%.sub.*}"
+    scriptSubcommand="${scriptName%%.cmd.*}"
+    scriptSubcommand="${scriptSubcommand%%.sub.*}"
     list+=($scriptSubcommand)
     $DEBUG && echo "Found #${#list[@]} : $scriptPath"
 done
@@ -34,5 +38,10 @@ fi
 for scriptPath in $scriptDir/$target
 do
     executeScript "$scriptPath" "$scriptDir" "$scriptName" "$scriptSubcommand"
-    exit 1
+    breadcrumbsList+=("$breadcrumbs")
+
+    return
 done
+
+$LOUD && echo "Not Found: $breadcrumbs sub-command: '$subcommand'."
+exit 1

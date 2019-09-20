@@ -4,41 +4,72 @@
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
-command="commands"
-description="list available commands"
+command="topic"
+description="display topics"
 #since help doesn't exec anything many common options don't apply
 commonOptions="--theme=light    # alternate theme"
-usage="$breadcrumbs    # list commands"
+usage="$breadcrumbs <topic_title>   # show topics"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return
- 
-function list_commands()
+
+#Options processing 
+TOPIC="$1"
+
+function search_topics()
 {
   commandFile="$1"
   readLocations "$commandFile"
+
 
   for loc in ${locations[@]} ; do
 
     $DEBUG && echo "Looking for $target in: $loc"
 
-    for scriptPath in $loc/*
+    for scriptPath in $loc/*.cmd.*
     do
       scriptName="${scriptPath##*/}"        
       scriptPrefix="${scriptName%%.cmd.*}"
       if [[ "$scriptPrefix" =~ [^.].*\.sub\. ]]; then
         if [[ -f "$scriptPath" ]]; then
           scriptSubcommand="${scriptPrefix%%.sub.*}"
-
           breadcrumbs="$2"
         
           executeScript "$scriptPath" "$loc" "$scriptName" "$scriptSubcommand"
- 
-          printf "%-45s" "$breadcrumbs"
-          echo "$description"
+         
         fi
       fi
     done
+
+    target="${TOPIC}*.topic.*"
+    
+    # if an exact match is available - upgrade the target to prioritize the exact match
+    for scriptPath in $loc/$TOPIC.topic.*
+    do
+        target="$TOPIC.topic.*"
+    done
+
+    for topicPath in $loc/$target
+     do
+ 
+       if [[ -f "$topicPath" ]]; then
+         topicFile="${topicPath##*/}"
+         topicName="${topicFile%%.topic.md}"
+         breadcrumbs="$2"
+
+         echo "$breadcrumbs topic $topicName"
+          case ${topicPath##*.} in
+              txt)
+                  cat "$topicPath"
+                  return
+              ;;
+              md)
+                  mdv "$topicPath"
+                  return
+              ;;
+          esac
+       fi
+     done
   done
 }
 
@@ -53,8 +84,6 @@ do
   firstCommandFile="${commandFileList[0]}"
   firstBreadcrumbs="${breadcrumbsList[0]}"
 
-  echo "${bold}${firstCommandFile##*/} commands:${reset}"
-
   if $DEBUG; then
     echo
     for i in "${!commandFileList[@]}"; do    
@@ -64,7 +93,7 @@ do
     echo
   fi
 
-  list_commands "$firstCommandFile" "$firstBreadcrumbs"
+  search_topics "$firstCommandFile" "$firstBreadcrumbs"
 
   #remove first command file from list
   old_array=("${commandFileList[@]}")
