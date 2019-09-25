@@ -18,36 +18,29 @@
 # 3) any other bespoke script or dispatcher
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
-
-commandName="${scriptName#*sub.}" # keep everything after first .sub.
-commandName="${commandName%%.cmd.*}"  # keep everything up to first .cmd.
-commandDir="${scriptDir%/*}/$commandName"
-dispatchName="${scriptName#*.cmd.}"  # keep everything after first .cmd.
-
 $DEBUG && echo "scriptName: ${bold}$scriptName${reset}"
-$DEBUG && echo "commandDir: $commandDir"
 
-readLocations "$commandDir/$commandName"
+readLocations "$destPath"
 
 shiftArgsIntoNext
 subcommand="$next"
 [ -z "$subcommand" ] && subcommand="$defaultSubcommand" 
 
-$DEBUG && echo "$scriptSubcommand($commandName $dispatchName) args(${#args[@]}): ${args[@]:+${args[@]}}"
+breadcrumbs="$breadcrumbs $scriptSubcommand"
 
+$DEBUG && echo "$scriptSubcommand($destCommand $destSubcommandName) args(${#args[@]}): ${args[@]:+${args[@]}}"
 
 # if no argument get the default for this command
 # given the argument look for commands that match
 for scriptDir in "${locations[@]}"
 do
-  if [ -f "$scriptDir/$dispatchName" ]; then
-    source "$scriptDir/$dispatchName"
+  if [ -f "$scriptDir/$destSubcommandName" ]; then
+    source "$scriptDir/$destSubcommandName"
     return
   fi
 done
 
-# So no commands match the argument...
- 
+# No commands match the argument...
 $LOUD && echo "Not Found: ${bold}${breadcrumbs}${reset} sub-command '${bold}${subcommand}${reset}'."
  
 exit 1

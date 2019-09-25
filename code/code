@@ -38,18 +38,19 @@ function readLocations
   commandDir=$(dirname "$commandFile")
   commandName=${commandFile##*/} # `basename $commandFile` 
 
-  locations=("$commandDir/$commandName.commands") #default
+  locations=("${commandFile}.commands") #default
   defaultSubcommand="_default" #default
   defaultDispatch="_dispatch.sh"
 
   #commandDir commandName globals used within <name>.locations.sh file
 
-  locationsConfig="${commandDir}/${commandName}.locations.sh"
-  $DEBUG && echo "Reading Locations: $locationsConfig"
+  locationsConfig="${commandFile}.locations.sh"
+
   if [ -f "$locationsConfig" ]; then  
+    $DEBUG && echo "Locations< $locationsConfig"
     source "$locationsConfig"
   else 
-    $DEBUG && echo "^^ not found"
+    $DEBUG && echo "LocationsX $locationsConfig"
   fi
   return 0
 }
@@ -58,9 +59,9 @@ function readConfig
 {
     for configFile in ${configFileLocations[@]:-}
     do
-        $DEBUG && echo "Looked for config in: $configFile"
+        $DEBUG && echo "Config? $configFile"
         if [[ -f "$configFile" ]]; then
-                $VERBOSE && echo "Reading configuration: $configFile"
+                $VERBOSE && echo "Config< $configFile"
                 source "$configFile"
                 break
         fi
@@ -74,10 +75,10 @@ function readThemes
     do
         if [[ -f "$themeFile" ]]
         then
-            $DEBUG && echo "Reading theme script: $themeFile"
+            $DEBUG && echo "Theme< $themeFile"
             source "$themeFile"
         else
-            $DEBUG && echo "Theme script not found: $themeFile"
+            $DEBUG && echo "ThemeX $themeFile"
         fi
     done
 
@@ -86,42 +87,39 @@ function readThemes
 
 # Args: "${args[@]:+${args[@]}}" # pattern needed when set -u is on bash<=4.1
  
-function executeScript {
+function executeScriptPath {
 
-    scriptPath="$1"
-    scriptDir="$2"
-    scriptName="$3"
-    scriptSubcommand="$4"
+  scriptPath="$1"
 
-    if [ "$scriptSubcommand" != "$defaultSubcommand" ]; then
-       breadcrumbs="${breadcrumbs} $scriptSubcommand"
-    fi
+  local title="Running"
+  $METADATAONLY && title="Metadata<"
 
-    case ${scriptPath##*.} in
-        sh)
-            $DEBUG && echo "Running source: $scriptPath ${args[@]:+${args[@]}}"
-            sourceScript "${args[@]:+${args[@]}}"
-            return
-        ;;
-        exec)
-            $DEBUG && echo "Running exec: $scriptPath ${args[@]:+${args[@]}}"
-            exec "$scriptPath" "${args[@]:+${args[@]}}"
-            return
-        ;;
-        *)
-            $DEBUG && echo "Running metadata file: ${scriptPath/.sub.*/.meta.sh}"
-            source "${scriptPath/.sub.*/.meta.sh}" ${args[@]:+${args[@]}}
+  case ${scriptPath##*.} in
+    sh)
+        $DEBUG && echo "$title source> $scriptPath ${args[@]:+${args[@]}}"
+        sourceScript "${args[@]:+${args[@]}}"
+        return
+    ;;
+    exec)
+        $DEBUG && echo "$title exec> $scriptPath ${args[@]:+${args[@]}}"
+        exec "$scriptPath" "${args[@]:+${args[@]}}"
+        return
+    ;;
+    *)
+        $DEBUG && echo "Metadata< ${scriptPath/.sub.*/.meta.sh}"
+        source "${scriptPath/.sub.*/.meta.sh}" ${args[@]:+${args[@]}}
 
-            $SHOWHELP && executeHelp
-            $METADATAONLY && return
+        $SHOWHELP && executeHelp
+        $METADATAONLY && return
 
-            $DEBUG && echo "Running eval: $scriptPath ${args[@]:+${args[@]}}"				
-            eval "$scriptPath" ${args[@]:+${args[@]}}
-            return
-        ;;
-    esac
+        $DEBUG && echo "Eval> $scriptPath ${args[@]:+${args[@]}}"				
+        eval "$scriptPath" ${args[@]:+${args[@]}}
+        return
+    ;;
+  esac
 }
 
+#Sourcing a script is done via this function, so that args are mapped in to $@
 function sourceScript
 {
     source "$scriptPath"
@@ -181,6 +179,7 @@ commonOptions="common options:
 #default flags
 
 DEBUG=false
+DDEBUG=false
 VERBOSE=false
 LOUD=true
 DRYRUN=true
@@ -196,6 +195,9 @@ subcommand=""
 for arg in "$@"
 do
     case "$arg" in
+      -DD)
+            DDEBUG=true
+      ;;
       --debug | -d | -D)
             DEBUG=true
             VERBOSE=true
@@ -256,8 +258,6 @@ if $DEBUG; then
     echo "Sub-command: '$subcommand'"
 fi
 
-commandFileList=()
-breadcrumbsList=()
 for scriptDir in ${locations[@]} 
 do
     dispatcher="$scriptDir/${defaultDispatch}"

@@ -32,7 +32,7 @@ function list_commands()
 
           breadcrumbs="$2"
         
-          executeScript "$scriptPath" "$loc" "$scriptName" "$scriptSubcommand"
+          executeScriptPath "$scriptPath" "$loc" "$scriptName" "$scriptSubcommand"
  
           printf "%-45s" "$breadcrumbs"
           echo "$description"
