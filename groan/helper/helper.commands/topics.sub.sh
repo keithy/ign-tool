@@ -1,98 +1,101 @@
-# groan help commands.cmd.sh
+# groan help topics.sub.sh
 #
-# by Keith Hodges 2018
+# by Keith Hodges 2019
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
-command="topics"
-description="list available documentation topics"
+command="$scriptSubcommand"
+description="list available commands"
 #since help doesn't exec anything many common options don't apply
 commonOptions="--theme=light    # alternate theme"
-usage="$breadcrumbs    # list topics"
+usage="$breadcrumbs    # list commands"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return
- 
-function list_commands()
+
+function list_topics()
 {
   commandFile="$1"
-  readLocations "$commandFile"
+  crumbs="$2"
  
-  for loc in ${locations[@]} ; do
+  readLocations "$commandFile"
 
-    $DEBUG && echo "Looking for $target in: $loc"
-
-    for scriptPath in $loc/*.cmd.*
+  for scriptDir in ${locations[@]} ; do
+    local first=true
+    for topicPath in $scriptDir/*.topic.{md,html,txt}
     do
-      scriptName="${scriptPath##*/}"        
-      scriptPrefix="${scriptName%%.cmd.*}"
-      if [[ "$scriptPrefix" =~ [^.].*\.sub\. ]]; then
-        if [[ -f "$scriptPath" ]]; then
-          scriptSubcommand="${scriptPrefix%%.sub.*}"
-          breadcrumbs="$2"
-        
-          executeScript "$scriptPath" "$loc" "$scriptName" "$scriptSubcommand"
-         
-        fi
-      fi
-    done
+      $first && printf "${dim}${commandFileList[i]##*/} topics:${reset}\n"
 
-   for topicPath in $loc/*.topic.{md,html,txt}
-    do
       if [[ -f "$topicPath" ]]; then
         topicFile="${topicPath##*/}"
         topicName="${topicFile%%.topic.*}"
         breadcrumbs="$2"
         
-        echo "$breadcrumbs topic $topicName"         
+        echo "$breadcrumbs topic ${bold}$topicName${reset}"         
       fi
+      first=false
     done
-
   done
 }
 
-$DEBUG && echo "METADATAONLY=${bold}true${reset}"
-METADATAONLY=true
+commandFileList=()
+crumbsList=()
+find_commands "$rootCommandFile" ${rootCommandFile##*/}
 
-commandFileList=("$rootCommandFile")
-breadcrumbsList=(${rootCommandFile##*/})
- 
-until [ ${#commandFileList} -eq 0 ]
-do
-  firstCommandFile="${commandFileList[0]}"
-  firstBreadcrumbs="${breadcrumbsList[0]}"
 
-  echo "${bold}${firstCommandFile##*/} topics:${reset}"
+TOPIC="${1:-}"
 
-  if $DEBUG; then
-    echo
-    for i in "${!commandFileList[@]}"; do    
-         printf "(%d) %-45s" $i ${breadcrumbsList[i]}
-         echo "${commandFileList[i]}"
-    done
-    echo
-  fi
-
-  list_commands "$firstCommandFile" "$firstBreadcrumbs"
-
-  #remove first command file from list
-  old_array=("${commandFileList[@]}")
-  old_bc_list=("${breadcrumbsList[@]}")
-  commandFileList=()
-  breadcrumbsList=()
-  for i in "${!old_array[@]}"; do
-    if [ "${old_array[i]}" != "$firstCommandFile" ]; then
-      commandFileList+=( "${old_array[i]}" )
-      breadcrumbsList+=( "${old_bc_list[i]}" )
-    fi
+if [ -z "$TOPIC" ]; then
+  for i in "${!commandFileList[@]}"
+  do
+    list_topics "${commandFileList[i]}" "${crumbsList[i]}"
   done
-  unset old_array
-  unset old_bc_list
   
   echo
-done
 
-exit 0
+  exit 0
+fi
+
+if [ -n "$TOPIC" ]; then
+  for i in "${!commandFileList[@]}"
+  do
+    readLocations "${commandFileList[i]}"
+
+    for scriptDir in ${locations[@]} ; do
+  
+      target="${TOPIC}*.topic.*"
+
+      # if an exact match is available - upgrade the target to prioritize the exact match
+      for topicPath in "$scriptDir/$TOPIC.topic."*
+      do
+          target="$TOPIC.topic.*"
+      done
+
+      for topicPath in $scriptDir/$target
+       do
+
+         if [[ -f "$topicPath" ]]; then
+           topicFile="${topicPath##*/}"
+           topicName="${topicFile%%.topic.md}"
+           breadcrumbs="${crumbsList[i]}"
+
+           echo "$breadcrumbs $command $topicName"
+            case ${topicPath##*.} in
+                txt)
+                    cat "$topicPath"
+                    return
+                ;;
+                md)
+                    mdv "$topicPath"
+                    return
+                ;;
+            esac
+         fi
+       done
+    done
+  done
+  exit 0
+fi
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 #Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."

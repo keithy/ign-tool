@@ -10,7 +10,9 @@
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
-#This function implements the format/policy of each command script for this folder
+#######
+#These functions implement the format/policy of each command script for this folder
+#######
 function parseScriptPath()
 {
   scriptPath="$1"
@@ -34,6 +36,40 @@ function parseScriptPath()
 
     fi
   fi
+}
+
+# Recursively scan the subcommands for those that call the dispatcher of a contained command
+# find_commands populates two arrays
+# commandFileList= each element is a sub-command file (e.g. helper)
+# breadcrumbsList= each element is a list of subcommands that reaches the above command
+
+function find_commands()
+{
+  local commandFile="$1"
+  local crumbs="$2"
+
+  commandFileList+=("$commandFile")
+  crumbsList+=("$crumbs")
+
+  local scriptDir
+  local scriptPath
+
+  readLocations "$commandFile"
+
+  for scriptDir in "${locations[@]}"
+  do
+    for scriptPath in "$scriptDir"/*.sub.*.cmd.*
+    do
+      parseScriptPath "$scriptPath"
+
+      if [ -n "scriptSubcommand" ]; then
+        if ! [[ "$destSubcommandName" == *.sub.* ]]; then #this subcommand invokes a dispatcher
+          crumbs="$2 $scriptSubcommand"
+          find_commands "$destPath" "$crumbs"
+        fi
+      fi
+    done
+  done
 }
 
 #note $subcommand requested may be partial and $scriptSubcommand is the matched result
@@ -64,6 +100,7 @@ done
 if [ ${#list[@]} -eq 1 ]; then #One script matches
   for scriptPath in $scriptDir/$target
   do
+      [[ "$scriptSubcommand" == _* ]] || breadcrumbs="$breadcrumbs $scriptSubcommand"
       executeScriptPath "$scriptPath"
       return
   done
@@ -74,16 +111,27 @@ if [ ${#list[@]} -gt 1 ]; then
     exit 1
 fi
 
-if [ ${#list[@]} -eq 0 ]; then #not found scenario
-  args=("$target" ${args[@]:+${args[@]}})
-  for scriptPath in $scriptDir/_not_found_sub.*
+#not found scenario
+
+args=("$subcommand" ${args[@]:+${args[@]}})
+for scriptPath in $scriptDir/_not_found_sub.*
+do
+  scriptName="${scriptPath##*/}"
+  scriptSubcommand=""
+  scriptRoute="${scriptName##_not_found_sub.}"  #remove 
+  destCommand="${scriptRoute%.cmd.*}" #remove after cmd 
+  destPath="${scriptDir%/*}/${destCommand}/${destCommand}"
+  destSubcommandName="${scriptRoute#*.cmd.}"  # keep everything after .cmd.
+
+  readLocations "$destPath"
+  for scriptDir in "${locations[@]}"
   do
-     scriptPath="$scriptPath"
-     parseScriptPath "$scriptPath"
-     executeScriptPath "$scriptPath"
-     return
+      executeScriptPath "$scriptDir/$destSubcommandName"
   done
-fi
+  return
+done
 
 $LOUD && echo "Not Found: $breadcrumbs ${bold}$subcommand${reset}"
 exit 1
+
+

@@ -1,10 +1,10 @@
-# groan help commands.cmd.sh
+# groan help topic.cmd.sh
 #
-# by Keith Hodges 2018
+# by Keith Hodges 2019
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
-command="topic"
+command="$scriptSubcommand"
 description="display topics"
 #since help doesn't exec anything many common options don't apply
 commonOptions="--theme=light    # alternate theme"

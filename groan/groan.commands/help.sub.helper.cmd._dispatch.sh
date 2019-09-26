@@ -26,8 +26,6 @@ shiftArgsIntoNext
 subcommand="$next"
 [ -z "$subcommand" ] && subcommand="$defaultSubcommand" 
 
-breadcrumbs="$breadcrumbs $scriptSubcommand"
-
 $DEBUG && echo "$scriptSubcommand($destCommand $destSubcommandName) args(${#args[@]}): ${args[@]:+${args[@]}}"
 
 # if no argument get the default for this command
