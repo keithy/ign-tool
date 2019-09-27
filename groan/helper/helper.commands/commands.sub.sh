@@ -1,6 +1,6 @@
-# groan help commands.cmd.sh
+# groan help commands.sub.sh
 #
-# by Keith Hodges 2018
+# by Keith Hodges 2019
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
@@ -12,73 +12,67 @@ usage="$breadcrumbs    # list commands"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return
- 
-function list_commands()
+
+function list_subcommands()
 {
   commandFile="$1"
+  crumbs="$2"
+ 
   readLocations "$commandFile"
 
-  for loc in ${locations[@]} ; do
+  for scriptDir in ${locations[@]} ; do
 
-    $DEBUG && echo "Looking for $target in: $loc"
+    # The default case without any subcommands (if not hidden)
+    if ! [[ "$defaultSubcommand" == _* ]] ; then    
+     for scriptPath in $scriptDir/$defaultSubcommand.sub.*
+      do
+        parseScriptPath "$scriptPath"
+        $DEBUG && echo "Parsed: …${scriptDir##*/}${dim}/${reset}$scriptName (${scriptSubcommand:-no subcommand})" 
+        METADATAONLY=true
+        executeScriptPath "$scriptPath"  
 
-    for scriptPath in $loc/*
+        printf "%-45s" "$crumbs"
+        echo "$description"
+      done
+    fi
+
+    for scriptPath in $scriptDir/*.sub.*
     do
-      scriptName="${scriptPath##*/}"        
-      scriptPrefix="${scriptName%%.cmd.*}"
-      if [[ "$scriptPrefix" =~ [^.].*\.sub\. ]]; then
-        if [[ -f "$scriptPath" ]]; then
-          scriptSubcommand="${scriptPrefix%%.sub.*}"
+      parseScriptPath "$scriptPath"
 
-          breadcrumbs="$2"
-        
-          executeScriptPath "$scriptPath" "$loc" "$scriptName" "$scriptSubcommand"
- 
-          printf "%-45s" "$breadcrumbs"
-          echo "$description"
-        fi
+      $DEBUG && echo "Parsed: …${scriptDir##*/}${dim}/${reset}$scriptName (${scriptSubcommand:-no subcommand})" 
+
+      if [ -n "$scriptSubcommand" ]; then
+        [[ "$scriptSubcommand" == _* ]] || crumbs="$2 $scriptSubcommand"
+
+        METADATAONLY=true
+        executeScriptPath "$scriptPath"  
+
+        printf "%-45s" "$crumbs"
+        echo "$description"
       fi
     done
   done
 }
 
-$DEBUG && echo "METADATAONLY=${bold}true${reset}"
-METADATAONLY=true
+commandFileList=()
+crumbsList=()
+find_commands "$rootCommandFile" ${rootCommandFile##*/}
 
-commandFileList=("$rootCommandFile")
-breadcrumbsList=(${rootCommandFile##*/})
- 
-until [ ${#commandFileList} -eq 0 ]
-do
-  firstCommandFile="${commandFileList[0]}"
-  firstBreadcrumbs="${breadcrumbsList[0]}"
-
-  echo "${bold}${firstCommandFile##*/} commands:${reset}"
-
-  if $DEBUG; then
-    echo
-    for i in "${!commandFileList[@]}"; do    
-         printf "(%d) %-45s" $i ${breadcrumbsList[i]}
-         echo "${commandFileList[i]}"
-    done
-    echo
-  fi
-
-  list_commands "$firstCommandFile" "$firstBreadcrumbs"
-
-  #remove first command file from list
-  old_array=("${commandFileList[@]}")
-  old_bc_list=("${breadcrumbsList[@]}")
-  commandFileList=()
-  breadcrumbsList=()
-  for i in "${!old_array[@]}"; do
-    if [ "${old_array[i]}" != "$firstCommandFile" ]; then
-      commandFileList+=( "${old_array[i]}" )
-      breadcrumbsList+=( "${old_bc_list[i]}" )
-    fi
+if $DEBUG; then # print out results of recursive search
+  echo
+  for i in "${!commandFileList[@]}"; do    
+       printf "(%d) %-45s" $i ${crumbsList[i]}
+       echo "${commandFileList[i]}"
   done
-  unset old_array
-  unset old_bc_list
+  echo
+fi
+
+for i in "${!commandFileList[@]}"
+do
+  echo "${bold}${commandFileList[i]##*/} commands:${reset}"
+
+  list_subcommands "${commandFileList[i]}" "${crumbsList[i]}"
   
   echo
 done

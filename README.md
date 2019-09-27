@@ -17,13 +17,13 @@ To use `groan`, you rename the command to be the name of your choice.
 
 ## Commands with sub-commands and sub-sub-commands...
 
-Roll your own gitlike command suites, complete with help-documentation help-topics and auto-completion.
+Roll your own gitlike command suites, complete with help-documentation help-topics.
 Support for standard options like --debug, --quiet is also included.
 
 ## Clever Stuff
 
 Groan is recursively merge-able/compose-able. Assemble a named suite of sub-command scripts in a folder, 
-that folder may be made available alongside commands of another suite or nested as sub-commands within another suite.
+that folder may be made available alongside, or nested as sub-commands within another suite.
 
 Groan uses/demonstrates this internally to implement the help sub-command. 
 The `groan help` sub-command of `groan` is implemented by the nested command `helper`. 

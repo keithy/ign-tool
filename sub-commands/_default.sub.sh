@@ -1,18 +1,22 @@
-#!/usr/bin/env bash
-# groan.test-ruby.cmd.rb
+# groan test.sh
 #
-# by Keith Hodges 2017
+# by Keith Hodges 2010
 #
-# A Test
+# A Dummy
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
-# meta-data (sourced by bash)
-
-command="test-ruby"
-description="testing ruby invocation"
+command="test"
+description="dummy (test for duplication)"
 usage="usage:
-$commandName test-ruby"
+$breadcrumbs test"
+
+$SHOWHELP && executeHelp
+$METADATAONLY && return
+
+echo "This is a placeholder"
+
+exit 0
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 #Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."
