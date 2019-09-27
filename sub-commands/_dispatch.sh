@@ -31,7 +31,7 @@ function parseScriptPath()
 
       scriptSubcommand="${scriptRoute%%.sub.*}" # everything before the first .sub
       destCommand="${scriptRoute#*sub.}"  # keep everything after first .sub.
-      destPath="${scriptDir%/*}/${destCommand}/${destCommand}"
+      destPath="${scriptDir%/*}/${destCommand}/${destCommand:-$commandName}"
       destSubcommandName="${scriptName#*.cmd.}"  # keep everything after .cmd.
 
     fi
