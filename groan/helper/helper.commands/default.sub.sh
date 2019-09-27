@@ -24,16 +24,16 @@ $DEBUG && echo "Command: '$command'"
 helpRequest=""
 for arg in $@
 do
-	case $arg in
-    	--all | -a)
-	   	VERBOSE=true
-		;;
-		*)
-		if [[ "$helpRequest" = "" ]]; then
-		   helpRequest=$arg
-		fi
-	    ;;
-	esac
+  case $arg in
+  --all | -a)
+      VERBOSE=true
+  ;;
+  *)
+      if [[ "$helpRequest" = "" ]]; then
+         helpRequest=$arg
+      fi
+  ;;
+  esac
 done
 
 $DEBUG && echo "Help request: '$helpRequest'"
@@ -54,52 +54,52 @@ previous=""
 
 for loc in ${locations[@]}
 do
-	$DEBUG && echo "Looking for $target in: $loc"
+  $DEBUG && echo "Looking for $target in: $loc"
 
-	[[ "$previous" == "$loc" ]] && continue
-	previous="$loc"
-	
-	$DEBUG && echo "Looking for $target in: $loc"
+  [[ "$previous" == "$loc" ]] && continue
+  previous="$loc"
 
-	# if an exact match is available - upgrade the target to prioritise the exact match
-	for found in $loc/$exact
-	do
-		target=$exact
-	done
-	
-	for found in $loc/$target
-	do
-		if [ -f "$found" ]; then
-			$DEBUG && echo "Found: $found"
-			helpFile="$found"
-			continue 2
-		fi
-	done
+  $DEBUG && echo "Looking for $target in: $loc"
+
+  # if an exact match is available - upgrade the target to prioritise the exact match
+  for found in $loc/$exact
+  do
+    target=$exact
+  done
+
+  for found in $loc/$target
+  do
+    if [ -f "$found" ]; then
+      $DEBUG && echo "Found: $found"
+      helpFile="$found"
+      continue 2
+    fi
+  done
 done
 
 if [[ "$helpFile" = "" ]]; then
-	$LOUD && echo "Warning: help for '$helpRequest' not found"
-	exit 1
+  $LOUD && echo "Warning: help for '$helpRequest' not found"
+  exit 1
 fi
 	
 case ${helpFile##*.} in
-    	txt | text)
-			$DEBUG && echo "Viewing txt: $found"
-		   	cat $helpFile
-		   	echo
-		;;
-	    md)
-			$DEBUG && echo "Using $markdownViewerUtility to display markdown: $found"
-		   	${markdownViewerUtility%% *} ${markdownViewerUtility#* } $helpFile
-	    ;;
-	  	sh)
-			$DEBUG && echo "Running source: $found"
-		   	source $helpFile
-	    ;;
-	    *)
-			$DEBUG && echo "Running eval: $found"
-		   	eval $helpFile
-	    ;;
+  txt | text)
+      $DEBUG && echo "Viewing txt: $found"
+      cat $helpFile
+      echo
+  ;;
+  md)
+      $DEBUG && echo "Using $markdownViewerUtility to display markdown: $found"
+      ${markdownViewerUtility%% *} ${markdownViewerUtility#* } $helpFile
+  ;;
+  sh)
+      $DEBUG && echo "Running source: $found"
+      source $helpFile
+  ;;
+  *)
+      $DEBUG && echo "Running eval: $found"
+      eval $helpFile
+  ;;
 esac
 
 exit 0

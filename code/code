@@ -114,7 +114,7 @@ function executeScriptPath {
 
         $DEBUG && echo "Eval> $scriptPath ${args[@]:+${args[@]}}"				
         eval "$scriptPath" ${args[@]:+${args[@]}}
-        return
+        exit 0
     ;;
   esac
 }
@@ -263,11 +263,10 @@ do
     dispatcher="$scriptDir/${defaultDispatch}"
     if [ -f "$dispatcher" ]; then
       source "$dispatcher"
-      exit 0
     fi
 done
 
-$LOUD && echo "Dispatcher Not Found: ${defaultDispatch:-_dispatch.sh}.
+$LOUD && echo "Not Found: $breadcrumbs ${bold}$subcommand${reset}"
 exit 1
 
 # "This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 

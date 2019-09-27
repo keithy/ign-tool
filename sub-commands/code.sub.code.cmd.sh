@@ -34,14 +34,8 @@ for scriptDir in "${locations[@]}"
 do
   if [ -f "$scriptDir/$destSubcommandName" ]; then
     source "$scriptDir/$destSubcommandName"
-    return
   fi
 done
-
-# No commands match the argument...
-$LOUD && echo "Not Found: ${bold}${breadcrumbs}${reset} sub-command '${bold}${subcommand}${reset}'."
- 
-exit 1
 
 # "This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 # Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed

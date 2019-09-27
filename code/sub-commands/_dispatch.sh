@@ -102,7 +102,7 @@ if [ ${#list[@]} -eq 1 ]; then #One script matches
   do
       [[ "$scriptSubcommand" == _* ]] || breadcrumbs="$breadcrumbs $scriptSubcommand"
       executeScriptPath "$scriptPath"
-      return
+      $METADATAONLY && return || exit 
   done
 fi
 
@@ -111,27 +111,6 @@ if [ ${#list[@]} -gt 1 ]; then
     exit 1
 fi
 
-#not found scenario
-
-args=("$subcommand" ${args[@]:+${args[@]}})
-for scriptPath in $scriptDir/_not_found_sub.*
-do
-  scriptName="${scriptPath##*/}"
-  scriptSubcommand=""
-  scriptRoute="${scriptName##_not_found_sub.}"  #remove 
-  destCommand="${scriptRoute%.cmd.*}" #remove after cmd 
-  destPath="${scriptDir%/*}/${destCommand}/${destCommand}"
-  destSubcommandName="${scriptRoute#*.cmd.}"  # keep everything after .cmd.
-
-  readLocations "$destPath"
-  for scriptDir in "${locations[@]}"
-  do
-      executeScriptPath "$scriptDir/$destSubcommandName"
-  done
-  return
-done
-
-$LOUD && echo "Not Found: $breadcrumbs ${bold}$subcommand${reset}"
-exit 1
+#not found scenario, continue to next dispatcher
 
 
