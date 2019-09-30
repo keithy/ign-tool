@@ -1,5 +1,6 @@
 *~
 .DS_Store
 .bzr*
+.version
 /nbproject
 /nbproject/private/

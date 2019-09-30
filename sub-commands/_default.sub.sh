@@ -1,4 +1,4 @@
-# groan test.sh
+# groan self-update.sh
 #
 # by Keith Hodges 2010
 #
@@ -6,10 +6,10 @@
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
-command="test"
-description="dummy (test for duplication)"
+command="self-update"
+description="Update to latest code (from git)"
 usage="usage:
-$breadcrumbs test"
+$breadcrumbs $command"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return

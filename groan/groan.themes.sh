@@ -2,7 +2,7 @@
 # http://www.karimsultan.com/live/?p=10136
  
 case $THEME in
-    plain)
+    none | off | 0)
         bold=$''  # Style Bold
         dim=$''   # Style Dim
         bold=$''  # Style Bold
