@@ -1,4 +1,4 @@
-# groan test.sub.sh
+# sensible test.sub.sh
 #
 # by Keithy 2019
 #

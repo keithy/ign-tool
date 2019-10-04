@@ -1,3 +1,6 @@
+The groan framework is a basis for building complex hierarchical CLI interfaces with bash and other languages,
+and aspires to achieve this with some degree of elegance, through hierarchical composition.
+
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
 [![Build Status](https://travis-ci.com/keithy/groan-dev.svg?branch=master)](https://travis-ci.com/keithy/groan-dev)
 [![GitHub issues](https://img.shields.io/github/issues/keithy/groan.svg)](https://github.com/keithy/groan/issues)
@@ -61,7 +64,7 @@ if I should ever develop any.
 ## Groan vs sub
 
 * Is recursively composeable and mergeable
-* Is much simpler than sub
+* Is simpler than sub
 * Sub-commands provide usage and documentation
 * Support for additional documentation topics/reporting
 * Demonstrates simple implementation conventions and patterns (e.g. options handling)
@@ -70,7 +73,7 @@ if I should ever develop any.
 
 ## Features
 
-* supports default option flags (--verbose --quiet --help --debug --dry-run --confirm)
+* supports default option flags (--verbose --quiet --help --debug --dry-run --confirm --ddebug)
 * finds sub-commands via a configurable search path (allows local overides)
 * finds config files via a configurable search path
 * reads a config file (to set environment vars) before running sub-commands
@@ -78,7 +81,7 @@ if I should ever develop any.
 * sub-commands can run as source, exec, or eval
 * help subcommand included provides:
 	* list of help topics - `groan help topics`
-	* list of commands and their usage - `groan help commands`
+	* list of commands and their usage - `groan help commands` / `groan commands`
 	* markdown viewer support
 	
 ## General Principles
@@ -86,11 +89,12 @@ if I should ever develop any.
 Groan subcommands are called after having:
 
 * processed and filtered out the standard set of flags.
-	* --verbose
-	* --debug
-	* --quiet
-	* --dry-run  # enabled by default
-	* --confirm  # disables --dry-run flag for destructive operations
+    * --verbose -V
+    * --debug -D
+    * --quiet 
+    * --dry-run    # enabled by default
+    * --confirm    # disables --dry-run flag for destructive operations
+    * --ddebug -DD # developer debug
 * attempted to work out what platform it is running on. 
 * found and 'sourced' a config-file.
 
@@ -110,18 +114,13 @@ Groan looks for config files in a number of places. This is configured in `renam
 
 Non-shell scripts provide their help metadata via `<name>.meta.sh`
 
-### Subcommand - help topics
+### Subcommand - help topics (provided by `helper`)
 
 The help subcommand included provides:
 
-* Display text file giving information on a topic e.g. `groan help test`
-	* `<name>.<topicname>.topic.txt`
-		* e.g. `groan.test.topic.txt`    
-* Generate topic information via code e.g. `groan help topics`
-	* `<name>.<topicname>.topic.sh` #sourced
-		* e.g. `groan.topics.topic.sh` # lists the available topics
-		* e.g. `groan.commands.topic.sh`# lists the available commands
-	* `<name>.<topicname>.topic.rb` #evaled
+* Display text file giving information on a topic e.g. `groan help topic test-topic`
+	* `<topicname>.topic.txt` e.g. `test-topic.topic.txt`    
+	* `<topicname>.topic.md`  e.g. `test-topic.topic.md`
 
 #### Help Meta Data
 
@@ -158,6 +157,39 @@ A number of template conf files can be provided, the user can choose a file and 
 
     groan self-install /usr/local/bin --link --confirm
 
+### Subcommand - remote (provided by `sensible`)
+
+  Expects to find remote host configuration has been provided via a `conf` file that can be loaded using `configure`. Example:
+
+```
+sensible_host_names=('test' 'atomic' 'rocky')
+ 
+declare -Ag sensible_deploy sensible_tags sensible_install
+
+sensible_install["_default_"]="/usr/local/bin"
+
+sensible_deploy[test]='localhost:/tmp/sensible'
+sensible_tags[test]='test'
+sensible_install[test]='/tmp'
+
+sensible_deploy[atomic]='keith@atomic.flat:/home/keith/base'
+sensible_install[atomic]='/home/keith/bin'
+sensible_tags[atomic]='server'
+```
+  
+  * Remote deploy via: `rename_me remote deploy --tag=test --install --confirm`
+  * Remote execute via: `rename_me remote exec --tag=all -- pwd`
+  * Remote undeploy via: `rename_me remote undeploy --tag=all --confirm`
+
+## Sub-command aliasing
+
+The script `groan/groan.commands/help.sub.helper.cmd._dispatch.sh` implements aliasing of one sub-command to another.
+If you copy this script and rename to `assistant.sub.helper.cmd._dispatch.sh` then the new `assistant` command
+will be handled by the enclosed `helper` command via `../helper/helper.commands/_dispatch.sh`.
+
+Aliasing can also be done, directly to another command e.g. `commands.sub.helper.cmd.commands.sub.sh`
+and within the same suite. e.g. `crumbs.sub..cmd.breadcrumbs.sub.sh`
+
 ## Test Suite
 
-The comprehensive test suite is here http://github.com/keithy/groan-dev
+The comprehensive test suite is here http://github.com/keithy/groan-dev using the `bash-spec` framework.

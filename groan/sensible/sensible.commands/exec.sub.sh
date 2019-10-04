@@ -1,4 +1,4 @@
-# sensible deploy.sub.sh
+# sensible exec.sub.sh
 #
 # by Keithy 2019
 #
@@ -9,7 +9,7 @@ command="deploy"
 description="deploy this command suite to remote hosts"
 usage=\
 "$breadcrumbs --hosts         # list configured hosts and their tags
-$breadcrumbs --tags=<a>,<b>  # select tagged hosts to deploy
+$breadcrumbs --tags=<a>,<b>  # select tagged hosts to execute on
 $breadcrumbs --help          # this message"
 
 $SHOWHELP && executeHelp
@@ -38,12 +38,19 @@ do
     --all)
       tags=('all')
     ;;
-    --*)
+    --)
+      shift
+      args=("$@")
+      break
     ;;
-    -*)
-    # ignore other options
+    --*)
+      args+=($arg)
+    ;;
+    *)
+      args+=($arg)
     ;;
   esac
+  shift
 done
  
 options=()
@@ -77,13 +84,9 @@ for host in ${sensible_host_names[@]}; do
     if [[ ",all,${sensible_tags[$host]}," == *,"$tag,"* ]]; then
  
       $LOUD && echo "${host}(${tag}):" ${sensible_deploy[$host]}
-      echo rsync -a "${options[@]}"  "${rootCommandFile%/*}/*" "${sensible_deploy[$host]}"
-      rsync -a "${options[@]}" "${rootCommandFile%/*}/"* "${sensible_deploy[$host]}"
-      
-      install_src="${sensible_deploy[$host]##*:}/${rootCommandFile##*/}"    
-      install_dest="${sensible_install[$host]:-${sensible_install["_default_"]}}/${rootCommandFile##*/}"
-      $LOUD && $INSTALL && echo ssh "${ssh_options[@]}" "${sensible_deploy[$host]%:*}" ln -s "${install_src}" "${install_dest}"
-      $CONFIRM && $INSTALL && ssh "${ssh_options[@]}" "${sensible_deploy[$host]%:*}" ln -s "${install_src}" "${install_dest}" || true
+       
+      $LOUD && echo ssh "${ssh_options[@]}" "${sensible_deploy[$host]%:*}" "${args[@]:+${args[@]}}"
+      ssh "${ssh_options[@]}" "${sensible_deploy[$host]%:*}" "${args[@]:+${args[@]}}" || true
     fi
   done
 done

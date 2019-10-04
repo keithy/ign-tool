@@ -1,4 +1,4 @@
-# groan undeploy.sub.sh
+# sensible undeploy.sub.sh
 #
 # by Keithy 2019
 #
