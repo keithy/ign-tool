@@ -11,9 +11,14 @@ _noun_
 1. the noise that emits from programmers forced to code in bash. 
 
 `Groan` is a simple extensible bash framework (similar to [sub](https://github.com/basecamp/sub))
-for creating a suite of scripts that have similar command, sub-command usage style to git/bzr/hg etc.
+for creating a suite of scripts that have similar command, sub-command usage style to git/bzr/hg/docker etc.
 
-To use `groan`, you rename the command to be the name of your choice.
+Clone this repository, and rename the files 'rename_me' to be the top level name of your command.
+Add your scripts (in any language) and help topics, to the `sub-commands` folder. 
+
+Your command can be nested within other commands, or you can compose your command from others. 
+The help facilities are provided by the enclosed command `helper`, and the remote upload and execution capability
+is provided by the command `sensible`.
 
 ## Commands with sub-commands and sub-sub-commands...
 

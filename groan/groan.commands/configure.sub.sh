@@ -5,14 +5,14 @@
 #
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
-command="configure"
+command="self-upload"
 description="select or edit configuration file"
 usage="usage:
-$breadcrumbs configure --show        # default behaviour
-$breadcrumbs configure --options     # list available options
-$breadcrumbs configure --local       # view local config
-$breadcrumbs configure --local --install someones.conf # view file
-$breadcrumbs configure --help        # this message"
+$breadcrumbs --show        # default behaviour
+$breadcrumbs --options     # list available options
+$breadcrumbs --local       # view local config
+$breadcrumbs --local --install someones.conf # view file
+$breadcrumbs --help        # this message"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return

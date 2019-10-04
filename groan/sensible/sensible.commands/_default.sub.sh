@@ -1,21 +1,20 @@
-# groan test.sh
+# sensible _default.sub.sh
 #
-# by Keith Hodges 2010
+# by Keithy 2019
 #
-# A Dummy
-
+#
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 command="test"
-description="dummy (test for duplication)"
-usage="usage:
-$breadcrumbs test"
+description="deploy and execute on remote servers"
+usage=\
+"$breadcrumbs               # test ssh connections
+$breadcrumbs --help        # this message"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return
 
-echo "This is a placeholder"
-
+ 
 exit 0
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 

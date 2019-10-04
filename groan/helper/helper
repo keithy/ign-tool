@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The groan framework is implemented by a minimal set of scripts.
 # All top-level "commands" are exactly the same code but with differing names.

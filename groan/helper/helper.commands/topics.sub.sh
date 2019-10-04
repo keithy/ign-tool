@@ -5,10 +5,10 @@
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 command="$scriptSubcommand"
-description="list available commands"
+description="list available topics"
 #since help doesn't exec anything many common options don't apply
 commonOptions="--theme=light    # alternate theme"
-usage="$breadcrumbs    # list commands"
+usage="$breadcrumbs    # list topics"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return
