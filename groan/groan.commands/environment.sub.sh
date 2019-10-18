@@ -42,7 +42,7 @@ done
 $VERBOSE && echo $what
 
 eval $what
-
+printf ${reset}
 exit 0
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 

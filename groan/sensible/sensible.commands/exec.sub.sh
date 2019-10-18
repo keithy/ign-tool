@@ -6,7 +6,7 @@
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 command="deploy"
-description="deploy this command suite to remote hosts"
+description="execute commands on remote hosts"
 usage=\
 "$breadcrumbs --hosts         # list configured hosts and their tags
 $breadcrumbs --tags=<a>,<b>  # select tagged hosts to execute on

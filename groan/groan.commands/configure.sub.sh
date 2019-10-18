@@ -5,14 +5,15 @@
 #
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
-command="self-upload"
+command="configure"
 description="select or edit configuration file"
 usage="usage:
-$breadcrumbs --show        # default behaviour
-$breadcrumbs --options     # list available options
-$breadcrumbs --local       # view local config
-$breadcrumbs --local --install someones.conf # view file
-$breadcrumbs --help        # this message"
+$breadcrumbs                                 # show current config file
+$breadcrumbs --show                          # show current config file
+$breadcrumbs --edit                          # edit current config file
+$breadcrumbs --options                       # list available location options
+$breadcrumbs --install=<option> <file.conf>  # install file at given location (local/user/global)
+$breadcrumbs --help                          # this message"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return
@@ -43,13 +44,10 @@ do
             SHOWOPTIONS=true
             SHOWCONFIG=true
         ;;
-        --install)
+        --install=*)
+            configOption="${arg#--install=}"
             INSTALL=true
             SHOWCONFIG=false
-        ;;
-        --*)
-            configOption="$arg"
-            SHOWCONFIG=true
         ;;
         -*)
         # ignore other options
@@ -97,7 +95,7 @@ if $SHOWCONFIG; then
     for i in "${!configOptions[@]}"
     do
         if [ -f ${configFileLocations[$i]} ]; then
-            echo "${configOptions[$i]} config found: ${configFileLocations[$i]}" 1>&2
+            echo "${bold}Option:${reset} ${dim}${configOptions[$i]}${reset} ${bold}found: ${reset}${dim}${configFileLocations[$i]}${reset}" 1>&2
             $SHOWOPTIONS || cat "${configFileLocations[$i]}"
             return 0
         fi
@@ -143,10 +141,11 @@ fi
 
 for i in "${!configOptions[@]}"
 do
-  [ "$configOption" == "${configOptions[$i]}" ] && break
+  [ "$configOption" == "${configOptions[i]}" ] && break
 done
- 
-$LOUD && echo "cp" "$configureName" "${configFileLocations[$i]}"
+
+$LOUD && echo "$configOption"
+$LOUD && echo "cp" "$configureName" "${configFileLocations[i]}"
 $DRYRUN && echo "dryrun:  --confirm required to proceed"
 
 $CONFIRM && cp  "$configureName" "${configFileLocations[$i]}"

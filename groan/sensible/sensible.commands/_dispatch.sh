@@ -102,6 +102,7 @@ if [ ${#list[@]} -eq 1 ]; then #One script matches
   do
       [[ "$scriptSubcommand" == _* ]] || breadcrumbs="$breadcrumbs $scriptSubcommand"
       executeScriptPath "$scriptPath"
+      $SHOWHELP && exit
       $METADATAONLY && return || exit 
   done
 fi

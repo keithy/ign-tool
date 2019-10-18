@@ -8,9 +8,12 @@ $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 command="deploy"
 description="deploy this command suite to remote hosts"
 usage=\
-"$breadcrumbs --hosts         # list configured hosts and their tags
-$breadcrumbs --tags=<a>,<b>  # select tagged hosts to deploy
-$breadcrumbs --help          # this message"
+"$breadcrumbs --hosts               # list configured hosts and their tags
+$breadcrumbs --tags=<a>,<b>         # select tagged hosts to deploy (if omitted - 'default')
+$breadcrumbs --confirm              # deploy for real
+$breadcrumbs --install --confirm    # install symbolic link on path
+$breadcrumbs --remove --confirm     # undeploy
+$breadcrumbs --help                 # this message"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return
@@ -19,8 +22,9 @@ $DEBUG && echo "Command: '$command'"
 
 LISTHOSTS=false
 INSTALL=false
+REMOVE=false
 UNINSTALL=false
-tags=()
+tags=("default")
 
 for arg in "$@"
 do
@@ -31,6 +35,9 @@ do
     ;;
     --install)
       INSTALL=true
+    ;;
+    --remove)
+      REMOVE=true
     ;;
     --tags=* | --tag=*)
       IFS=',' tags=(${arg##--t*=}) #interpret (comma separated) as an array
@@ -53,12 +60,13 @@ if $DRYRUN; then
 fi
 
 if $VERBOSE; then
-  r_options+=('--verbose')
+  r_options+=('-v')
   ssh_options+=('-v')
 fi
 
 if $DDEBUG; then
   ssh_options+=('-vv')
+  r_options+=('-vv')
 fi
 
 if $LISTHOSTS; then
@@ -72,18 +80,38 @@ if $LISTHOSTS; then
   exit 0
 fi
 
+if $REMOVE; then
+  for host in ${sensible_host_names[@]}; do
+    for tag in ${tags[@]}; do
+      if [[ ",all,${sensible_tags[$host]}," == *,"$tag,"* ]]; then
+        $LOUD && echo "${host}(${tag}):" ${sensible_deploy[$host]}
+        code_at="${sensible_deploy[$host]##*:}"    
+        linked_to="${sensible_install[$host]:-${sensible_install["_default_"]}}/${rootCommandFile##*/}"
+        $LOUD && echo ssh "${ssh_options[@]}" "${sensible_deploy[$host]%:*}" rm -rf "${linked_to}" "${code_at}"
+        $CONFIRM && ssh "${ssh_options[@]}" "${sensible_deploy[$host]%:*}" rm -rf "${linked_to}" "${code_at}" || true  
+        $DRYRUN && echo "${dim}dryrun:  --confirm required to proceed ${reset}"
+      fi
+    done
+  done
+  exit 0
+fi
+
+
 for host in ${sensible_host_names[@]}; do
   for tag in ${tags[@]}; do
     if [[ ",all,${sensible_tags[$host]}," == *,"$tag,"* ]]; then
  
       $LOUD && echo "${host}(${tag}):" ${sensible_deploy[$host]}
-      echo rsync -a "${options[@]}"  "${rootCommandFile%/*}/*" "${sensible_deploy[$host]}"
-      rsync -a "${options[@]}" "${rootCommandFile%/*}/"* "${sensible_deploy[$host]}"
+      $LOUD && echo rsync -a "${r_options[@]}"  "${rootCommandFile%/*}/*" "${sensible_deploy[$host]}"
+      rsync -a "${r_options[@]}" "${rootCommandFile%/*}/"* "${sensible_deploy[$host]}"
       
       install_src="${sensible_deploy[$host]##*:}/${rootCommandFile##*/}"    
       install_dest="${sensible_install[$host]:-${sensible_install["_default_"]}}/${rootCommandFile##*/}"
-      $LOUD && $INSTALL && echo ssh "${ssh_options[@]}" "${sensible_deploy[$host]%:*}" ln -s "${install_src}" "${install_dest}"
-      $CONFIRM && $INSTALL && ssh "${ssh_options[@]}" "${sensible_deploy[$host]%:*}" ln -s "${install_src}" "${install_dest}" || true
+      $LOUD && $INSTALL && echo ssh "${ssh_options[@]}" "${sensible_deploy[$host]%:*}" "mkdir -p \"${install_dest%/*}\" && ln -s \"${install_src}\" \"${install_dest}\""
+      $CONFIRM && $INSTALL && ssh "${ssh_options[@]}" "${sensible_deploy[$host]%:*}" "mkdir -p \"${install_dest%/*}\" && ln -s \"${install_src}\" \"${install_dest}\"" || true
+      $CONFIRM && echo "done"
+
+      $DRYRUN && echo "${dim}dryrun:  --confirm required to proceed ${reset}"
     fi
   done
 done

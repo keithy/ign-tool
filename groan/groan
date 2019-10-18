@@ -32,7 +32,7 @@ function identifyPlatform
     fi
 }
 
-function readLocations
+function readLocations # from locations file
 {
   commandFile="$1"
   commandDir=$(dirname "$commandFile")
@@ -55,7 +55,7 @@ function readLocations
   return 0
 }
 
-function readConfig
+function readConfig # from the first of the configFileLocations listed in the locations file
 {
     for configFile in ${configFileLocations[@]:-}
     do
@@ -68,7 +68,7 @@ function readConfig
     done
 }
 
-function readThemes
+function readThemes # from 
 {
   bold=$''; dim=$''; bold=$''; reset=$''
   for themeFile in ${themePath[@]:-}
@@ -85,7 +85,7 @@ function readThemes
   return 0
 }
 
-# Args: "${args[@]:+${args[@]}}" # pattern needed when set -u is on bash<=4.1
+# Args: "${args[@]:+${args[@]}}" # pattern needed when set -u is enabled bash<=4.1
  
 function executeScriptPath {
 
@@ -131,7 +131,7 @@ function executeHelp {
   printf "\n${bold}usage:${reset}\n$usage\n"
 }
 
-function checkMarkdownViewer {
+function checkForMarkdownViewer {
     # Check for Markdown Viewer
     [[ -z $(which ${markdownViewerUtility%% *}) ]] && markdownViewerUtility="cat"
     $DEBUG && echo "Markdown viewer: $markdownViewerUtility"
@@ -176,7 +176,7 @@ commonOptions="common options:
 --confirm            # not a dry run - perform action
 --theme=light        # select an alternate colour theme"
 
-#default flags
+# Parsing options the groan way - initialize all flags to defaults
 
 DEBUG=false
 DDEBUG=false
@@ -195,10 +195,10 @@ subcommand=""
 for arg in "$@"
 do
     case "$arg" in
-      -DD)
+      -DD|--ddebug)
             DDEBUG=true
       ;;
-      --debug | -d | -D)
+      --debug | -D)
             DEBUG=true
             VERBOSE=true
             LOUD=true
@@ -254,9 +254,7 @@ $VERBOSE && echo "${bold}SCRIPT${reset}: $workingDir${dim}/${reset}${bold}$comma
 # handle the default empty case
 [ -z "$subcommand" ] && subcommand="$defaultSubcommand"
 
-if $DEBUG; then
-    echo "Sub-command: '$subcommand'"
-fi
+$DEBUG && echo "Sub-command: '$subcommand'"
 
 for scriptDir in ${locations[@]} 
 do
