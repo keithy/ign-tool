@@ -36,7 +36,7 @@ function readLocations # from locations file
 {
   commandFile="$1"
   commandDir=$(dirname "$commandFile")
-  commandName=${commandFile##*/} # `basename $commandFile` 
+  commandName="${commandFile##*/}" # `basename $commandFile` 
 
   locations=("${commandFile}.commands") #default
   defaultSubcommand="_default" #default
@@ -57,7 +57,7 @@ function readLocations # from locations file
 
 function readConfig # from the first of the configFileLocations listed in the locations file
 {
-    for configFile in ${configFileLocations[@]:-}
+    for configFile in "${configFileLocations[@]:-}"
     do
         $DEBUG && echo "Config? $configFile"
         if [[ -f "$configFile" ]]; then
@@ -71,7 +71,7 @@ function readConfig # from the first of the configFileLocations listed in the lo
 function readThemes # from 
 {
   bold=$''; dim=$''; bold=$''; reset=$''
-  for themeFile in ${themePath[@]:-}
+  for themeFile in "${themePath[@]:-}"
     do
         if [[ -f "$themeFile" ]]
         then
@@ -94,7 +94,7 @@ function executeScriptPath {
   local title="Running"
   $METADATAONLY && title="Metadata<"
 
-  case ${scriptPath##*.} in
+  case "${scriptPath##*.}" in
     sh)
         $DEBUG && echo "$title source> $scriptPath ${args[@]:+${args[@]}}"
         sourceScript "${args[@]:+${args[@]}}"
@@ -107,13 +107,13 @@ function executeScriptPath {
     ;;
     *)
         $DEBUG && echo "Metadata< ${scriptPath/.sub.*/.meta.sh}"
-        source "${scriptPath/.sub.*/.meta.sh}" ${args[@]:+${args[@]}}
+        source "${scriptPath/.sub.*/.meta.sh}" "${args[@]:+${args[@]}}"
 
         $SHOWHELP && executeHelp
         $METADATAONLY && return
 
-        $DEBUG && echo "Eval> $scriptPath ${args[@]:+${args[@]}}"				
-        eval "$scriptPath" ${args[@]:+${args[@]}}
+        $DEBUG && echo "Eval> $scriptPath ${args[@]:+${args[@]}}"
+        eval "$scriptPath" "${args[@]:+${args[@]}}"
         exit 0
     ;;
   esac
@@ -133,7 +133,7 @@ function executeHelp {
 
 function checkForMarkdownViewer {
     # Check for Markdown Viewer
-    [[ -z $(which ${markdownViewerUtility%% *}) ]] && markdownViewerUtility="cat"
+    [[ -z $(which "${markdownViewerUtility%% *}") ]] && markdownViewerUtility="cat"
     $DEBUG && echo "Markdown viewer: $markdownViewerUtility"
 }
 
@@ -142,7 +142,7 @@ function shiftArgsIntoNext {
     next=""
     params=()
 
-    if [[ ${#args[@]} > 0 ]]; then
+    if [[ "${#args[@]}" > 0 ]]; then
             for arg in "${args[@]}"
             do 
                     if [ -z "$next" ]; then
@@ -162,7 +162,7 @@ workingDir=$(pwd)
 #find the $commandFile and importantly the $commandDir
 commandFile="$(cd "${0%/*}" 2>/dev/null; echo "$PWD"/"${0##*/}")"
 if [ -L "$commandFile" ]; then
-  commandFile=`readlink -n $commandFile`
+  commandFile=$(readlink -n "$commandFile")
 fi
 
 # our contribution to help
@@ -226,16 +226,16 @@ do
             CONFIRM=true
       ;;
       --theme=*)
-            THEME=${arg##--theme=}
+            THEME="${arg##--theme=}"
       ;;
       --*)
-        args+=($arg)
+        args+=("$arg")
       ;;
       *)
           if [[ "$subcommand" = "" ]]; then
-             subcommand=$arg
+             subcommand="$arg"
           else
-             args+=($arg)
+             args+=("$arg")
           fi
       ;;
     esac
@@ -256,7 +256,7 @@ $VERBOSE && echo "${bold}SCRIPT${reset}: $workingDir${dim}/${reset}${bold}$comma
 
 $DEBUG && echo "Sub-command: '$subcommand'"
 
-for scriptDir in ${locations[@]} 
+for scriptDir in "${locations[@]}" 
 do
     dispatcher="$scriptDir/${defaultDispatch}"
     if [ -f "$dispatcher" ]; then
