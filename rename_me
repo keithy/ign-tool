@@ -20,15 +20,17 @@ function identifyPlatform
 {
     MACOSX=false
     WINDOWS=false
-    UNIX=false
+    LINUX=false
 
-    system=$(uname)
     if [[  -d "/System/Library/Frameworks" ]] ; then
+		system=$(uname)
         MACOSX=true
     elif [ -d "/WINDOWS" ] ; then
         WINDOWS=true
     else
+		system=$(uname)
         UNIX=true
+        export $(grep -v '^#' /etc/os-release | xargs -d '\n')
     fi
 }
 
@@ -103,6 +105,11 @@ function executeScriptPath {
     exec)
         $DEBUG && echo "$title exec> $scriptPath ${args[@]:+${args[@]}}"
         exec "$scriptPath" "${args[@]:+${args[@]}}"
+        return
+    ;;
+    su)
+        $DEBUG && echo "$title exec> $scriptPath ${args[@]:+${args[@]}}"
+        sudo "$scriptPath" "${args[@]:+${args[@]}}"
         return
     ;;
     *)
