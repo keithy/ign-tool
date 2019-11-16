@@ -8,9 +8,14 @@ configFileLocations=(
 	"$commandDir/$commandName.conf.sh"  # --global
 )
 
+configPresetLocations=(
+    "$commandDir"
+)
+
 #locations to search for commands
 locations=(
 	"$commandDir/../groan/groan.commands"
+	"$commandDir/../groan/coder.commands"
 )
 
 defaultDispatch="_dispatch.sh"
