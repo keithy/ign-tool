@@ -8,8 +8,8 @@ $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 command="test"
 description="dummy (test for duplication)"
-usage="usage:
-$breadcrumbs test"
+usage=\
+"$breadcrumbs test"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return

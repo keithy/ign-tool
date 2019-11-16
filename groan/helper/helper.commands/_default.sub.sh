@@ -14,6 +14,7 @@ description="show topical help"
 commonOptions="--theme=light    # alternate theme"
 usage="$breadcrumbs <command|topic>
 $breadcrumbs commands
+$breadcrumbs topics
 $breadcrumbs --help    # this text"
 
 $SHOWHELP && executeHelp

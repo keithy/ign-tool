@@ -8,9 +8,14 @@ configFileLocations=(
 	"$commandDir/$commandName.conf"  # --global
 )
 
+configPresetLocations=(
+    "$commandDir/templates"
+)
+
 #locations to search for commands
 locations=(
 	"$commandDir/sub-commands"         # your own sub-commands
+	"$commandDir/topics"               # your own help topics
 	"$commandDir/groan/groan.commands" # merge with groan sub-commands 
 )
 
