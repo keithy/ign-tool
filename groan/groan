@@ -6,6 +6,20 @@
 #
 # This "Command" script - Provides basic features and redirects `groan <cmd>` to `<cmd>.sub.sh`
 
+# our contribution to help
+optionsLongForm=\
+"--help    | -h | -?  Usage help for a command
+--quiet   | -q       Quiet mode - say nothing
+--verbose | -V       Verbose
+--debug   | -D       Debug - tell all
+--dry-run            # default
+--confirm            # not a dry run - perform action
+--theme=light        # select an alternate colour theme"
+
+commonOptionsLong=\
+"--help --quiet --verbose --debug"
+commonOptionsShort=\
+"-h     -q      -V        -D"
 # STRICT-MODE
 
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
@@ -28,9 +42,22 @@ function identifyPlatform
     elif [ -d "/WINDOWS" ] ; then
         WINDOWS=true
     else
-		system=$(uname)
+        system=$(uname)
         UNIX=true
-        export $(grep -v '^#' /etc/os-release | xargs -d '\n')
+        export $(cat /etc/os-release)
+    fi
+}
+
+function needs_sudo() {
+    local prompt
+    prompt=$(sudo -nv 2>&1)
+    if [ $? -eq 0 ]; then
+       $DEBUG && echo "User has 'sudo' access."
+    elif echo $prompt | grep -q '^sudo:'; then
+       $DEBUG && echo "User has sudo (password required)"
+    else
+       echo "this action requires `sudo` access."
+       exit 1
     fi
 }
 
@@ -63,12 +90,13 @@ function readConfig # from the first of the configFileLocations listed in the lo
     do
         $DEBUG && echo "Config? $configFile"
         if [[ -f "$configFile" ]]; then
-                $VERBOSE && echo "Config< $configFile"
+                $DEBUG && echo "Config< $configFile"
                 source "$configFile"
                 break
         fi
     done
 }
+
 
 function readThemes # from 
 {
@@ -133,9 +161,15 @@ function sourceScript
 }
 
 function executeHelp {
-  printf "${bold}$description${reset}\n"
-  printf "\n${bold}options:${reset}\n$commonOptions\n"
-  printf "\n${bold}usage:${reset}\n$usage\n"
+  printf "${bold}${brief:-$description}${reset}\n"
+  [[ ! -z ${brief+x} ]] && printf "$description\n\n"
+  [[ ! -z ${extra+x} ]] && printf "$extra\n\n"
+  if [[ ! -z ${options+x} ]]; then
+    printf "${bold}common:${reset} ${commonOptionsLong}\n${bold}options:${reset} ${commonOptionsShort}\n$options\n\n"
+  else
+    printf "${bold}options:${reset}\n${optionsLongForm}\n\n"
+  fi
+  printf "${bold}usage:${reset}\n${usage}\n"
 }
 
 function checkForMarkdownViewer {
@@ -161,7 +195,7 @@ function shiftArgsIntoNext {
     fi
     args=("${params[@]:+${params[@]}}")
 }
-
+ 
 # START
 
 workingDir=$(pwd)
@@ -171,17 +205,6 @@ commandFile="$(cd "${0%/*}" 2>/dev/null; echo "$PWD"/"${0##*/}")"
 if [ -L "$commandFile" ]; then
   commandFile=$(readlink -n "$commandFile")
 fi
-
-# our contribution to help
-
-commonOptions="common options:
---help    | -h | -?  Usage help for a command
---quiet   | -q       Quiet mode - say nothing
---verbose | -V       Verbose
---debug   | -d | -D  Debug - tell all
---dry-run            # default
---confirm            # not a dry run - perform action
---theme=light        # select an alternate colour theme"
 
 # Parsing options the groan way - initialize all flags to defaults
 
@@ -257,6 +280,8 @@ readConfig
 readThemes
 
 $VERBOSE && echo "${bold}SCRIPT${reset}: $workingDir${dim}/${reset}${bold}$commandName${reset}"
+ 
+! $DEBUG && $VERBOSE && [[ -f "$configFile" ]] && echo "Config< $configFile"
  
 # handle the default empty case
 [ -z "$subcommand" ] && subcommand="$defaultSubcommand"

@@ -19,7 +19,7 @@ ADDACTION=false
 ADDLINK=false
 UNLINK=false
 FULLINSTALL=false
-installPath=""
+installPath="/usr/local/bin"
 
 for arg in "$@"
 do

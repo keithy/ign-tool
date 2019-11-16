@@ -102,8 +102,8 @@ for host in ${sensible_host_names[@]}; do
     if [[ ",all,${sensible_tags[$host]}," == *,"$tag,"* ]]; then
  
       $LOUD && echo "${host}(${tag}):" ${sensible_deploy[$host]}
-      $LOUD && echo rsync -a "${r_options[@]}"  "${rootCommandFile%/*}/*" "${sensible_deploy[$host]}"
-      rsync -a "${r_options[@]}" "${rootCommandFile%/*}/"* "${sensible_deploy[$host]}"
+      $LOUD && echo rsync -a --delete "${r_options[@]}"  "${rootCommandFile%/*}/*" "${sensible_deploy[$host]}"
+      rsync -a --delete "${r_options[@]}" "${rootCommandFile%/*}/"* "${sensible_deploy[$host]}"
       
       install_src="${sensible_deploy[$host]##*:}/${rootCommandFile##*/}"    
       install_dest="${sensible_install[$host]:-${sensible_install["_default_"]}}/${rootCommandFile##*/}"

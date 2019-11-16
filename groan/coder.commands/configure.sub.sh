@@ -20,13 +20,11 @@ $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"
 
-file=""
 configureName=""
 configOption=""
 SHOWCONFIG=true
 EDITCONFIG=false
 SHOWOPTIONS=false		    
-LISTTEMPLATES=false
 INSTALL=false
 GETFILE=false
 
@@ -64,6 +62,7 @@ if [ -n "$configureName" ]; then
 fi
 
 # --options
+[[ -z ${configPresetLocations+x} ]] && configPresetLocations=("$commandDir")
 
 if $SHOWOPTIONS; then
     printf "\nAvailable options:\n"
@@ -75,9 +74,12 @@ if $SHOWOPTIONS; then
 
     printf "\nAvailable .conf files:\n"
 
-    for found in "$commandDir/"*.conf
-    do
-        echo "    ${found##*/} (preset)"
+	for presetDir in "${configPresetLocations[@]}" 
+	do
+    	for found in "$presetDir/"*.conf
+    	do
+        	echo "    ${found##*/} (preset)"
+    	done
     done
     
     if [ "$PWD" != "$commandDir" ]; then
@@ -120,8 +122,16 @@ fi
 # auto-append .conf extension
 [ "${configureName##*.}" != "conf" ] && configureName="${configureName}.conf"
 
+# search for preset file
+if [[ ! -f "$configureName" ]]; then
+	for presetDir in "${configPresetLocations[@]}" 
+	do
+   		[[ -f "${presetDir}/${configureName}" ]] && configureName="${presetDir}/${configureName}"
+	done
+fi
+
 # exit if file does not exist
-[ ! -f "$configureName" ] && echo "$configureName not found" && exit 1
+[[ ! -f "$configureName" ]] && echo "$configureName not found" && exit 1
 
 # show if the file exists and install is not requested
 if [ $INSTALL == false ]; then
