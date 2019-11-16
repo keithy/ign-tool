@@ -1,4 +1,4 @@
-# groan help commands.sub.sh
+# groan single command list of subcommands.sub.sh
 #
 # by Keith Hodges 2019
 
@@ -12,6 +12,10 @@ usage="$breadcrumbs    # list commands"
 
 $SHOWHELP && executeHelp
 $METADATAONLY && return
+
+commandFileList=()
+crumbsList=()
+find_commands "$commandFile" "$breadcrumbs"
 
 function list_subcommands()
 {
@@ -54,10 +58,6 @@ function list_subcommands()
     done
   done
 }
-
-commandFileList=()
-crumbsList=()
-find_commands "$rootCommandFile" ${rootCommandFile##*/}
 
 if $DEBUG; then # print out results of recursive search
   echo
