@@ -1,0 +1,4 @@
+passwd.groups[+]:
+  name: jim
+  gid: 100
+

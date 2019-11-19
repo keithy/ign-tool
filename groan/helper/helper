@@ -90,13 +90,12 @@ function readConfig # from the first of the configFileLocations listed in the lo
     do
         $DEBUG && echo "Config? $configFile"
         if [[ -f "$configFile" ]]; then
-                $DEBUG && echo "Config< $configFile"
+                $VERBOSE && echo "Config< $configFile"
                 source "$configFile"
                 break
         fi
     done
 }
-
 
 function readThemes # from 
 {
@@ -127,7 +126,9 @@ function executeScriptPath {
   case "${scriptPath##*.}" in
     sh)
         $DEBUG && echo "$title source> $scriptPath ${args[@]:+${args[@]}}"
+        $XDEBUG && set -x
         sourceScript "${args[@]:+${args[@]}}"
+        $XDEBUG && set +x
         return
     ;;
     exec)
@@ -210,6 +211,7 @@ fi
 
 DEBUG=false
 DDEBUG=false
+XDEBUG=false
 VERBOSE=false
 LOUD=true
 DRYRUN=true
@@ -227,6 +229,9 @@ do
     case "$arg" in
       -DD|--ddebug)
             DDEBUG=true
+      ;;
+      -XX)
+            XDEBUG=true
       ;;
       --debug | -D)
             DEBUG=true

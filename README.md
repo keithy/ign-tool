@@ -6,25 +6,17 @@
 
 ## Getting Started
 
-Having cloned this project, add `ign` to your path - `ign` has a `self-install` command.
-(inherited from the `groan` framework.)
+Having cloned this project,  `ign` includes a setup utility command `self-install` that adds it to your path .
 ```
-./ign self-install ~/bin --link --confirm
+./ign-tool/ign setup self-install ~/bin --link --confirm
 ```
-Now setup a project directory, and create a configuration file there. Using the `--local` option for configurations
-will use the configuration of the current working directory, allowing `ign` to be used on several projects simultaneously.
-
-To see available options `ign configure --options`
-To view the example `ign configure example'
-To install the example.conf in your local project folder
+To create a new project `ign` includes handy templates.
 ```
-ign configure --install=local example --confirm
+ign setup new
+ign setup new sandbox.ign --start --confirm
+cd sandbox.ign
 ```
-To get started `ign` has handy templates - `ign new` - lists the available options
-```
-ign new 
-```
-
+The local configuration file `ign.conf` applies when running `ign` from the new directory.
 
 
 ### dependencies:

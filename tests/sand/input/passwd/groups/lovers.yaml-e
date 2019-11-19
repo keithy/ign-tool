@@ -1,0 +1,4 @@
+passwd.groups[+]:
+  name: lovers
+  gid: 3333
+  system: true

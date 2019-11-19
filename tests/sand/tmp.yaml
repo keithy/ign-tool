@@ -1,0 +1,28 @@
+Error: open 00-header.yaml: no such file or directory
+Usage:
+  yq write [yaml_file] [path] [value] [flags]
+
+Aliases:
+  write, w
+
+Examples:
+
+yq write things.yaml a.b.c cat
+yq write --inplace -- things.yaml a.b.c --cat
+yq w -i things.yaml a.b.c cat
+yq w --script update_script.yaml things.yaml
+yq w -i -s update_script.yaml things.yaml
+yq w --doc 2 things.yaml a.b.d[+] foo
+yq w -d2 things.yaml a.b.d[+] foo
+      
+
+Flags:
+  -d, --doc string      process document index number (0 based, * for all documents) (default "0")
+  -h, --help            help for write
+  -i, --inplace         update the yaml file inplace
+  -s, --script string   yaml script for updating yaml
+
+Global Flags:
+  -t, --trim      trim yaml output (default true)
+  -v, --verbose   verbose mode
+

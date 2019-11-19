@@ -4,16 +4,15 @@
 #
 #
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
-
 command="new"
-description="create a new project using template"
+description="create a new project/file structure from a template"
 options=\
 "--options|--list    # list available templates
 --confirm            # not a dry run - perform action
 --template=<hoice>   # selection (-t=<choice>)
 --<choice>           # selection (like cargo)
 --go-ahead           # allow copy into existing project"
-
+ 
 usage=\
 "$breadcrumbs                               # --list & --help
 $breadcrumbs --<template>                  # show template contents
@@ -32,8 +31,8 @@ do
    	do
        	extra="$extra  ${found##*/} - "
        	title="\n"
-       	[[ -f "$found/README.md" ]] && title=$(grep -m 1 -i "^#" "$found/README.md")
-       	[[ -f "$found/.gitignore" ]] && title=$(grep -m 1 -i "^#" "$found/.gitignore")
+       	#[[ -f "$found/.gitignore" ]] && title="$(grep -m 1 -i "^#" "$found/.gitignore")"
+       	[[ -f "$found/README.md" ]] && title="$(grep -m 1 -i "^#" "$found/README.md")"
        	extra="$extra$title"
    	done
 done
@@ -76,9 +75,6 @@ do
     esac
 done
 
-# --options
-[[ -z ${configPresetLocations+x} ]] && configPresetLocations=("$commandDir")
-
 $LIST_TEMPLATES && printf "$extra\n\n" && exit 0
 
 [[ -z "$TEMPLATE" ]] && executeHelp && exit 0
@@ -119,8 +115,6 @@ $DRYRUN && echo "${dim}dryrun:  --confirm required to proceed${reset}"
 
 $CONFIRM && rsync "-rltO${r_options}"  "$templatePath/" "$targetPath"
 $CONFIRM && echo "Generated $targetPath"
-
-exit 0
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 #Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."
