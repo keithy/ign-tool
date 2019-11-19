@@ -23,12 +23,10 @@ $DEBUG && echo "scriptName: ${bold}$scriptName${reset}"
 readLocations "$destPath"
 
 shiftArgsIntoNext
-subcommand="$next"
-[ -z "$subcommand" ] && subcommand="$defaultSubcommand" 
+subcommand="${next:-$defaultSubcommand}" # if no argument get the default (set in locations.sh)
 
 $DEBUG && echo "$scriptSubcommand($destCommand $destSubcommandName) args(${#args[@]}): ${args[@]:+${args[@]}}"
 
-# if no argument get the default for this command
 # given the argument look for commands that match
 for scriptDir in "${locations[@]}"
 do
@@ -37,6 +35,7 @@ do
   fi
 done
 
+$LOUD && echo "Not Found: $breadcrumbs ${bold}$subcommand${reset}"
 # "This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 # Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed
 # subject to the same license."

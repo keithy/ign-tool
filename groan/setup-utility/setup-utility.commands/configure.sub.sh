@@ -62,7 +62,7 @@ if [ -n "$configureName" ]; then
 fi
 
 # --options
-[[ -z ${configPresetLocations+x} ]] && configPresetLocations=("$commandDir")
+[[ -z ${configPresetLocations+x} ]] && configPresetLocations=("${rootCommandFile%/*}")
 
 if $SHOWOPTIONS; then
     printf "\nAvailable options:\n"
@@ -82,7 +82,7 @@ if $SHOWOPTIONS; then
     	done
     done
     
-    if [ "$PWD" != "$commandDir" ]; then
+    if [ "$PWD" != "${rootCommandFile%/*}" ]; then
         for found in *.conf
         do
             echo "    $found"
