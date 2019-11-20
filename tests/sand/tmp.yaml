@@ -1,28 +1,23 @@
-Error: open 00-header.yaml: no such file or directory
-Usage:
-  yq write [yaml_file] [path] [value] [flags]
-
-Aliases:
-  write, w
-
-Examples:
-
-yq write things.yaml a.b.c cat
-yq write --inplace -- things.yaml a.b.c --cat
-yq w -i things.yaml a.b.c cat
-yq w --script update_script.yaml things.yaml
-yq w -i -s update_script.yaml things.yaml
-yq w --doc 2 things.yaml a.b.d[+] foo
-yq w -d2 things.yaml a.b.d[+] foo
-      
-
-Flags:
-  -d, --doc string      process document index number (0 based, * for all documents) (default "0")
-  -h, --help            help for write
-  -i, --inplace         update the yaml file inplace
-  -s, --script string   yaml script for updating yaml
-
-Global Flags:
-  -t, --trim      trim yaml output (default true)
-  -v, --verbose   verbose mode
-
+variant: fcos
+version: 1.0.0
+passwd:
+  groups:
+  - name: knitting
+    gid: 1
+    password_hash: $6$rounds=656000$Al6umEBmYc01L6J6$pzwdIK1JHUhWGS1w4gh2NErkBLF5uvjBQ2IvtVgbo5jsJozq4n1I1ZTBNvzDCaXsKNdXk2.azn/.OZsCq22f81
+  users:
+  - name: david
+    team[+]name: david
+  - name: kate
+    uid: 1000
+    system: false
+    password_hash: $6$rounds=656000$dedtNT6gq3EYfUno$HGmOWR57FQ9OIoNNe4kVu.wVi/2oW6fqaN1bYI/kWnHJz/q44OggWHN3BY3gWzPR4IrWF4C68XoM/uqzABzYg0
+    groups:
+    - knitting
+    - games
+  - name: keith
+    uid: 1001
+    primary_group: devops
+    groups:
+    - devops
+    - knitting

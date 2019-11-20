@@ -32,6 +32,7 @@ for scriptDir in "${locations[@]}"
 do
   if [ -f "$scriptDir/$destSubcommandName" ]; then
     source "$scriptDir/$destSubcommandName"
+    $METADATAONLY && return
   fi
 done
 

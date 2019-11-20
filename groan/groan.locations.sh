@@ -19,7 +19,7 @@ locations=(
 )
 
 defaultDispatch="_dispatch.sh"
-defaultSubcommand="help"
+defaultSubcommand="_default"
  
 themePath=( "$commandDir/groan.themes.sh" "$commandDir/groan.theme-$THEME.sh" )
 

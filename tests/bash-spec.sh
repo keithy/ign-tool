@@ -86,8 +86,12 @@ function _array_contains_ {
   for elem in "${_actual_[@]}"; do
     [[ "$elem" == $_expected_ ]] && ((_count_++))
   done
-  [ $_count_ -eq $_times_ ] && return 0
-  [ $_count_ -gt 0 ] && _expected_="$_expected_ (x$_times_)" && return 1
+	if [ -n "$_times_" ]; then
+  		[ $_count_ -eq $_times_ ] && return 0
+  		[ $_count_ -gt 0 ] && _expected_="$_expected_ (x$_times_ found x$_count_)" && return 1
+	else
+		[ $_count_ -gt 0 ] && return 0 || return 1
+	fi
 }
 
 function _negation_check_ {
@@ -219,7 +223,7 @@ function to_match {
 
 function to_contain {
   _expected_="$1"
-  _times_="${3:-1}"
+  _times_="${3:-}"
   _pass_=false
   _array_contains_ "$_expected_" "$_actual_" "$_times_" && _pass_=true
   _negation_check_

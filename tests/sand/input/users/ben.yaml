@@ -1,0 +1,18 @@
+passwd.users[+]:
+  name: ben
+##uid:
+##shell:
+##system:
+##password_hash:
+##ssh_authorized_keys:
+##gecos:
+##home_dir:
+##no_create_home:
+##primary_group:
+  groups:
+  - toys
+  - celebrities
+##no_user_group:
+##no_log_init:
+
+

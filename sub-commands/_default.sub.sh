@@ -5,7 +5,7 @@
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 command="commands"
-description="list available commands"
+description="list $commandName commands"
 #since help doesn't exec anything many common options don't apply
 commonOptions="--theme=light    # alternate theme"
 usage="$breadcrumbs    # list commands"
@@ -15,7 +15,9 @@ $METADATAONLY && return
 
 commandFileList=()
 crumbsList=()
-find_commands "$commandFile" "$breadcrumbs"
+
+# start search at this level, not the top level
+find_commands "$commandFile" "$breadcrumbs" false
 
 function list_subcommands()
 {
@@ -26,8 +28,8 @@ function list_subcommands()
 
   for scriptDir in ${locations[@]} ; do
 
-    # The default case without any subcommands (if not hidden)
-    if ! [[ "$defaultSubcommand" == _* ]] ; then    
+	# Display the default sub-command at the top of  the list (without its breadcrumb)
+    #if ! [[ "$defaultSubcommand" == _* ]] ; then    
      for scriptPath in $scriptDir/$defaultSubcommand.sub.*
       do
         parseScriptPath "$scriptPath"
@@ -38,24 +40,26 @@ function list_subcommands()
         printf "%-45s" "$crumbs"
         echo "$description"
       done
-    fi
+    #fi
 
-    for scriptPath in $scriptDir/*.sub.*
-    do
-      parseScriptPath "$scriptPath"
+	#Display the subcommands (with breadcrumb)
+	for scriptPath in $scriptDir/[^_]*.sub.*
+	do
+	  parseScriptPath "$scriptPath"
 
-      $DEBUG && echo "Parsed: …${scriptDir##*/}${dim}/${reset}$scriptName (${scriptSubcommand:-no subcommand})" 
+	  $DEBUG && echo "Parsed: …${scriptDir##*/}${dim}/${reset}$scriptName (${scriptSubcommand:-no subcommand})" 
 
-      if [ -n "$scriptSubcommand" ]; then
-        [[ "$scriptSubcommand" == _* ]] || crumbs="$2 $scriptSubcommand"
+	  if [[ -n "$scriptSubcommand" ]] && [[ "$destSubcommandName" == *.sub.* ]]; then
+	 
+		crumbs="$2 $scriptSubcommand"
 
-        METADATAONLY=true
-        executeScriptPath "$scriptPath"  
+		METADATAONLY=true
+		printf "%-45s" "$crumbs"
+		executeScriptPath "$scriptPath"  
 
-        printf "%-45s" "$crumbs"
-        echo "$description"
-      fi
-    done
+		echo "$description"
+	  fi
+	done
   done
 }
 
@@ -68,15 +72,16 @@ if $DEBUG; then # print out results of recursive search
   echo
 fi
 
-for i in "${!commandFileList[@]}"
-do
+# only display our direct subcommands (no need to loop)
+i=0
+#for i in "${!commandFileList[@]}"; do
   displayName="${commandFileList[i]##*/}"
   echo "${bold}${displayName/-/ } commands:${reset}"
 
   list_subcommands "${commandFileList[i]}" "${crumbsList[i]}"
   
   echo
-done
+#done
 
 exit 0
 

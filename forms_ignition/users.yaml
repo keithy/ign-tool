@@ -1,0 +1,16 @@
+passwd.users[+]:
+  name:
+##uid:
+##shell:
+##system:
+##password_hash:
+##ssh_authorized_keys:
+##gecos:
+##home_dir:
+##no_create_home:
+##primary_group:
+##groups:
+##no_user_group:
+##no_log_init:
+
+

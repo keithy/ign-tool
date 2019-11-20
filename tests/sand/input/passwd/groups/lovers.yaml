@@ -1,5 +1,0 @@
-passwd.groups[+]:
-  name: lovers
-  gid: 3333
-  system: true
-  password_hash: $6$rounds=656000$DL6phOc0iiknxCQZ$RF.HrMsBdxzJI9TW7J7BuC8sSshz.EGQFQt5XMke4gtNOOQ/4hCdQZIOzEM4RbTS8bBsy1bCRQTRs7ux2sfmR.

@@ -5,7 +5,7 @@
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 command="commands"
-description="list available commands"
+description="full list of commands"
 #since help doesn't exec anything many common options don't apply
 commonOptions="--theme=light    # alternate theme"
 usage="$breadcrumbs    # list commands"
@@ -22,8 +22,8 @@ function list_subcommands()
 
   for scriptDir in ${locations[@]} ; do
 
-    # The default case without any subcommands (if not hidden)
-    if ! [[ "$defaultSubcommand" == _* ]] ; then    
+	# Display the default sub-command at the top of  the list (without its breadcrumb)
+    #if ! [[ "$defaultSubcommand" == _* ]] ; then    
      for scriptPath in $scriptDir/$defaultSubcommand.sub.*
       do
         parseScriptPath "$scriptPath"
@@ -34,21 +34,23 @@ function list_subcommands()
         printf "%-45s" "$crumbs"
         echo "$description"
       done
-    fi
+    #fi
 
-    for scriptPath in $scriptDir/*.sub.*
+	# Display the subcommands (with breadcrumb)
+    for scriptPath in $scriptDir/[^_]*.sub.*
     do
       parseScriptPath "$scriptPath"
 
       $DEBUG && echo "Parsed: …${scriptDir##*/}${dim}/${reset}$scriptName (${scriptSubcommand:-no subcommand})" 
 
-      if [ -n "$scriptSubcommand" ]; then
-        [[ "$scriptSubcommand" == _* ]] || crumbs="$2 $scriptSubcommand"
+      if [[ -n "$scriptSubcommand" ]] && [[ "$destSubcommandName" == *.sub.* ]]; then
+         
+        crumbs="$2 $scriptSubcommand"
 
         METADATAONLY=true
+        printf "%-45s" "$crumbs"
         executeScriptPath "$scriptPath"  
 
-        printf "%-45s" "$crumbs"
         echo "$description"
       fi
     done

@@ -1,0 +1,12 @@
+storage.links[+]:
+  path:
+  target:
+##overwrite:
+##user:
+##  name:
+##  id:
+##group:
+##  name:
+##  id:
+##hard:
+  

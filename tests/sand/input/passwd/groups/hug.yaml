@@ -1,3 +1,0 @@
-passwd.groups[+]:
-  name: hug
-  password_hash: $6$rounds=656000$z4VYycSrB3DzlYYv$v/899IlYvMMhnOMGZhYmMc8oxJuPLQ8dGhMjzvFq/UwToM0ys5ug7gynwBZYW3KXlAVA3kFzATkRv6iqIYUd9.

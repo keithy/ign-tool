@@ -47,7 +47,7 @@ function find_commands()
 {
   local commandFile="$1"
   local crumbs="$2"
-
+ 
   commandFileList+=("$commandFile")
   crumbsList+=("$crumbs")
 
@@ -65,7 +65,7 @@ function find_commands()
       if [ -n "scriptSubcommand" ]; then
         if ! [[ "$destSubcommandName" == *.sub.* ]]; then #this subcommand invokes a dispatcher
           crumbs="$2 $scriptSubcommand"
-          find_commands "$destPath" "$crumbs"
+          find_commands "$destPath" "$crumbs"  
         fi
       fi
     done

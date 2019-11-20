@@ -126,9 +126,11 @@ function executeScriptPath {
   case "${scriptPath##*.}" in
     sh)
         $DEBUG && echo "$title source> $scriptPath ${args[@]:+${args[@]}}"
+        
         $XDEBUG && set -x
         sourceScript "${args[@]:+${args[@]}}"
-        $XDEBUG && set +x
+        if $XDEBUG; then set +x; fi #short && form does not agree with a following return
+                
         return
     ;;
     exec)

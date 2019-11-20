@@ -66,12 +66,12 @@ done
 # --options
 $USETMP && script=$(mktemp) || script="$output.src" && $DDEBUG && echo "script: $script" 
 
-find "${workspace}" -name "*.yaml" -type f -exec cat {} \; -exec echo \; > $script
+find "${workspace}" -name "*.yaml" -type f -exec grep -v '^##' {} \; -exec echo \; > $script
  
 $VIEW_SCRIPT && cat $script && exit 0
 
 $USETMP && yaml=$(mktemp) || yaml="$output.yaml" && $DDEBUG && echo "yaml: $yaml"
- 
+
 yq w -s $script "$header" > $yaml
 
 $VIEW_YAML && cat $yaml && exit 0

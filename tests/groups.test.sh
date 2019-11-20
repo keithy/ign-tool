@@ -3,7 +3,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source ${DIR}/bash-spec.sh
 
 # new fixture
-cp -RP ${DIR}/sandbox.fixture/. /tmp/sandbox.ign # idempotent form of cp
+cp -a ${DIR}/sandbox.fixture/. /tmp/sandbox.ign # idempotent form of cp
 trap "\rm -rf /tmp/sandbox.ign; output_results;" EXIT
 cd /tmp/sandbox.ign
 
@@ -41,7 +41,7 @@ describe "when no groups are defined" && {
 		}
 	}
 	
-	context "ign groups hug --gid 10" && {
+	context "ign groups hug gid=10" && {
 		
 		it "should report 'hug - not found'" && {
 			out=$(ign groups hug) 
@@ -64,7 +64,7 @@ describe "adding a group" && {
 								"  name: hug"
 		}
 		it "creates script record file" && {
-			expect "./input/passwd/groups/hug.yaml" to_exist
+			expect "./input/groups/hug.yaml" to_exist
 		}
 	}
     
@@ -72,7 +72,7 @@ describe "adding a group" && {
     
 		it "shows updated record" && {
 		
-			out=$(ign groups hug --gid 111) ; should_succeed
+			out=$(ign groups hug gid=111) ; should_succeed
 		
 			expect "$out" to_be "hug.yaml" \
 								"passwd.groups[+]:" \
@@ -85,7 +85,7 @@ describe "adding a group" && {
     
 		it "shows updated record" && {
 		
-			out=$(ign groups hug --system=true) ; should_succeed
+			out=$(ign groups hug system=true) ; should_succeed
 		
 			expect "$out" to_be "hug.yaml" \
 								"passwd.groups[+]:" \
@@ -99,7 +99,7 @@ describe "adding a group" && {
     
 		it "shows updated record" && {
 		
-			out=$(ign groups hug --password_hash '$5$lr7WA/EN75k$lpTSE7E0uJzaA4Ewxp3sRP0RBPsfnrWPB1kKAfmahY0') 
+			out=$(ign groups hug 'password_hash=$5$lr7WA/EN75k$lpTSE7E0uJzaA4Ewxp3sRP0RBPsfnrWPB1kKAfmahY0') 
 			should_succeed
 		
 			expect "$out" to_be "hug.yaml" \
@@ -110,12 +110,11 @@ describe "adding a group" && {
 								'  password_hash: $5$lr7WA/EN75k$lpTSE7E0uJzaA4Ewxp3sRP0RBPsfnrWPB1kKAfmahY0'
 		}     	 	
 	}
-	
 	context "remove password" && {
     
 		it "shows updated record" && {
 		
-			out=$(ign groups hug --password_hash false) 
+			out=$(ign groups hug password_hash=) 
 			should_succeed
 		
 			expect "$out" to_be "hug.yaml" \
@@ -130,7 +129,7 @@ describe "adding a group" && {
     
 		it "shows updated record" && {
 		
-			out=$(ign groups hug --gid 0) ; should_succeed
+			out=$(ign groups hug gid=) ; should_succeed
 		
 			expect "$out" to_be "hug.yaml" \
 								"passwd.groups[+]:" \
@@ -143,7 +142,7 @@ describe "adding a group" && {
     
 		it "shows updated record" && {
 		
-			out=$(ign groups hug --system=false) ; should_succeed
+			out=$(ign groups hug system=) ; should_succeed
 		
 			expect "$out" to_be "hug.yaml" \
 								"passwd.groups[+]:" \
@@ -172,7 +171,7 @@ describe "deleting a group" && {
 		}
 	
 		it "file should be gone" && {
-			expect "./input/passwd/groups/hug.yaml" not to_exist
+			expect "./input/groups/hug.yaml" not to_exist
 		}
 	}
 	context "ign groups --list" && {
