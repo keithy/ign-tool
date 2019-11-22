@@ -28,6 +28,7 @@ The local configuration file `ign.conf` applies when running `ign` from the new 
 ## issues
 
 - https://gitlab.com/keithy/ign-tool
+- systemd dropins not supported in the direct editor
  
 ### groan
 

@@ -1,0 +1,6 @@
+storage.disks[+]:
+  device:
+# wipe_table:
+  partitions:
+  format:
+

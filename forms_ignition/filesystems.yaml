@@ -1,0 +1,9 @@
+storage.filesystems[+]:
+  path:
+  device:
+  format:
+# wipe_filesystem:
+# label:
+# uuid:
+# options:
+

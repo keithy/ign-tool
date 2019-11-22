@@ -1,5 +1,0 @@
-passwd.groups[+]:
-  name: knitting
-  gid: 1
-##system:
-##password_hash:

@@ -48,51 +48,62 @@ DELETE=false
 ADD_ENTRY=false
 EDIT_ENTRY=false
 ENTER_PASSWORD=false
+GET_FILEPATH=false
 a_name=""
 a_password=""
+a_file=""
+a_contents=""
 keys=()
 values=()
+keys_del=()
 values_del=()
 keys_add=()
 values_add=()
 for arg in "$@"
 do
+	[[ $arg == "--"* ]] && SHOW=false
+	$GET_FILEPATH && a_file="$arg" && GET_FILEPATH=false && continue
     case "$arg" in
-        --list|-l)
-            LIST=true
-            SHOW=false
-        ;;
         --show|-s)
             SHOW=true
             LIST=false
+    	;;
+        --list|-l)
+            LIST=true
         ;;
         --form)
             SHOW_FORM=true
-            SHOW=false
-            LIST=false
         ;;
         --edit|-e|-E)
             EDIT_ENTRY=true
-            LIST=false
-            SHOW=false
         ;;
         --delete)
         	DELETE=true
-        	SHOW=false
-        	LIST=false
         ;;
         --add)
         	ADD_ENTRY=true
-        	SHOW=false
+        ;;
+        contents_file=*|inline_file=*)
+			keys+=("${arg%%_file=*}")
+			values+=("|")
+			a_file="${arg##*_file=}"
+        ;;
+        --file)
         ;;
         --password|-p)
 			ENTER_PASSWORD=true
-			SHOW=false	
         ;;
+        contents=*|inline=*)
+        	keys+=("${arg%%=*}")
+    		values+=("|")
+        	a_contents="${arg##*=}"
+		;;
         *-=*)
+   			keys_del+=("${arg%%-=*}")
 			values_del+=("${arg#*-=}")
         ;;
         *+=*)
+   			keys_del+=("${arg%%+=*}")
 			keys_add+=("${arg%%+=*}")
 			values_del+=("${arg#*+=}")
 			values_add+=("${arg#*+=}")
@@ -107,7 +118,7 @@ do
         # ? in this context is a single letter wildcard 
         ?*)
 	        a_name="$arg"
-	        SHOW=false   
+	        SHOW=false
         ;;
     esac
 done
@@ -122,7 +133,7 @@ do
 	$LIST && echo $theName
 	
 	if $SHOW; then
-		content=$(grep -v '^##' "$thePath"); 
+		content=$(grep -v '^#' "$thePath"); 
 		[[ "${content: -1}" == "\n" ]] && NL='' || NL=$'\n' 
 		echo "${bold}$theFile${reset}"
 	    echo "$content$NL"
@@ -146,7 +157,7 @@ if ! $FOUND && $ADD_ENTRY && [[ -n "$a_name" ]]; then
 	thePath="$workspace/$command/${a_name}.yaml"
  	theFile="${thePath##*/}"
  	theName="${theFile%.yaml}"
-
+	[[ ! -f "${forms}/$command.yaml" ]] && echo "Missing form:" "${forms}/$command.yaml"
 	cp "${forms}/$command.yaml" "$thePath"
  	FOUND=true
  	
@@ -160,23 +171,79 @@ $ENTER_PASSWORD && \
 	values+=($(python -c "from passlib.hash import sha512_crypt; \
 			import getpass; print sha512_crypt.encrypt(getpass.getpass())"))
 
-# Keys and value pairs
+# Keys and value pairs: key=value (-z value re-comments key)
 for i in "${!keys[@]}"
 do
-  key="${keys[i]}"
+  keyA="${keys[i]%%.*}"
+  keyB="${keys[i]##*.}"
   value="${values[i]}"
-    $DEBUG && echo "$key=$value"
-  if [[ -z "$value" ]]; then
-  	  sed -i.bak "s~[ #][ #]\(.*\)${key}:.*~##\1${key}:~" "$thePath"
-  else
-	  sed -i.bak "s~[ #][ #]\(.*\)${key}:.*~  \1${key}: ${value}~" "$thePath"
-  fi
-done
 
+  $DEBUG && echo "$keyA.$keyB='$value' ($a_file) [$a_contents]"
+  
+	cp "$thePath" "$thePath".bak
+	awk -v keyA="$keyA" \
+		-v keyB="$keyB" \
+		-v valA="$value" \
+		-v inlineFile="$a_file" \
+		-v inlineContents="$a_contents" \
+		-f- "$thePath".bak > "$thePath" <<- 'EOD'
+		BEGIN {
+			look="key";
+			if ( keyA == keyB ) look="value";
+		    value=valA
+		}
+		{
+			#print look > "/dev/stderr"
+			# 0 - looking for a matching key - if found ensure that line is uncommented
+			if ( look == "key" && match($0, keyA ) ) {
+				sub(/^#/," ");
+				print;
+				look="value";
+				next;
+			}
+			# 1 - looking for a matching keyB
+			if ( look == "value" && match($0, keyB ) ) {
+				look="finish";
+				 
+				match($0, /[# ]( *)/, spaces)
+
+			    if (inlineContents=="" && inlineFile=="" && valA=="|") value=""
+				comment=" "
+				if ( value == "" ) { comment="#" }
+				printf( "%s%s%s: %s\n", comment, spaces[1], keyB, value);
+
+				if ( valA == "|" ) {
+			   		# read the given file 
+					if ( inlineContents != "") { 
+						split(inlineContents, lines, "\n")
+						for (i in lines) {
+							printf( "    %s\n" , lines[i] )
+						}
+						printf( "\n" );
+					} else if ( inlineFile != "") { 
+						while ((getline < inlineFile) > 0) print "   ", $0;
+					} 
+					look="contents-read-already"
+				}
+				next;
+			}	
+			# 2 - line ending with | marks the start of an inline content area
+			if ( $0 ~ /\|$/ ) look="contents";
+			# 3 - an empty line marks the end of an inline content area
+			if (look !="finish" && $0 ~ /^[\s\t\r]*$/) { printf( "\n" ); look="finish"; next };
+			
+			if ( look=="contents-read-already" ) next;
+			
+			# finish - copy out non-empty lines
+			if ( ! /^[ \s\t\r]*$/ ) { print }
+		}
+		END { }
+	EOD
+done
 
 #Keys and value adding to list of strings
 for i in "${!values_del[@]}"; do
-  sed -i.bak -e "/   *- ${values_del[i]}/d" "$thePath"
+	sed -i.bak -e "/   *- ${values_del[i]}/d" "$thePath"
 done
 
 #Keys and value adding to list of strings
@@ -184,15 +251,15 @@ for i in "${!keys_add[@]}"; do
   key="${keys_add[i]}"
   [[ "$key" == "keys" ]] && key="ssh_authorized_keys"
   value="${values_add[i]}"
-  if [[ -n "$value" ]]; then
+  if [[ -n "$value" ]]; then #array add entry
 	NL=$'\n'
-	sed -i.bak -e "s~[ #][ #]\(.*\)${key}:.*~  \1${key}:\\${NL}  \1- ${value}~g" "$thePath"				
+	sed -i.bak -e "s~[ #]\( *\)${key}:.*~ \1${key}:\\${NL} \1- ${value}~g" "$thePath"				
   fi
 done
 
 $VERBOSE && $FOUND && echo "${bold}${theFile}${reset}" && cat "$thePath" && exit 0
 
-$LOUD && $FOUND && echo "${bold}${theFile}${reset}" && grep -v '^##' "$thePath"
+$LOUD && $FOUND && echo "${bold}${theFile}${reset}" && grep -v '^#' "$thePath"
 	
 exit 0
 

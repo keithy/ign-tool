@@ -1,5 +1,17 @@
-passwd.groups[+]:
-  name:
-##gid:
-##system:
-##password_hash:
+storage.files[+]:
+  path:
+# overwrite:
+# mode:
+# user:
+#   name:
+#   id:
+# group:
+#   name:
+#   id:
+# contents:
+#   source:
+#   compression:
+#   verification:
+#     hash:
+#   inline:
+

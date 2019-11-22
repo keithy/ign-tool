@@ -95,7 +95,7 @@ describe "adding a group" && {
 		}     	 	
 	}
 	
-	context "add password" && {
+	context "add password_hash" && {
     
 		it "shows updated record" && {
 		
@@ -110,7 +110,7 @@ describe "adding a group" && {
 								'  password_hash: $5$lr7WA/EN75k$lpTSE7E0uJzaA4Ewxp3sRP0RBPsfnrWPB1kKAfmahY0'
 		}     	 	
 	}
-	context "remove password" && {
+	context "remove password_hash" && {
     
 		it "shows updated record" && {
 		
@@ -167,7 +167,7 @@ describe "deleting a group" && {
 		
 			out=$(ign groups hug --delete) ; should_succeed
 		
-			expect "$out" to_be "Moved hug.yaml to /Users/keith/.Trash"
+			expect "$out" to_match "Moved hug.yaml to /*"
 		}
 	
 		it "file should be gone" && {

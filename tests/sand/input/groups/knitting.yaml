@@ -1,5 +1,0 @@
-passwd.groups[+]:
-  name: knitting
-  gid: 1
-##system:
-  password_hash: $6$rounds=656000$Al6umEBmYc01L6J6$pzwdIK1JHUhWGS1w4gh2NErkBLF5uvjBQ2IvtVgbo5jsJozq4n1I1ZTBNvzDCaXsKNdXk2.azn/.OZsCq22f81
