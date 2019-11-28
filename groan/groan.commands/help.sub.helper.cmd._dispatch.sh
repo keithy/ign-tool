@@ -14,29 +14,30 @@
 # command contained in the parent folder, whose target script is provided within <helper>.commands 
 # The target script may be either
 # 1) a specific sub-command
-# 2) a dispatcher, selecting the sub-sub-command based upon the next argument
-# 3) any other bespoke script or dispatcher
+# 2) a g_dispatcher, selecting the sub-sub-command based upon the next argument
+# 3) any other bespoke script or g_dispatcher
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
-$DEBUG && echo "scriptName: ${bold}$scriptName${reset}"
+$DEBUG && echo "s_name: ${bold}$s_name${reset}"
 
-readLocations "$destPath"
+g_readLocations "$s_dest_path"
 
-shiftArgsIntoNext
-subcommand="${next:-$defaultSubcommand}" # if no argument get the default (set in locations.sh)
+g_shiftArgsIntoNext
 
-$DEBUG && echo "$scriptSubcommand($destCommand $destSubcommandName) args(${#args[@]}): ${args[@]:+${args[@]}}"
+c_sub_cmd="${next:-$g_default_subcommand}" # if no argument get the default (set in g_locations.sh)
+
+$DEBUG && echo "$s_sub_cmd($s_dest_cmd $s_dest_subcmd_name) args(${#args[@]}): ${args[@]:+${args[@]}}"
 
 # given the argument look for commands that match
-for scriptDir in "${locations[@]}"
+for s_dir in "${g_locations[@]}"
 do
-  if [ -f "$scriptDir/$destSubcommandName" ]; then
-    source "$scriptDir/$destSubcommandName"
+  if [ -f "$s_dir/$s_dest_subcmd_name" ]; then
+    source "$s_dir/$s_dest_subcmd_name"
     $METADATAONLY && return
   fi
 done
 
-$LOUD && echo "Not Found: $breadcrumbs ${bold}$subcommand${reset}"
+$LOUD && echo "Not Found: $breadcrumbs ${bold}$c_sub_cmd${reset}"
 # "This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 # Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed
 # subject to the same license."

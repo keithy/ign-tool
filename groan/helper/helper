@@ -27,28 +27,29 @@ set -euo pipefail
 IFS=$'\n\t'
 shopt -s nullglob # make sure globs are empty arrays if nothing is found
 set -o allexport
+NL=$'\n'
 
 # FUNCTIONS
 
-function identifyPlatform
+function g_identifyPlatform
 {
     MACOSX=false
     WINDOWS=false
     LINUX=false
 
     if [[  -d "/System/Library/Frameworks" ]] ; then
-		system=$(uname)
+		g_system=$(uname)
         MACOSX=true
     elif [ -d "/WINDOWS" ] ; then
         WINDOWS=true
     else
-        system=$(uname)
+		g_system=$(uname)
         UNIX=true
         export $(cat /etc/os-release)
     fi
 }
 
-function needs_sudo() {
+function g_needsSudo() {
     local prompt
     prompt=$(sudo -nv 2>&1)
     if [ $? -eq 0 ]; then
@@ -61,53 +62,54 @@ function needs_sudo() {
     fi
 }
 
-function readLocations # from locations file
+function g_readLocations # from g_locations file
 {
-  commandFile="$1"
-  commandDir=$(dirname "$commandFile")
-  commandName="${commandFile##*/}" # `basename $commandFile` 
+  c_file="$1"
+  c_dir=$(dirname "$c_file")
+  c_name="${c_file##*/}" # `basename $c_file` 
 
-  locations=("${commandFile}.commands") #default
-  defaultSubcommand="_default" #default
-  defaultDispatch="_dispatch.sh"
+  g_locations=("${c_file}.commands") #default
+  g_default_subcommand="_default" #default
+  g_default_dispatch="_dispatch.sh"
 
-  #commandDir commandName globals used within <name>.locations.sh file
+  #c_dir c_name globals used within <name>.locations.sh file
 
-  locationsConfig="${commandFile}.locations.sh"
+  g_locations_config="${c_file}.locations.sh"
 
-  if [ -f "$locationsConfig" ]; then  
-    $DEBUG && echo "Locations< $locationsConfig"
-    source "$locationsConfig"
+  if [ -f "$g_locations_config" ]; then  
+    $DEBUG && echo "Locations< $g_locations_config"
+    source "$g_locations_config"
   else 
-    $DEBUG && echo "LocationsX $locationsConfig"
+    $DEBUG && echo "LocationsX $g_locations_config"
   fi
   return 0
 }
 
-function readConfig # from the first of the configFileLocations listed in the locations file
+function g_readConfig # from the first of the g_config_file_locations listed in the g_locations file
 {
-    for configFile in "${configFileLocations[@]:-}"
+	for g_config_file in "${g_config_file_locations[@]:-}"
     do
-        $DEBUG && echo "Config? $configFile"
-        if [[ -f "$configFile" ]]; then
-                $VERBOSE && echo "Config< $configFile"
-                source "$configFile"
+        $DEBUG && echo "Config? $g_config_file"
+        if [[ -f "$g_config_file" ]]; then
+                $VERBOSE && echo "Config< $g_config_file"
+                source "$g_config_file"
                 break
         fi
     done
 }
 
-function readThemes # from 
+function g_readThemes # from 
 {
+  local g_theme_file
   bold=$''; dim=$''; bold=$''; reset=$''
-  for themeFile in "${themePath[@]:-}"
+  for g_theme_file in "${g_theme_path[@]:-}"
     do
-        if [[ -f "$themeFile" ]]
+        if [[ -f "$g_theme_file" ]]
         then
-            $DEBUG && echo "Theme< $themeFile"
-            source "$themeFile"
+            $DEBUG && echo "Theme< $g_theme_file"
+            source "$g_theme_file"
         else
-            $DEBUG && echo "ThemeX $themeFile"
+            $DEBUG && echo "ThemeX $g_theme_file"
         fi
     done
 
@@ -116,54 +118,54 @@ function readThemes # from
 
 # Args: "${args[@]:+${args[@]}}" # pattern needed when set -u is enabled bash<=4.1
  
-function executeScriptPath {
+function g_executeScriptPath {
 
-  scriptPath="$1"
+  s_path="$1"
 
   local title="Running"
   $METADATAONLY && title="Metadata<"
 
-  case "${scriptPath##*.}" in
+  case "${s_path##*.}" in
     sh)
-        $DEBUG && echo "$title source> $scriptPath ${args[@]:+${args[@]}}"
+        $DEBUG && echo "$title source> $s_path ${args[@]:+${args[@]}}"
         
         $XDEBUG && set -x
-        sourceScript "${args[@]:+${args[@]}}"
+        g_sourceScriptMappingArgs "${args[@]:+${args[@]}}"
         if $XDEBUG; then set +x; fi #short && form does not agree with a following return
                 
         return
     ;;
     exec)
-        $DEBUG && echo "$title exec> $scriptPath ${args[@]:+${args[@]}}"
-        exec "$scriptPath" "${args[@]:+${args[@]}}"
+        $DEBUG && echo "$title exec> $s_path ${args[@]:+${args[@]}}"
+        exec "$s_path" "${args[@]:+${args[@]}}"
         return
     ;;
     su)
-        $DEBUG && echo "$title exec> $scriptPath ${args[@]:+${args[@]}}"
-        sudo "$scriptPath" "${args[@]:+${args[@]}}"
+        $DEBUG && echo "$title exec> $s_path ${args[@]:+${args[@]}}"
+        sudo "$s_path" "${args[@]:+${args[@]}}"
         return
     ;;
     *)
-        $DEBUG && echo "Metadata< ${scriptPath/.sub.*/.meta.sh}"
-        source "${scriptPath/.sub.*/.meta.sh}" "${args[@]:+${args[@]}}"
+        $DEBUG && echo "Metadata< ${s_path/.sub.*/.meta.sh}"
+        source "${s_path/.sub.*/.meta.sh}" "${args[@]:+${args[@]}}"
 
-        $SHOWHELP && executeHelp
+        $SHOWHELP && g_displayHelp
         $METADATAONLY && return
 
-        $DEBUG && echo "Eval> $scriptPath ${args[@]:+${args[@]}}"
-        eval "$scriptPath" "${args[@]:+${args[@]}}"
+        $DEBUG && echo "Eval> $s_path ${args[@]:+${args[@]}}"
+        eval "$s_path" "${args[@]:+${args[@]}}"
         exit 0
     ;;
   esac
 }
 
 #Sourcing a script is done via this function, so that args are mapped in to $@
-function sourceScript
+function g_sourceScriptMappingArgs
 {
-    source "$scriptPath"
+    source "$s_path"
 }
 
-function executeHelp {
+function g_displayHelp {
   printf "${bold}${brief:-$description}${reset}\n"
   [[ ! -z ${brief+x} ]] && printf "$description\n\n"
   [[ ! -z ${extra+x} ]] && printf "$extra\n\n"
@@ -173,18 +175,20 @@ function executeHelp {
     printf "${bold}options:${reset}\n${optionsLongForm}\n\n"
   fi
   printf "${bold}usage:${reset}\n${usage}\n"
+  [[ ! -z ${help_postscript+x} ]] && printf "\n$help_postscript\n"
 }
 
-function checkForMarkdownViewer {
+function g_checkForMarkdownViewer {
     # Check for Markdown Viewer
-    [[ -z $(which "${markdownViewerUtility%% *}") ]] && markdownViewerUtility="cat"
-    $DEBUG && echo "Markdown viewer: $markdownViewerUtility"
+    [[ -z $(which "${g_markdown_viewer%% *}") ]] && g_markdown_viewer="cat"
+    $DEBUG && echo "Markdown viewer: $g_markdown_viewer"
 }
 
 # This function should be easy but bash begs to differ: ${args[@]:1}
-function shiftArgsIntoNext {
+function g_shiftArgsIntoNext {
     next=""
-    params=()
+    local params=()
+    local arg
 
     if [[ "${#args[@]}" > 0 ]]; then
             for arg in "${args[@]}"
@@ -201,12 +205,12 @@ function shiftArgsIntoNext {
  
 # START
 
-workingDir=$(pwd)
+g_working_dir=$(pwd)
 
-#find the $commandFile and importantly the $commandDir
-commandFile="$(cd "${0%/*}" 2>/dev/null; echo "$PWD"/"${0##*/}")"
-if [ -L "$commandFile" ]; then
-  commandFile=$(readlink -n "$commandFile")
+#find the $c_file and importantly the $c_dir
+c_file="$(cd "${0%/*}" 2>/dev/null; echo "$PWD"/"${0##*/}")"
+if [ -L "$c_file" ]; then
+  c_file=$(readlink -n "$c_file")
 fi
 
 # Parsing options the groan way - initialize all flags to defaults
@@ -225,7 +229,7 @@ THEME=default
 # Options processing pattern - search through the arguments for the command and flags
 
 args=()
-subcommand=""
+c_sub_cmd=""
 for arg in "$@"
 do
     case "$arg" in
@@ -269,8 +273,8 @@ do
         args+=("$arg")
       ;;
       *)
-          if [[ "$subcommand" = "" ]]; then
-             subcommand="$arg"
+          if [[ -z "$c_sub_cmd" ]]; then
+             c_sub_cmd="$arg"
           else
              args+=("$arg")
           fi
@@ -278,32 +282,32 @@ do
     esac
 done
  
-readLocations "$commandFile"
+g_readLocations "$c_file"
 
-breadcrumbs="$commandName"
-rootCommandFile="$commandFile"
+breadcrumbs="$c_name"
+g_root_cmd_file="$c_file"
 
-readConfig
-readThemes
+g_readConfig
+g_readThemes
 
-$VERBOSE && echo "${bold}SCRIPT${reset}: $workingDir${dim}/${reset}${bold}$commandName${reset}"
+$VERBOSE && echo "${bold}SCRIPT${reset}: $g_working_dir${dim}/${reset}${bold}$c_name${reset}"
  
-! $DEBUG && $VERBOSE && [[ -f "$configFile" ]] && echo "Config< $configFile"
+! $DEBUG && $VERBOSE && [[ -f "$g_config_file" ]] && echo "Config< $g_config_file"
  
 # handle the default empty case
-[ -z "$subcommand" ] && subcommand="$defaultSubcommand"
+[[ -z "$c_sub_cmd" ]] && c_sub_cmd="$g_default_subcommand"
 
-$DEBUG && echo "Sub-command: '$subcommand'"
+$DEBUG && echo "Sub-command: '$c_sub_cmd'"
 
-for scriptDir in "${locations[@]}" 
+for s_dir in "${g_locations[@]}" 
 do
-    dispatcher="$scriptDir/${defaultDispatch}"
-    if [ -f "$dispatcher" ]; then
-      source "$dispatcher"
+    g_dispatcher="$s_dir/${g_default_dispatch}"
+    if [ -f "$g_dispatcher" ]; then
+      source "$g_dispatcher"
     fi
 done
 
-$LOUD && echo "Not Found: $breadcrumbs ${bold}$subcommand${reset}"
+$LOUD && echo "Not Found: $breadcrumbs ${bold}$c_sub_cmd${reset}"
 exit 1
 
 # "This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 

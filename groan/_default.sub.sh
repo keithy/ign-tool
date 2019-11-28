@@ -16,7 +16,7 @@ usage="$breadcrumbs <command|topic>
 $breadcrumbs commands
 $breadcrumbs --help    # this text"
 
-$SHOWHELP && executeHelp
+$SHOWHELP && g_displayHelp
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"
@@ -41,7 +41,7 @@ $DEBUG && echo "Help request: '$helpRequest'"
 	
 #check user has given us a file reference
 if [[ "$helpRequest" = "" ]]; then
-  executeHelp
+  g_displayHelp
   printf "\nPlease give me a help topic\n"
   exit 1
 fi
@@ -52,7 +52,7 @@ exact="help.$helpRequest.topic.*"
 
 previous=""
 
-for loc in ${locations[@]}
+for loc in ${g_locations[@]}
 do
   $DEBUG && echo "Looking for $target in: $loc"
 
@@ -89,8 +89,8 @@ case ${helpFile##*.} in
       echo
   ;;
   md)
-      $DEBUG && echo "Using $markdownViewerUtility to display markdown: $found"
-      ${markdownViewerUtility%% *} ${markdownViewerUtility#* } $helpFile
+      $DEBUG && echo "Using $g_markdown_viewer to display markdown: $found"
+      ${g_markdown_viewer%% *} ${g_markdown_viewer#* } $helpFile
   ;;
   sh)
       $DEBUG && echo "Running source: $found"

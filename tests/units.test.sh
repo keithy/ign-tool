@@ -86,7 +86,7 @@ describe "adding a unit" && {
     
 		it "shows updated record - with contents" && {
 		
-			out=$(ign units ruby "contents=test\nthis"; echo "<END") ; should_succeed
+			out=$(ign units ruby "contents=test\nthis\n"; echo "<END") ; should_succeed
 		
 			expect "$out" to_be "ruby.yaml" \
 								"systemd.units[+]:" \
@@ -132,7 +132,6 @@ describe "adding a unit" && {
 								"    to be" \
 								"    or not" \
 								"    to be" \
-								"" \
 								"<END" #verify trailing empty line
 		}     	 	    	 	
 	}		
@@ -150,7 +149,6 @@ describe "adding a unit" && {
 								"    to be" \
 								"    or not" \
 								"    to be" \
-								"" \
 								"<END" #verify trailing empty line
 		}    	 	
 	}

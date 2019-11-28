@@ -1,0 +1,20 @@
+dist: bionic
+
+language: bash
+
+addons:
+  apt:
+    packages:
+    - expect
+    - python3-pip
+
+before_install:
+  - mkdir -p ${HOME}/.Trash
+  - pip3 install passlib
+
+env:
+  global:
+    - PATH=${TRAVIS_BUILD_DIR}:${PATH}
+
+script:
+    - make -C tests

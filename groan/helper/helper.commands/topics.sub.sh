@@ -4,27 +4,27 @@
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
-command="$scriptSubcommand"
+command="$s_sub_cmd"
 description="list available topics"
 #since help doesn't exec anything many common options don't apply
 commonOptions="--theme=light    # alternate theme"
 usage="$breadcrumbs    # list topics"
 
-$SHOWHELP && executeHelp
+$SHOWHELP && g_displayHelp
 $METADATAONLY && return
 
 function list_topics()
 {
-  commandFile="$1"
-  crumbs="$2"
+  local c_file="$1"
+  local crumbs="$2"
  
-  readLocations "$commandFile"
+  g_readLocations "$c_file"
 
-  for scriptDir in ${locations[@]} ; do
+  for s_dir in ${g_locations[@]} ; do
     local first=true
-    for topicPath in $scriptDir/*.topic.{md,html,txt}
+    for topicPath in $s_dir/*.topic.{md,html,txt}
     do
-      $first && printf "${dim}${commandFileList[i]##*/} topics:${reset}\n"
+      $first && printf "${dim}${c_file_list[i]##*/} topics:${reset}\n"
 
       if [[ -f "$topicPath" ]]; then
         topicFile="${topicPath##*/}"
@@ -38,17 +38,17 @@ function list_topics()
   done
 }
 
-commandFileList=()
+c_file_list=()
 crumbsList=()
-find_commands "$rootCommandFile" ${rootCommandFile##*/}
+g_findCommands "$g_root_cmd_file" ${g_root_cmd_file##*/}
 
 
 TOPIC="${1:-}"
 
 if [ -z "$TOPIC" ]; then
-  for i in "${!commandFileList[@]}"
+  for i in "${!c_file_list[@]}"
   do
-    list_topics "${commandFileList[i]}" "${crumbsList[i]}"
+    list_topics "${c_file_list[i]}" "${crumbsList[i]}"
   done
   
   echo
@@ -57,21 +57,21 @@ if [ -z "$TOPIC" ]; then
 fi
 
 if [ -n "$TOPIC" ]; then
-  for i in "${!commandFileList[@]}"
+  for i in "${!c_file_list[@]}"
   do
-    readLocations "${commandFileList[i]}"
+    g_readLocations "${c_file_list[i]}"
 
-    for scriptDir in ${locations[@]} ; do
+    for s_dir in ${g_locations[@]} ; do
   
       target="${TOPIC}*.topic.*"
 
       # if an exact match is available - upgrade the target to prioritize the exact match
-      for topicPath in "$scriptDir/$TOPIC.topic."*
+      for topicPath in "$s_dir/$TOPIC.topic."*
       do
           target="$TOPIC.topic.*"
       done
 
-      for topicPath in $scriptDir/$target
+      for topicPath in $s_dir/$target
        do
 
          if [[ -f "$topicPath" ]]; then

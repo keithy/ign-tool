@@ -10,46 +10,46 @@ description="full list of commands"
 commonOptions="--theme=light    # alternate theme"
 usage="$breadcrumbs    # list commands"
 
-$SHOWHELP && executeHelp
+$SHOWHELP && g_displayHelp
 $METADATAONLY && return
 
-function list_subcommands()
+function list_sub_cmds()
 {
-  commandFile="$1"
-  crumbs="$2"
+  local c_file="$1"
+  local crumbs="$2"
  
-  readLocations "$commandFile"
+  g_readLocations "$c_file"
 
-  for scriptDir in ${locations[@]} ; do
+  for s_dir in ${g_locations[@]} ; do
 
 	# Display the default sub-command at the top of  the list (without its breadcrumb)
-    #if ! [[ "$defaultSubcommand" == _* ]] ; then    
-     for scriptPath in $scriptDir/$defaultSubcommand.sub.*
+    #if ! [[ "$g_default_subcommand" == _* ]] ; then    
+     for s_path in $s_dir/${g_default_subcommand}.sub.*
       do
-        parseScriptPath "$scriptPath"
-        $DEBUG && echo "Parsed: …${scriptDir##*/}${dim}/${reset}$scriptName (${scriptSubcommand:-no subcommand})" 
+        g_parseScriptPath "$s_path"
+        $DEBUG && echo "Parsed: …${s_dir##*/}${dim}/${reset}$s_name (${s_sub_cmd:-no subcommand})" 
         METADATAONLY=true
-        executeScriptPath "$scriptPath"  
+        g_executeScriptPath "$s_path"  
 
         printf "%-45s" "$crumbs"
         echo "$description"
       done
     #fi
 
-	# Display the subcommands (with breadcrumb)
-    for scriptPath in $scriptDir/[^_]*.sub.*
+	# Display the c_sub_cmds (with breadcrumb)
+    for s_path in $s_dir/[^_]*.sub.*
     do
-      parseScriptPath "$scriptPath"
+      g_parseScriptPath "$s_path"
 
-      $DEBUG && echo "Parsed: …${scriptDir##*/}${dim}/${reset}$scriptName (${scriptSubcommand:-no subcommand})" 
+      $DEBUG && echo "Parsed: …${s_dir##*/}${dim}/${reset}$s_name (${s_sub_cmd:-no subcommand})" 
 
-      if [[ -n "$scriptSubcommand" ]] && [[ "$destSubcommandName" == *.sub.* ]]; then
+      if [[ -n "$s_sub_cmd" ]] && [[ "$s_dest_subcmd_name" == *.sub.* ]]; then
          
-        crumbs="$2 $scriptSubcommand"
+        crumbs="$2 $s_sub_cmd"
 
         METADATAONLY=true
         printf "%-45s" "$crumbs"
-        executeScriptPath "$scriptPath"  
+        g_executeScriptPath "$s_path"  
 
         echo "$description"
       fi
@@ -57,25 +57,25 @@ function list_subcommands()
   done
 }
 
-commandFileList=()
+c_file_list=()
 crumbsList=()
-find_commands "$rootCommandFile" ${rootCommandFile##*/}
+g_findCommands "$g_root_cmd_file" ${g_root_cmd_file##*/}
 
 if $DEBUG; then # print out results of recursive search
   echo
-  for i in "${!commandFileList[@]}"; do    
+  for i in "${!c_file_list[@]}"; do    
        printf "(%d) %-45s" $i ${crumbsList[i]}
-       echo "${commandFileList[i]}"
+       echo "${c_file_list[i]}"
   done
   echo
 fi
 
-for i in "${!commandFileList[@]}"
+for i in "${!c_file_list[@]}"
 do
-  displayName="${commandFileList[i]##*/}"
+  displayName="${c_file_list[i]##*/}"
   echo "${bold}${displayName/-/ } commands:${reset}"
 
-  list_subcommands "${commandFileList[i]}" "${crumbsList[i]}"
+  list_sub_cmds "${c_file_list[i]}" "${crumbsList[i]}"
   
   echo
 done

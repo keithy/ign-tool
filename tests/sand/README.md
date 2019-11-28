@@ -1,1 +1,4 @@
-# Testing Sandbox
+# Testing
+
+The "sand" directory is used for testing
+

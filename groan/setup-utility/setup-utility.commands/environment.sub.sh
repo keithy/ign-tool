@@ -14,7 +14,7 @@ $breadcrumbs environment [--all|-a]
 $breadcrumbs environment [--eval "expr"] - evaluate expression in script context
 $breadcrumbs environment --help"
 
-$SHOWHELP && executeHelp
+$SHOWHELP && g_displayHelp
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"

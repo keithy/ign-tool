@@ -1,0 +1,11 @@
+storage: 
+  files:
+    #
+    # Toolbox
+    #
+    - path: /opt/inbox/package/core/toolbox_v0.0.16.tar.xz
+      mode: 0644
+      contents:
+        source: https://github.com/containers/toolbox/releases/download/0.0.16/toolbox-0.0.16.tar.xz
+        verification:
+          hash: sha512-4b87c023090a5862c0b16aa994eb3778158e199525e3a0e8836e361824238df4fae58b020df91b0131a6fb7ac6dc1ee3eaa153cc50f6232826b55eb5a0903c90

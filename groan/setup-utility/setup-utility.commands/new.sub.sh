@@ -9,7 +9,7 @@ description="create a new project/file structure from a template"
 options=\
 "--options|--list    # list available templates
 --confirm            # not a dry run - perform action
---template=<hoice>   # selection (-t=<choice>)
+--template=<choice>  # selection (-t=<choice>)
 --<choice>           # selection (like cargo)
 --go-ahead           # allow copy into existing project"
  
@@ -22,22 +22,21 @@ $breadcrumbs --list                        # list available templates
 $breadcrumbs --help                        # this message"
 
 # --options
-[[ -z ${configPresetLocations+x} ]] && configPresetLocations=("$commandDir")
+[[ -z ${g_config_preset_locations+x} ]] && g_config_preset_locations=("$c_dir")
 
 extra="\nAvailable templates:\n"
-for presetDir in "${configPresetLocations[@]}" 
+for presetDir in "${g_config_preset_locations[@]}" 
 do
    	for found in "$presetDir/"*.tmpl
    	do
-       	extra="$extra  ${found##*/} - "
-       	title="\n"
+       	title=""
        	#[[ -f "$found/.gitignore" ]] && title="$(grep -m 1 -i "^#" "$found/.gitignore")"
        	[[ -f "$found/README.md" ]] && title="$(grep -m 1 -i "^#" "$found/README.md")"
-       	extra="$extra$title"
+       	extra="$(printf "$extra %17s - $title" "${found##*/}")\n"
    	done
 done
 
-$SHOWHELP && executeHelp
+$SHOWHELP && g_displayHelp
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"
@@ -77,7 +76,7 @@ done
 
 $LIST_TEMPLATES && printf "$extra\n\n" && exit 0
 
-[[ -z "$TEMPLATE" ]] && executeHelp && exit 0
+[[ -z "$TEMPLATE" ]] && g_displayHelp && exit 0
 
 
 
@@ -87,7 +86,7 @@ templatePath="$TEMPLATE"
 
 # search for template dir
 if [[ ! -d "$templatePath" ]]; then
-	for presetDir in "${configPresetLocations[@]}" 
+	for presetDir in "${g_config_preset_locations[@]}" 
 	do
    		[[ -d "${presetDir}/${templatePath}" ]] && templatePath="${presetDir}/${templatePath}"
 	done

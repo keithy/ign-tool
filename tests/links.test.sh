@@ -44,7 +44,7 @@ describe "when no links are defined" && {
 	context "ign links ruby path=/usr/local/bin/ruby" && {
 		
 		it "should report 'ruby - not found'" && {
-			out=$(ign links ruby) 
+			out=$(ign links ruby path=/usr/local/bin/ruby) 
  
 			expect $out to_be "ruby - not found"
 		}
@@ -61,8 +61,8 @@ describe "adding a link" && {
 
 			expect "$out" to_be "ruby.yaml" \
 								"storage.links[+]:" \
-								"  path:" \
-								"  target:"
+								"  path: " \
+								"  target: "
 		}
 		it "creates script record file" && {
 			expect "./input/links/ruby.yaml" to_exist
@@ -91,9 +91,10 @@ describe "adding a link" && {
 			expect "$out" to_be "ruby.yaml" \
 								"storage.links[+]:" \
 								"  path: /usr/local/bin/ruby" \
-								"  target: /usr/local/lib/ruby-2.0.0/ruby" \
 								"  user:" \
-								"    name: bob"
+								"    name: bob" \
+								"  target: /usr/local/lib/ruby-2.0.0/ruby" 
+
 		}     	 	
 	}
 	
@@ -106,11 +107,11 @@ describe "adding a link" && {
 			expect "$out" to_be "ruby.yaml" \
 								"storage.links[+]:" \
 								"  path: /usr/local/bin/ruby" \
-								"  target: /usr/local/lib/ruby-2.0.0/ruby" \
 								"  user:" \
 								"    name: bob" \
 								"  group:" \
-								"    name: builders"
+								"    name: builders" \
+								"  target: /usr/local/lib/ruby-2.0.0/ruby" 
 		}     	 	    	 	
 	}
 	context "add link user id" && {
@@ -122,12 +123,12 @@ describe "adding a link" && {
 			expect "$out" to_be "ruby.yaml" \
 								"storage.links[+]:" \
 								"  path: /usr/local/bin/ruby" \
-								"  target: /usr/local/lib/ruby-2.0.0/ruby" \
 								"  user:" \
-								"    name: bob" \
 								"    id: 1000"\
+								"    name: bob" \
 								"  group:" \
-								"    name: builders"
+								"    name: builders" \
+								"  target: /usr/local/lib/ruby-2.0.0/ruby"
 		}     	 	    	 	
 	}	
 	context "remove user name" && {
@@ -139,11 +140,11 @@ describe "adding a link" && {
 			expect "$out" to_be "ruby.yaml" \
 								"storage.links[+]:" \
 								"  path: /usr/local/bin/ruby" \
-								"  target: /usr/local/lib/ruby-2.0.0/ruby" \
 								"  user:" \
 								"    id: 1000" \
 								"  group:" \
-								"    name: builders"
+								"    name: builders" \
+								"  target: /usr/local/lib/ruby-2.0.0/ruby"
 		}  	 	
 	}
 	
@@ -156,10 +157,9 @@ describe "adding a link" && {
 			expect "$out" to_be "ruby.yaml" \
 								"storage.links[+]:" \
 								"  path: /usr/local/bin/ruby" \
-								"  target: /usr/local/lib/ruby-2.0.0/ruby" \
-								"  user:" \
 								"  group:" \
-								"    name: builders"
+								"    name: builders" \
+								"  target: /usr/local/lib/ruby-2.0.0/ruby"
 		}    	 	
 	}
 	
@@ -172,9 +172,9 @@ describe "adding a link" && {
 			expect "$out" to_be "ruby.yaml" \
 								"storage.links[+]:" \
 								"  path: /usr/local/bin/ruby" \
-								"  target: /usr/local/lib/ruby-2.0.0/ruby" \
 								"  group:" \
-								"    name: builders"
+								"    name: builders" \
+								"  target: /usr/local/lib/ruby-2.0.0/ruby"
 		}    	 	
 	}
 }

@@ -1,30 +1,30 @@
-#locations to search for configuration *.conf files
+#g_locations to search for configuration *.conf files
 
-configOptions=("local" "user" "global")
+g_config_options=("local" "user" "global")
 
-configFileLocations=(
-	"$workingDir/$commandName.conf"  # --local
-	"$HOME/.$commandName.conf"       # --user
-	"$commandDir/$commandName.conf"  # --global
+g_config_file_locations=(
+	"$g_working_dir/$c_name.conf"  # --local
+	"$HOME/.$c_name.conf"       # --user
+	"$c_dir/$c_name.conf"  # --global
 )
 
-configPresetLocations=(
-    "$commandDir/templates"
+g_config_preset_locations=(
+    "$c_dir/templates"
 )
 
-#locations to search for commands
-locations=(
-	"$commandDir/sub-commands"         # your own sub-commands
-	"$commandDir/topics"               # your own help topics
-	"$commandDir/groan/groan.commands" # merge with groan sub-commands 
+#g_locations to search for commands
+g_locations=(
+	"$c_dir/sub-commands"         # your own sub-commands
+	"$c_dir/topics"               # your own help topics
+	"$c_dir/groan/groan.commands" # merge with groan sub-commands 
 )
 
-defaultDispatch="_dispatch.sh"
-defaultSubSubcommand="default"
+g_default_dispatch="_dispatch.sh"
+g_default_subcommand="default"
 
-themePath=( "$commandDir/groan/groan.themes.sh" "$commandDir/$commandName.themes.sh" "$commandDir/$commandName.theme-$THEME.sh" )
+g_theme_path=( "$c_dir/groan/groan.themes.sh" "$c_dir/$c_name.themes.sh" "$c_dir/$c_name.theme-$THEME.sh" )
 
-markdownViewerUtility="mdv -t 715.1331"
+g_markdown_viewer="mdv -t 715.1331"
 
 # "This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 # Any additional contribution submitted for incorporation into or for distribution with this 

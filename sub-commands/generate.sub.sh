@@ -16,17 +16,20 @@ usage=\
 $breadcrumbs generate --view            # generate ignition file
 $breadcrumbs generate                   # generate ignition file"
 
-$SHOWHELP && executeHelp
+$SHOWHELP && g_displayHelp
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"
 
 # default config
 $DEBUG && echo "Viewer: $VIEWER"
-[[ -z ${libraries+x} ]] && libraries=("$workingDir/plugs" "$commandDir/plugs")
-[[ -z ${workspace+x} ]] && workspace="$workingDir/input"
 [[ -z ${header+x} ]]    && header="00-header.yaml"
 [[ -z ${output+x} ]]    && USETMP=true || USETMP=false 
+[[ -z ${libraries+x} ]] && libraries=("$g_working_dir/plugs" "$c_dir/plugs")
+[[ -z ${workspace+x} ]] && workspace="$g_working_dir/input"
+[[ ! -f "$g_config_file" || ! -d "$workspace" ]] \
+	&& echo "Config not found or not within an ign project directory" && exit 1
+
 $USETMP || output="${output%.json}"
 
 GENERATE=true

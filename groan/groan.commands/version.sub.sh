@@ -10,12 +10,12 @@ description="returns version tagged in git and the short hash"
 usage="usage:
 $breadcrumbs version"
 
-$SHOWHELP && executeHelp
+$SHOWHELP && g_displayHelp
 $METADATAONLY && return
 
-commandFileList=()
+c_file_list=()
 crumbsList=()
-find_commands "$rootCommandFile" "${rootCommandFile##*/}"
+g_findCommands "$g_root_cmd_file" "${g_root_cmd_file##*/}"
 
 # get the cached version, the git version, use cache if git not working, if changed write cache
 function get_version()
@@ -33,11 +33,11 @@ function get_version()
 
 get_version $(dirname "${BASH_SOURCE%/*}")
 
-for i in "${!commandFileList[@]}"
+for i in "${!c_file_list[@]}"
 do
-  readLocations "${commandFileList[i]}"
+  g_readLocations "${c_file_list[i]}"
 
-  get_version "${commandFileList[i]%/*}" "${crumbsList[i]}"
+  get_version "${c_file_list[i]%/*}" "${crumbsList[i]}"
   
 done
  

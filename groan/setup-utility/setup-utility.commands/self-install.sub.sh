@@ -10,7 +10,7 @@ usage="usage:
 $breadcrumbs self-install /usr/local/bin --link
 $breadcrumbs self-install --unlink"
 
-$SHOWHELP && executeHelp
+$SHOWHELP && g_displayHelp
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"
@@ -45,9 +45,9 @@ do
 done
 
 if $UNLINK; then
-    theInstalledLink=$(which "$commandName")
+    theInstalledLink=$(which "$c_name")
     if [ -z "$theInstalledLink" ]; then
-        echo "$commandName appears not to be installed"
+        echo "$c_name appears not to be installed"
         exit 1
     fi
 
@@ -57,7 +57,7 @@ if $UNLINK; then
     fi
 
     theInstalled=$(readlink -n $theInstalledLink)
-    if [ "$theInstalled" != "$commandFile" ]; then
+    if [ "$theInstalled" != "$c_file" ]; then
         echo "This link does not point to me: $theInstalledLink - leaving well alone"
         exit 1
     fi
@@ -94,10 +94,10 @@ if [[ ! -d "$installPath" ]]; then
 fi
 
 if $ADDLINK; then
-    $LOUD && echo "ln -s $commandFile $installPath/$commandName"
+    $LOUD && echo "ln -s $c_file $installPath/$c_name"
     $DRYRUN && echo "dryrun: --confirm required to proceed"
-    $CONFIRM && ln -s "$commandFile" "$installPath/$commandName" 
-    $CONFIRM && echo "Installed symbolic link from $installPath/$commandName to $commandFile"
+    $CONFIRM && ln -s "$c_file" "$installPath/$c_name" 
+    $CONFIRM && echo "Installed symbolic link from $installPath/$c_name to $c_file"
 fi
 
 exit 0

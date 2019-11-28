@@ -106,8 +106,9 @@ describe "adding a group" && {
 								"passwd.groups[+]:" \
 								"  name: hug" \
 								"  gid: 111" \
-								"  system: true" \
-								'  password_hash: $5$lr7WA/EN75k$lpTSE7E0uJzaA4Ewxp3sRP0RBPsfnrWPB1kKAfmahY0'
+								'  password_hash: $5$lr7WA/EN75k$lpTSE7E0uJzaA4Ewxp3sRP0RBPsfnrWPB1kKAfmahY0' \
+								"  system: true"
+
 		}     	 	
 	}
 	context "remove password_hash" && {

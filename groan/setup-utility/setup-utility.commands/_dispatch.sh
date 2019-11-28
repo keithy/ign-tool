@@ -1,116 +1,116 @@
-# This dispatcher is looking for the chosen sub-command (in this directory)
+# This g_dispatcher is looking for the chosen sub-command (in this directory)
 # It was invoked from the context of a top level command whose <cmd>.locations.sh
-# specified this as the dispatcher.
+# specified this as the g_dispatcher.
 #
 # Features:
-# Running subcommand <sub>.sub.<ext>
-# Mapping subcommand to that of another command <sub>.sub.<cmd>.cmd.<cmdsub>.sub.<ext>
+# Running c_sub_cmd <sub>.sub.<ext>
+# Mapping c_sub_cmd to that of another command <sub>.sub.<cmd>.cmd.<cmdsub>.sub.<ext>
 # Failthrough to _not_found_sub.<cmd>.cmd.<cmdsub>.sub.<ext>
-# Partial matching of subcommands is supported
+# Partial matching of c_sub_cmds is supported
 
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 #######
 #These functions implement the format/policy of each command script for this folder
 #######
-function parseScriptPath()
+function g_parseScriptPath()
 {
-  scriptPath="$1"
-  scriptName="${scriptPath##*/}"
-  scriptDir="${scriptPath%/*}"
-  scriptSubcommand=""
-  destCommand=""
-  destSubcommandName=""
+  s_path="$1"
+  s_name="${s_path##*/}"
+  s_dir="${s_path%/*}"
+  s_sub_cmd=""
+  s_dest_cmd=""
+  s_dest_subcmd_name=""
 
   #we remove everything .sub. onwards to avoid getting false matches on .sub
-  local scriptRoute="${scriptName%%.cmd.*}" 
+  local scriptRoute="${s_name%%.cmd.*}" 
 
-  if [[ "$scriptRoute" =~ \.sub\. ]]; then #a subcommand is defined
+  if [[ "$scriptRoute" =~ \.sub\. ]]; then #a c_sub_cmd is defined
 
-    if [[ -f "$scriptPath" ]]; then
+    if [[ -f "$s_path" ]]; then
 
-      scriptSubcommand="${scriptRoute%%.sub.*}" # everything before the first .sub
-      destCommand="${scriptRoute#*sub.}"  # keep everything after first .sub.
-      destPath="${scriptDir%/*}/${destCommand}/${destCommand:-$commandName}"
-      destSubcommandName="${scriptName#*.cmd.}"  # keep everything after .cmd.
+      s_sub_cmd="${scriptRoute%%.sub.*}" # everything before the first .sub
+      s_dest_cmd="${scriptRoute#*sub.}"  # keep everything after first .sub.
+      s_dest_path="${s_dir%/*}/${s_dest_cmd}/${s_dest_cmd:-$c_name}"
+      s_dest_subcmd_name="${s_name#*.cmd.}"  # keep everything after .cmd.
 
     fi
   fi
 }
 
-# Recursively scan the subcommands for those that call the dispatcher of a contained command
-# find_commands populates two arrays
-# commandFileList= each element is a sub-command file (e.g. helper)
-# breadcrumbsList= each element is a list of subcommands that reaches the above command
+# Recursively scan the c_sub_cmds for those that call the g_dispatcher of a contained command
+# g_findCommands populates two arrays
+# c_file_list= each element is a sub-command file (e.g. helper)
+# breadcrumbsList= each element is a list of c_sub_cmds that reaches the above command
 
-function find_commands()
+function g_findCommands()
 {
-  local commandFile="$1"
-  local crumbs="$2"
+  local c_file="$1"
+  local crumbs="$2"=
  
-  commandFileList+=("$commandFile")
+  c_file_list+=("$c_file")
   crumbsList+=("$crumbs")
 
-  local scriptDir
-  local scriptPath
+  local s_dir
+  local s_path
 
-  readLocations "$commandFile"
+  g_readLocations "$c_file"
 
-  for scriptDir in "${locations[@]}"
+  for s_dir in "${g_locations[@]}"
   do
-    for scriptPath in "$scriptDir"/*.sub.*.cmd.*
+    for s_path in "$s_dir"/*.sub.*.cmd.*
     do
-      parseScriptPath "$scriptPath"
+      g_parseScriptPath "$s_path"
 
-      if [ -n "scriptSubcommand" ]; then
-        if ! [[ "$destSubcommandName" == *.sub.* ]]; then #this subcommand invokes a dispatcher
-          crumbs="$2 $scriptSubcommand"
-          find_commands "$destPath" "$crumbs"  
+      if [ -n "s_sub_cmd" ]; then
+        if ! [[ "$s_dest_subcmd_name" == *.sub.* ]]; then #this c_sub_cmd invokes a g_dispatcher
+          crumbs="$2 $s_sub_cmd"
+          g_findCommands "$s_dest_path" "$crumbs"  
         fi
       fi
     done
   done
 }
 
-#note $subcommand requested may be partial and $scriptSubcommand is the matched result
-[ -z "$subcommand" ] && subcommand="$defaultSubcommand"
+#note $c_sub_cmd requested may be partial and $s_sub_cmd is the matched result
+[ -z "$c_sub_cmd" ] && c_sub_cmd="$g_default_subcommand"
 
-target="${subcommand}*.sub.*"
-exact="${subcommand}.sub.*"
+g_target="${c_sub_cmd}*.sub.*"
+g_exact="${c_sub_cmd}.sub.*"
 
-$DEBUG && echo "Looking for $target in: $scriptDir"
+$DEBUG && echo "Looking for $g_target in: $s_dir"
 
-# if an exact match is available - upgrade the target to prioritize the exact match
-for scriptPath in $scriptDir/$exact
+# if an g_exact match is available - upgrade the g_target to prioritize the g_exact match
+for s_path in $s_dir/$g_exact
 do
-    target=$exact
+    g_target=$g_exact
 done
 
 list=()
-for scriptPath in $scriptDir/$target
+for s_path in $s_dir/$g_target
 do
-    parseScriptPath "$scriptPath"
+    g_parseScriptPath "$s_path"
 
-    if [ -n "$scriptSubcommand" ]; then
-      list+=($scriptSubcommand)
-      $DEBUG && echo "Found #${#list[@]} : $scriptPath"
+    if [ -n "$s_sub_cmd" ]; then
+      list+=($s_sub_cmd)
+      $DEBUG && echo "Found #${#list[@]} : $s_path"
     fi
 done
 
 if [ ${#list[@]} -eq 1 ]; then #One script matches
-  for scriptPath in $scriptDir/$target
+  for s_path in $s_dir/$g_target
   do
-      [[ "$scriptSubcommand" == _* ]] || breadcrumbs="$breadcrumbs $scriptSubcommand"
-      executeScriptPath "$scriptPath"
+      [[ "$s_sub_cmd" == _* ]] || breadcrumbs="$breadcrumbs $s_sub_cmd"
+      g_executeScriptPath "$s_path"
       $SHOWHELP && exit
       $METADATAONLY && return || exit 
   done
 fi
 
 if [ ${#list[@]} -gt 1 ]; then
-    $LOUD && echo "Multiple options exist for requested '${subcommand}' (${list[@]})"
+    $LOUD && echo "Multiple options exist for requested '${c_sub_cmd}' (${list[@]})"
     exit 1
 fi
 
-#not found scenario, continue to next dispatcher
+#not found scenario, continue to next g_dispatcher
 
