@@ -3,9 +3,9 @@
 g_config_options=("local" "user" "global")
 
 g_config_file_locations=(
-	"$g_working_dir/$c_name.conf"  # --local
-	"$HOME/.$c_name.conf"       # --user
-	"$c_dir/$c_name.conf"  # --global
+	"$g_working_dir/$c_name.conf"  	# --local
+	"$HOME/.$c_name.conf"       	# --user
+	"$c_dir/$c_name.conf"  			# --global
 )
 
 g_config_preset_locations=(
@@ -20,7 +20,7 @@ g_locations=(
 )
 
 g_default_dispatch="_dispatch.sh"
-g_default_subcommand="default"
+g_default_subcommand="commands"
 
 g_theme_path=( "$c_dir/groan/groan.themes.sh" "$c_dir/$c_name.themes.sh" "$c_dir/$c_name.theme-$THEME.sh" )
 

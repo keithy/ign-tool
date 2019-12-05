@@ -1,0 +1,5 @@
+# Header
+
+variant: ${VARIANT}
+version: 1.0.0
+

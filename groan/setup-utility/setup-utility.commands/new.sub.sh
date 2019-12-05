@@ -113,7 +113,7 @@ $LOUD && echo "rsync -rltO${r_options}" "$templatePath" "$targetPath"
 $DRYRUN && echo "${dim}dryrun:  --confirm required to proceed${reset}"
 
 $CONFIRM && rsync "-rltO${r_options}"  "$templatePath/" "$targetPath"
-$CONFIRM && echo "Generated $targetPath"
+$CONFIRM && echo "Created $targetPath"
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 #Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."

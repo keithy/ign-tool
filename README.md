@@ -4,6 +4,8 @@
 
 # IGN - Tools for working with fcct/ignition
 
+[![asciicast](https://asciinema.org/a/285507.svg)](https://asciinema.org/a/285507)
+
 Ign provides a working environment for building an ignition provisioning script from the command line.
 
 Find your SSH public keys

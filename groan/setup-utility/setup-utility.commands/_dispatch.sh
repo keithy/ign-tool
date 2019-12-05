@@ -46,8 +46,8 @@ function g_parseScriptPath()
 function g_findCommands()
 {
   local c_file="$1"
-  local crumbs="$2"=
- 
+  local crumbs="$2"
+
   c_file_list+=("$c_file")
   crumbsList+=("$crumbs")
 
@@ -65,7 +65,7 @@ function g_findCommands()
       if [ -n "s_sub_cmd" ]; then
         if ! [[ "$s_dest_subcmd_name" == *.sub.* ]]; then #this c_sub_cmd invokes a g_dispatcher
           crumbs="$2 $s_sub_cmd"
-          g_findCommands "$s_dest_path" "$crumbs"  
+          g_findCommands "$s_dest_path" "$crumbs"
         fi
       fi
     done
@@ -75,19 +75,19 @@ function g_findCommands()
 #note $c_sub_cmd requested may be partial and $s_sub_cmd is the matched result
 [ -z "$c_sub_cmd" ] && c_sub_cmd="$g_default_subcommand"
 
-g_target="${c_sub_cmd}*.sub.*"
-g_exact="${c_sub_cmd}.sub.*"
+target="${c_sub_cmd}*.sub.*"
+exact="${c_sub_cmd}.sub.*"
 
-$DEBUG && echo "Looking for $g_target in: $s_dir"
+$DEBUG && echo "Looking for $target in: $s_dir"
 
-# if an g_exact match is available - upgrade the g_target to prioritize the g_exact match
-for s_path in $s_dir/$g_exact
+# if an exact match is available - upgrade the target to prioritize the exact match
+for s_path in $s_dir/$exact
 do
-    g_target=$g_exact
+    target=$exact
 done
 
 list=()
-for s_path in $s_dir/$g_target
+for s_path in $s_dir/$target
 do
     g_parseScriptPath "$s_path"
 
@@ -98,7 +98,7 @@ do
 done
 
 if [ ${#list[@]} -eq 1 ]; then #One script matches
-  for s_path in $s_dir/$g_target
+  for s_path in $s_dir/$target
   do
       [[ "$s_sub_cmd" == _* ]] || breadcrumbs="$breadcrumbs $s_sub_cmd"
       g_executeScriptPath "$s_path"
@@ -113,4 +113,5 @@ if [ ${#list[@]} -gt 1 ]; then
 fi
 
 #not found scenario, continue to next g_dispatcher
+
 

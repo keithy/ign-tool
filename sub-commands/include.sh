@@ -5,6 +5,13 @@
 #
 $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
+# CONFIG
+
+[[ -z ${g_presets_dir+x} ]] && g_presets_dir="$g_working_dir/presets"
+[[ -z ${workspace+x} 	 ]] && workspace="$g_working_dir/input"
+
+# HELP
+
 description="edit $command"
 options=\
 "--list                      # list record names
@@ -22,28 +29,52 @@ $breadcrumbs $command hug --add              # add record
 $breadcrumbs $command key=value              # add field
 $breadcrumbs $command --help                 # this message"
 
-# Pretty print the form
-form=$(echo "$theForm" | sed -e "s/^ \(.*\):/ ${bold}\1:${reset}/" \
-  					         -e "s/^#\(.*\):/ ${dim}\1:${reset}/" )
-      
-extra="\n${bold}form:${reset}\n$form"
+# Pretty print theForm if defined
+if [[ -n "$theForm" ]]; then
+	form=$(echo "$theForm" | sed 	-e "s/^ \(.*\):/ ${bold}\1:${reset}/" \
+  					         		-e "s/^#\(.*\):/ ${dim}\1:${reset}/" )
+	extra="\n${bold}form:${reset}\n$form"
+fi
 
+# Pretty print any preset/templates if defined
+function process_presets () {
+	local theFile
+	local theName
+	presets_info=""
+	for preset in "${g_presets_dir}"/$command/*.yaml
+	do
+		theFile="${preset##*/}"
+		theName="${theFile%.yaml}"
+		presets_info="$presets$theName\n"
+		$USE_PRESET \
+			&& [[ "${theName}" == "${a_preset:-}" ]] \
+			&& [[ ! -f "$workspace/$command/${a_name}.yaml" ]] \
+			&& cp "${preset}" "$workspace/$command/${a_name}.yaml"
+	done
+}
+
+process_presets
+[[ -n "$presets_info" ]] && extra="\n${bold}presets:${reset}\n${presets_info}"
+
+# Return - individual commands can add their own metadata/help things
 $METADATAONLY && return
 
-$DEBUG && echo "Command: '$command'"
+# CONFIG
 
-# default config
-[[ -z ${workspace+x} ]] && workspace="$g_working_dir/input"
 [[ ! -f "$g_config_file" || ! -d "$workspace" ]] \
 	&& echo "Config not found or not within an ign project directory" && exit 1
+
+$DEBUG && echo "Command: '$command'"
 
 SHOW=true #default
 LIST=false
 SHOW_FORM=false
+SHOW_PRESETS=false
 DELETE_ENTRY=false
 ADD_ENTRY=false
 EDIT_ENTRY=false
 a_name=""
+a_preset=""
  
 for arg in "$@"
 do
@@ -58,6 +89,23 @@ do
         ;;
         --form)
             SHOW_FORM=true
+        ;;
+        --presets)
+        	SHOW_PRESETS=true
+        ;;
+        --use|--use-preset)
+        	USE_PRESET=true
+        ;;
+        --use=*|--use-preset=*)
+        	USE_PRESET=true
+        	a_preset="${arg#--use*=}"
+        	a_name="${a_name:-$a_preset}"
+        ;;
+        --edit=*)
+        	USE_PRESET=true
+            EDIT_ENTRY=true
+        	a_preset="${arg#--edit=}"
+        	a_name="${a_name:-$a_preset}"
         ;;
         --edit|-e|-E)
             EDIT_ENTRY=true
@@ -74,14 +122,18 @@ do
         # ? in this context is a single letter wildcard 
         ?*)
 	        a_name="$arg"
+			a_preset="${a_preset:-$arg}"
 	        SHOW=false
         ;;
     esac
 done
 
+$SHOW_PRESETS && printf "\n${bold}presets:${reset}\n%s" "${presets_info}"
+process_presets
+
 # FIND LIST||SHOW
 FOUND=false	
-for thePath in "$workspace"/$command/*.yaml
+for thePath in "$workspace/$command/"*.yaml
 do
  	theFile="${thePath##*/}"
  	theName="${theFile%.yaml}"

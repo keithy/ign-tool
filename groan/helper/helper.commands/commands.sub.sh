@@ -22,22 +22,28 @@ function list_sub_cmds()
 
   for s_dir in ${g_locations[@]} ; do
 
-	# Display the default sub-command at the top of  the list (without its breadcrumb)
-    #if ! [[ "$g_default_subcommand" == _* ]] ; then    
-     for s_path in $s_dir/${g_default_subcommand}.sub.*
-      do
-        g_parseScriptPath "$s_path"
-        $DEBUG && echo "Parsed: …${s_dir##*/}${dim}/${reset}$s_name (${s_sub_cmd:-no subcommand})" 
-        METADATAONLY=true
-        g_executeScriptPath "$s_path"  
+		# Display the default sub-command at the top of  the list (without its breadcrumb)
+		#if ! [[ "$g_default_subcommand" == _* ]] ; then    
+		 for s_path in $s_dir/${g_default_subcommand}.sub.*
+		  do
+			g_parseScriptPath "$s_path"
+			$DEBUG && echo "Parsed[$s_path]: …${s_dir##*/}${dim}/${reset}$s_name (${s_sub_cmd:-no subcommand})" 
+			METADATAONLY=true
+			printf "%-45s" "$crumbs"
+			g_executeScriptPath "$s_path"  
 
-        printf "%-45s" "$crumbs"
-        echo "$description"
-      done
-    #fi
+			echo "$description"
+		  done
+		#fi
+ done
 
+ local c_file="$1"
+ g_readLocations "$c_file"
+	
+ for s_dir in ${g_locations[@]} ; do
+	
 	# Display the c_sub_cmds (with breadcrumb)
-    for s_path in $s_dir/[^_]*.sub.*
+  	for s_path in $s_dir/[^_]*.sub.*
     do
       g_parseScriptPath "$s_path"
 
@@ -54,7 +60,7 @@ function list_sub_cmds()
         echo "$description"
       fi
     done
-  done
+ done
 }
 
 c_file_list=()

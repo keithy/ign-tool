@@ -25,7 +25,7 @@ theForm="passwd.users[+]:
 "
 
 source "$s_dir/include.sh"
-options="$options\n--password                # enter at prompt"
+options="$options\n--password                  # enter at prompt"
 
 $SHOWHELP && g_displayHelp
 $METADATAONLY && return

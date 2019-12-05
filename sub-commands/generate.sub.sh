@@ -1,4 +1,4 @@
-# groan new.sub.sh
+# ign generate.sub.sh
 #
 # by Keith Hodges 2019
 #
@@ -8,13 +8,16 @@ $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 command="generate"
 description="generate ignition file"
 options=\
-"--confirm            # not a dry run - perform action
---view               # see the input"
+"--script             # show unprocessed input script
+--vars               # list variables in the script
+--yaml               # yaml final
+--json               # validated json output
+--verbose            # (all of the above)
+--confirm            # not a dry run - deploy"
  
 usage=\
-"$breadcrumbs                            # --list & --help
-$breadcrumbs generate --view            # generate ignition file
-$breadcrumbs generate                   # generate ignition file"
+"$breadcrumbs --verbose  # show all steps in generation
+$breadcrumbs --confirm  # generate and deploy ignition file"
 
 $SHOWHELP && g_displayHelp
 $METADATAONLY && return
@@ -22,27 +25,38 @@ $METADATAONLY && return
 $DEBUG && echo "Command: '$command'"
 
 # default config
-$DEBUG && echo "Viewer: $VIEWER"
-[[ -z ${header+x} ]]    && header="00-header.yaml"
-[[ -z ${output+x} ]]    && USETMP=true || USETMP=false 
+[[ -z ${output+x} 	 ]] && USETMP=true || USETMP=false 
 [[ -z ${libraries+x} ]] && libraries=("$g_working_dir/plugs" "$c_dir/plugs")
 [[ -z ${workspace+x} ]] && workspace="$g_working_dir/input"
+[[ -z ${header+x}    ]] && header="$workspace/00-header.yaml"
 [[ ! -f "$g_config_file" || ! -d "$workspace" ]] \
 	&& echo "Config not found or not within an ign project directory" && exit 1
 
 $USETMP || output="${output%.json}"
 
 GENERATE=true
-VIEW_SCRIPT=false
-VIEW_YAML=false
-VIEW_JSON=false
+VIEW_HEADER="$VERBOSE"
+VIEW_SCRIPT="$VERBOSE"
+LIST_VARIABLES="$VERBOSE"
+VIEW_YAML="$VERBOSE"
+VIEW_JSON="$VERBOSE"
 FCCT_PRETTY="-pretty"
 FCCT_STRICT="-strict"
+GET_INPUT=false
+input_file=""
 
 for arg in "$@"
 do
+	$GET_INPUT && input_file="$arg" && GET_INPUT=false && continue
     case "$arg" in
-        --input|--script)
+        --input|-input)
+            GET_INPUT=true
+            continue
+        ;;
+        --header)
+            VIEW_HEADER=true
+        ;;
+        --script)
             VIEW_SCRIPT=true
         ;;
         --yaml)
@@ -57,6 +71,9 @@ do
         --no-strict)
             FCCT_STRICT=""
         ;;
+        --variables|--vars)
+            LIST_VARIABLES=true
+        ;;
         -*)
         # ignore other options
         ;;
@@ -66,27 +83,54 @@ do
     esac
 done
 
-# --options
+# Three input options
+# A - Start with named input file
+# B - Build upon a standard header
+# C - Read input from pipe
+if [[ -n "$input_file" ]]; then #A
+ 	input=$(cat "$input_file")
+elif [ -t 0 ]; then #B
+	input=$(cat "$header")
+else #C
+	input=$(cat) #read from stdin
+fi
+
+$VIEW_HEADER && printf "${bold}header:${reset}\n$input\n"
+
+# Collate the input script
 $USETMP && script=$(mktemp) || script="$output.src" && $DDEBUG && echo "script: $script" 
+cp /dev/null "$script"
 
-find "${workspace}" -name "*.yaml" -type f -exec grep -v '^##' {} \; -exec echo \; > $script
- 
-$VIEW_SCRIPT && cat $script && exit 0
+find "${workspace}" -mindepth 2 -name "*.yaml" -type f -exec grep -v '^##' {} \; -exec echo \; > "$script" 
+$VIEW_SCRIPT && printf "${bold}script:${reset}\n" && cat "$script"
 
+# Generate YAML
 $USETMP && yaml=$(mktemp) || yaml="$output.yaml" && $DDEBUG && echo "yaml: $yaml"
+echo "$input" > "$yaml"
 
-yq w -s $script "$header" > $yaml
+YQ_HAPPY=false
+echo "$input" | yq w -s "$script" - 2&> /dev/null && YQ_HAPPY=true
 
-$VIEW_YAML && cat $yaml && exit 0
+if $LIST_VARIABLES; then
+	$YQ_HAPPY && echo "$input" | yq w -s "$script" - > "$yaml"
+	printf "${bold}vars:${reset}\n" && envsubst --variables "$(cat "$yaml")"
+fi
 
+$VIEW_YAML && printf "${bold}yaml:${reset}\n"
+$YQ_HAPPY && echo "$input" | yq w -s "$script" - | envsubst > "$yaml"
+$YQ_HAPPY || echo "$input" | envsubst > "$yaml"
+$VIEW_YAML && cat $yaml
+
+# Generate JSON
 $USETMP && json=$(mktemp) || json="$output.json" && $DDEBUG && echo "json: $json"
+cp /dev/null "$json"
 
-fcct $FCCT_PRETTY $FCCT_STRICT -input $yaml -output $json
-
-$VIEW_JSON && cat $json && exit 0
+$VIEW_JSON && $VERBOSE && printf "${bold}json:${reset}\n"
+fcct $FCCT_PRETTY $FCCT_STRICT -input "$yaml" -output "$json"
+$CONFIRM || cat "$json"
 
 # Deployment is --confirm(ed)
-$CONFIRM || echo "${dim}(--confirm to deploy)${reset}"
+$CONFIRM || printf "\nadd ${dim}--confirm${reset} to deploy to: $deploy_target\n" >&2
 $CONFIRM || exit 0
 
 $LOUD && echo cp $json "$deploy_target"

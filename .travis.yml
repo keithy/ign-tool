@@ -12,6 +12,11 @@ before_install:
   - mkdir -p ${HOME}/.Trash
   - pip3 install passlib
 
+before_script:
+  - wget https://github.com/coreos/fcct/releases/download/v0.2.0/fcct-x86_64-unknown-linux-gnu -O ${TRAVIS_BUILD_DIR}/fcct
+  - wget https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64 -O ${TRAVIS_BUILD_DIR}/yq
+  - chmod a+x ${TRAVIS_BUILD_DIR}/fcct ${TRAVIS_BUILD_DIR}/yq
+
 env:
   global:
     - PATH=${TRAVIS_BUILD_DIR}:${PATH}

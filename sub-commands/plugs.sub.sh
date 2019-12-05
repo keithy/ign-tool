@@ -26,8 +26,6 @@ storage.files[+]:
 [[ -z ${libraries+x} ]] && libraries=("$c_dir/plugs" "$g_working_dir/plugs")
 [[ -z ${repo_directory+x} ]] && repo_directory="$c_dir/repos"
 [[ -z ${workspace+x} ]] && workspace="$g_working_dir/input"
-[[ ! -f "$g_config_file" || ! -d "$workspace" ]] \
-	&& echo "Config not found or not within an ign project directory" && exit 1
 
 function installed_plugs () {
 	installed=""
@@ -60,6 +58,9 @@ $SHOWHELP && g_displayHelp
 $METADATAONLY && return
 
 $DEBUG && echo "Command: '$command'"
+
+[[ ! -f "$g_config_file" || ! -d "$workspace" ]] \
+	&& echo "Config not found or not within an ign project directory" && exit 1
 
 plugs_add=""
 plugs_minus=""
