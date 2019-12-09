@@ -32,6 +32,9 @@ $DEBUG && echo "Command: '$command'"
 [[ ! -f "$g_config_file" || ! -d "$workspace" ]] \
 	&& echo "Config not found or not within an ign project directory" && exit 1
 
+command -v fcct >/dev/null 2>&1 || { echo "Missing dependency for generating ignition - fcct" ; exit 1 ; }
+command -v yq >/dev/null 2>&1 || { echo "Missing dependency for composing yaml - yq" ; exit 1 ; } 
+
 $USETMP || output="${output%.json}"
 
 GENERATE=true

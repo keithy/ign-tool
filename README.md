@@ -22,7 +22,7 @@ Provisioning a user in one line with the above keys and also direct password ent
 ```
 Generating the ignition.json to the designated target (configured in ign.conf)
 ```
-ign generate --json
+ign generate --confirm
 ```
 
 ## Getting Started
@@ -35,7 +35,7 @@ links it to somewhere on your path.
 To create a new project `ign` includes a handy template working directory (like rust cargo etc.)
 ```
 ign setup new 
-ign setup new my.ign --start --confirm
+ign setup new my.ign --starter --confirm
 cd my.ign
 nano ign.conf
 ```

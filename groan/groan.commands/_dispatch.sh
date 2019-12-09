@@ -8,7 +8,7 @@
 # Failthrough to _not_found_sub.<cmd>.cmd.<cmdsub>.sub.<ext>
 # Partial matching of c_sub_cmds is supported
 
-$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
+$DEBUG && echo "${dim}${BASH_SOURCE[0]}${reset}"
 
 #######
 #These functions implement the format/policy of each command script for this folder
@@ -62,7 +62,7 @@ function g_findCommands()
     do
       g_parseScriptPath "$s_path"
 
-      if [ -n "s_sub_cmd" ]; then
+      if [ -n "$s_sub_cmd" ]; then
         if ! [[ "$s_dest_subcmd_name" == *.sub.* ]]; then #this c_sub_cmd invokes a g_dispatcher
           crumbs="$2 $s_sub_cmd"
           g_findCommands "$s_dest_path" "$crumbs"
@@ -92,7 +92,7 @@ do
     g_parseScriptPath "$s_path"
 
     if [ -n "$s_sub_cmd" ]; then
-      list+=($s_sub_cmd)
+      list+=("$s_sub_cmd")
       $DEBUG && echo "Found #${#list[@]} : $s_path"
     fi
 done

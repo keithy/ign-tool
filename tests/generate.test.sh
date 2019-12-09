@@ -9,6 +9,9 @@ cd /tmp/sandbox.ign
 
 NL=$'\n'
 
+which fcct || echo "Missing dependency for generating ignition - fcct"
+which yq   || echo "Missing dependency for composing yaml - yq" 
+
 # lets go!
 
 describe "Run generate on empty workspace" && {

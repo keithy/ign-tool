@@ -45,7 +45,7 @@ function g_identifyPlatform
     else
 		g_system=$(uname)
         UNIX=true
-        export $(cat /etc/os-release)
+        export "$(cat /etc/os-release)"
     fi
 }
 
@@ -54,10 +54,10 @@ function g_needsSudo() {
     prompt=$(sudo -nv 2>&1)
     if [ $? -eq 0 ]; then
        $DEBUG && echo "User has 'sudo' access."
-    elif echo $prompt | grep -q '^sudo:'; then
+    elif echo "$prompt" | grep -q '^sudo:'; then
        $DEBUG && echo "User has sudo (password required)"
     else
-       echo "this action requires `sudo` access."
+       echo "this action requires 'sudo' access."
        exit 1
     fi
 }
@@ -167,20 +167,20 @@ function g_sourceScriptMappingArgs
 
 function g_displayHelp {
   printf "${bold}${brief:-$description}${reset}\n"
-  [[ ! -z ${brief+x} ]] && printf "$description\n\n"
-  [[ ! -z ${extra+x} ]] && printf "$extra\n\n"
-  if [[ ! -z ${options+x} ]]; then
+  [[ -n ${brief+x} ]] && printf "$description\n\n"
+  [[ -n ${extra+x} ]] && printf "$extra\n\n"
+  if [[ -n ${options+x} ]]; then
     printf "${bold}common:${reset} ${commonOptionsLong}\n${bold}options:${reset} ${commonOptionsShort}\n$options\n\n"
   else
     printf "${bold}options:${reset}\n${optionsLongForm}\n\n"
   fi
   printf "${bold}usage:${reset}\n${usage}\n"
-  [[ ! -z ${help_postscript+x} ]] && printf "\n$help_postscript\n"
+  [[ -n ${help_postscript+x} ]] && printf "\n$help_postscript\n"
 }
 
 function g_checkForMarkdownViewer {
     # Check for Markdown Viewer
-    [[ -z $(which "${g_markdown_viewer%% *}") ]] && g_markdown_viewer="cat"
+    [[ -z $(command -v "${g_markdown_viewer%% *}") ]] && g_markdown_viewer="cat"
     $DEBUG && echo "Markdown viewer: $g_markdown_viewer"
 }
 
@@ -190,7 +190,7 @@ function g_shiftArgsIntoNext {
     local params=()
     local arg
 
-    if [[ "${#args[@]}" > 0 ]]; then
+    if [[ "${#args[@]}" -gt 0 ]]; then
             for arg in "${args[@]}"
             do 
                     if [ -z "$next" ]; then

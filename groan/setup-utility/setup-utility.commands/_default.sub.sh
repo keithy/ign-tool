@@ -26,11 +26,11 @@ function list_sub_cmds()
 
   g_readLocations "$c_file"
 
-  for s_dir in ${g_locations[@]} ; do
+  for s_dir in "${g_locations[@]}" ; do
 
 	# Display the default sub-command at the top of  the list (without its breadcrumb)
     #if ! [[ "$g_default_subcommand" == _* ]] ; then    
-     for s_path in $s_dir/${g_default_subcommand}.sub.*
+     for s_path in "$s_dir/${g_default_subcommand}.sub."*
       do
         g_parseScriptPath "$s_path"
         $DEBUG && echo "Parsed: …${s_dir##*/}${dim}/${reset}$s_name (${s_sub_cmd:-no subcommand})" 
@@ -43,7 +43,7 @@ function list_sub_cmds()
     #fi
 
 	#Display the c_sub_cmds (with breadcrumb)
-	for s_path in $s_dir/[^_]*.sub.*
+	for s_path in "$s_dir"/[^_]*.sub.*
 	do
 	  g_parseScriptPath "$s_path"
 
@@ -66,7 +66,7 @@ function list_sub_cmds()
 if $DEBUG; then # print out results of recursive search
   echo
   for i in "${!c_file_list[@]}"; do    
-       printf "(%d) %-45s" $i ${crumbsList[i]}
+       printf "(%d) %-45s" "$i" "${crumbsList[i]}"
        echo "${c_file_list[i]}"
   done
   echo

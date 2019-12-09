@@ -2,7 +2,7 @@
 #
 # by Keith Hodges 2010
 #
-$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
+$DEBUG && echo "${dim}${BASH_SOURCE[0]}${reset}"
 
 command="self-install"
 description="install in system"
@@ -94,10 +94,10 @@ if [[ ! -d "$installPath" ]]; then
 fi
 
 if $ADDLINK; then
-    $LOUD && echo "ln -s $c_file $installPath/$c_name"
+    $LOUD && echo "ln -s "$g_root_cmd_file" "$installPath/${g_root_cmd_file##*/}" 
     $DRYRUN && echo "dryrun: --confirm required to proceed"
-    $CONFIRM && ln -s "$c_file" "$installPath/$c_name" 
-    $CONFIRM && echo "Installed symbolic link from $installPath/$c_name to $c_file"
+    $CONFIRM && ln -s "$g_root_cmd_file" "$installPath/${g_root_cmd_file##*/}" 
+    $CONFIRM && echo "Installed symbolic link from $installPath/${g_root_cmd_file##*/} to $g_root_cmd_file"
 fi
 
 exit 0
