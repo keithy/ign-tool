@@ -30,24 +30,7 @@ set -o allexport
 NL=$'\n'
 
 # FUNCTIONS
-
-function g_identifyPlatform
-{
-    MACOSX=false
-    WINDOWS=false
-    LINUX=false
-
-    if [[  -d "/System/Library/Frameworks" ]] ; then
-		g_system=$(uname)
-        MACOSX=true
-    elif [ -d "/WINDOWS" ] ; then
-        WINDOWS=true
-    else
-		g_system=$(uname)
-        UNIX=true
-        export "$(cat /etc/os-release)"
-    fi
-}
+g_PLATFORM="${BASH_VERSINFO[5]}" # the simplest to use determinator?
 
 function g_needsSudo() {
     local prompt

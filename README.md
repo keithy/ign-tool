@@ -46,10 +46,10 @@ The `ign` command creates yaml snippets in `my.ign/inputs` which are merged toge
 ### dependencies:
 
 - `bash` >= 4.4
-- `yq` # yaml query tool
-- `fcct` # Fedora Configuration Transpiler
-- `pip3 install passlib` # for generating password hash
-- `apt-get install expect` # for testing password interaction
+- `[yq](https://github.com/mikefarah/yq/releases)` # yaml query tool
+- `[fcct](https://github.com/coreos/fcct/releases)` # Fedora Configuration Transpiler 
+- `sudo pip3 install passlib` # for generating user/group password hash
+- `sudo yum install expect` # (TESTING ONLY) password interaction
 
 ## issues
 

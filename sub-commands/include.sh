@@ -3,10 +3,12 @@
 # by Keith Hodges 2019
 #
 #
-$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
+$DEBUG && echo "${dim}${BASH_SOURCE[0]}${reset}"
 
 # CONFIG
 
+[[ -z ${trash+x} ]] && [[ -d "$HOME/.Trash" ]] && trash="$HOME/.Trash"
+[[ -z ${trash+x} ]] && trash="$HOME/.local/share/Trash/files" && mkdir -p "$trash" || true
 [[ -z ${g_presets_dir+x} ]] && g_presets_dir="$g_working_dir/presets"
 [[ -z ${workspace+x} 	 ]] && workspace="$g_working_dir/input"
 
