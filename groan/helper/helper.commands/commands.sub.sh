@@ -65,7 +65,7 @@ function list_sub_cmds()
 
 c_file_list=()
 crumbsList=()
-g_findCommands "$g_root_cmd_file" ${g_root_cmd_file##*/}
+g_findCommands "${g_file}" ${g_name}
 
 if $DEBUG; then # print out results of recursive search
   echo

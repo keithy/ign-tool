@@ -30,6 +30,8 @@ do
     ;;
     --unlink)
         UNLINK=true
+        ADDLINK=false
+        ADDACTION=false
     ;;
 #   --full)
 #	FULLINSTALL=true
@@ -45,18 +47,19 @@ do
 done
 
 if $UNLINK; then
-    theInstalledLink=$(which "$c_name")
-    if [ -z "$theInstalledLink" ]; then
-        echo "$c_name appears not to be installed"
+    theInstalledLink="$(command -v "$g_name" || true)"
+    #echo "THEINSTALLEDLINK: $theInstalledLink ($g_name) [$PATH]"
+    if [[ -z "$theInstalledLink" ]]; then
+        echo "$g_name appears not to be installed"
         exit 1
     fi
 
-    if [ ! -L "$theInstalledLink" ]; then
+    if [[ ! -L "$theInstalledLink" ]]; then
         echo "Not a link: $theInstalledLink - leaving well alone"
         exit 1
     fi
 
-    theInstalled=$(readlink -n $theInstalledLink)
+    theInstalled="$(readlink -n "$theInstalledLink" || true)"
     if [ "$theInstalled" != "$c_file" ]; then
         echo "This link does not point to me: $theInstalledLink - leaving well alone"
         exit 1
@@ -83,7 +86,7 @@ fi
 
 #user gave us a destination is it on the $PATH
 searchablePath=":$PATH:"
-if [ "$searchablePath" = "${searchablePath/:$installPath:/:}" ]; then
+if [[ "$searchablePath" != *":$installPath:"* ]]; then
     echo "Your PATH does not include $installPath, please specify a valid path."
     exit 1
 fi
@@ -94,10 +97,10 @@ if [[ ! -d "$installPath" ]]; then
 fi
 
 if $ADDLINK; then
-    $LOUD && echo "ln -s "$g_root_cmd_file" "$installPath/${g_root_cmd_file##*/}" 
+    $LOUD && echo "ln -s ${g_file} $installPath/${g_name}"
     $DRYRUN && echo "dryrun: --confirm required to proceed"
-    $CONFIRM && ln -s "$g_root_cmd_file" "$installPath/${g_root_cmd_file##*/}" 
-    $CONFIRM && echo "Installed symbolic link from $installPath/${g_root_cmd_file##*/} to $g_root_cmd_file"
+    $CONFIRM && ln -s "${g_file}" "$installPath/${g_name}" 
+    $CONFIRM && echo "Installed symbolic link from $installPath/${g_name} to ${g_file}"
 fi
 
 exit 0

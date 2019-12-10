@@ -15,7 +15,7 @@ $METADATAONLY && return
 
 c_file_list=()
 crumbsList=()
-g_findCommands "$g_root_cmd_file" "${g_root_cmd_file##*/}"
+g_findCommands "${g_file}" "${g_name}"
 
 # get the cached version, the git version, use cache if git not working, if changed write cache
 function get_version()

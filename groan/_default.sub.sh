@@ -29,7 +29,7 @@ do
       VERBOSE=true
   ;;
   *)
-      if [[ "$helpRequest" = "" ]]; then
+      if [[ -z "$helpRequest" ]]; then
          helpRequest=$arg
       fi
   ;;
@@ -38,9 +38,8 @@ done
 
 $DEBUG && echo "Help request: '$helpRequest'"
 
-	
 #check user has given us a file reference
-if [[ "$helpRequest" = "" ]]; then
+if [[ -z "$helpRequest" ]]; then
   g_displayHelp
   printf "\nPlease give me a help topic\n"
   exit 1

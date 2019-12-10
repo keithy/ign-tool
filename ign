@@ -176,12 +176,16 @@ function g_displayHelp {
   fi
   printf "${bold}usage:${reset}\n${usage}\n"
   [[ -n ${help_postscript+x} ]] && printf "\n$help_postscript\n"
+  
+  return 0 
 }
 
 function g_checkForMarkdownViewer {
     # Check for Markdown Viewer
     [[ -z $(command -v "${g_markdown_viewer%% *}") ]] && g_markdown_viewer="cat"
     $DEBUG && echo "Markdown viewer: $g_markdown_viewer"
+    
+    return 0
 }
 
 # This function should be easy but bash begs to differ: ${args[@]:1}
@@ -285,7 +289,10 @@ done
 g_readLocations "$c_file"
 
 breadcrumbs="$c_name"
-g_root_cmd_file="$c_file"
+g_dir="$c_dir"
+g_file="$c_file"
+g_name="$c_name"
+
 
 g_readConfig
 g_readThemes

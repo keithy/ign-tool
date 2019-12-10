@@ -62,7 +62,7 @@ if [ -n "$configureName" ]; then
 fi
 
 # --options
-[[ -z ${g_config_preset_locations+x} ]] && g_config_preset_locations=("${g_root_cmd_file%/*}")
+[[ -z ${g_config_preset_locations+x} ]] && g_config_preset_locations=("${g_dir}")
 
 if $SHOWOPTIONS; then
     printf "\nAvailable options:\n"
@@ -82,7 +82,7 @@ if $SHOWOPTIONS; then
     	done
     done
     
-    if [ "$PWD" != "${g_root_cmd_file%/*}" ]; then
+    if [ "$PWD" != "${g_dir}" ]; then
         for found in *.conf
         do
             echo "    $found"
