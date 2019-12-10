@@ -28,25 +28,27 @@ $DEBUG && echo "Command: '$command'"
 	&& echo "Config not found or not within an ign project directory" && exit 1
 
 
-LIST_KEYS=true
-FIND_KEYS=true
-FIND_NEEDLE=false
+LIST_KEYS=false
+FIND_KEYS=false
+EXPORT_VARS=false
 needle=""
 for arg in "$@"
 do
     case "$arg" in
         --list)
             LIST_KEYS=true
-            FIND_KEYS=false
+            EXPORT_VARS=false
         ;;
         --find)
             FIND_KEYS=true
-            LIST_KEYS=false
+        ;;
+        --export)
+            EXPORT_VARS=true
         ;;
         =*) #(comma separated list)
-        	FIND_NEEDLE=true
        	    LIST_KEYS=false
         	FIND_KEYS=false
+        	EXPORT_VARS=false
         	needles="${arg#=}"
         ;;
         -*)
@@ -61,18 +63,37 @@ done
 if $FIND_KEYS; then
     $LOUD && echo "${bold}found:${reset}"
  	$VERBOSE && print="-print" || print=""
- 	find $HOME/.. -name "*.pub" -path "*/.ssh/*" -type f -maxdepth 3 $print -exec awk \
- 		'{printf "%3c) %12s %s...%s %s\n", 64 + NR, $1, substr($2, 1, 7), substr($2,length($2)-7) , $3}' \
+ 	find $HOME/.. -name "*.pub" -path "*/.ssh/*" -type f -maxdepth 3 $print \
+ 		-exec awk '{printf "%3c) %12s %s...%s %s\n", 64 + NR, $1, substr($2, 1, 7), substr($2,length($2)-7) , $3}' \
  		{} + 2> /dev/null || true
+ 	exit 0
 fi
 
-if $FIND_NEEDLE; then
-    $VERBOSE && echo "${bold}needle:${reset}"
- 	$VERBOSE && print="-print" || print=""
- 	find $HOME/.. -name "*.pub" -path "*/.ssh/*" -type f -maxdepth 3 $print -exec awk -v "needles=,$needles," \
- 		'{ key=sprintf(",%c,", NR+64 ); if ( needles ~ key  ) print $0}' \
- 		{} + 2> /dev/null || true
-fi
+i=1
+$LOUD && echo "${bold}ssh keys:${reset}"
+$VERBOSE && print="-print" || print=""
+for user_path in "$HOME/../"*
+do
+	for pub_path in "$user_path"/.ssh/*.pub
+	do
+		if  [[ ",${needles:-$i}," == *",$i,"* ]]; then
+			pub="${pub_path##*/}"
+			name_type="${user_path##*/}_${pub%.pub}"
+			value="$(cat "$pub_path")"
+			
+			if $EXPORT_VARS; then
+				printf "SSH_%s=%s\n" "$name_type" "$value"
+			else
+				$LOUD && printf "  $i) %s " "${value##* }"			
+				$LOUD && printf "${dim}available as:${reset} "
+				printf "%s\n" "\${SSH_$name_type}"
+			fi
+		fi
+		i=$(( $i + 1 ))		 
+	done
+done
+
+exit 0
 
 $LOUD && $LIST_KEYS && echo "${bold}list keys used:${reset}"
 cd "$workspace"
@@ -96,7 +117,7 @@ do
 			;;
 		esac
 		if $READ_KEYS; then
-			$LIST_KEYS && printf "%3d) %s %s\n" "$i" "$a_file" "$line_no_ws"
+			$LIST_KEYS && printf "%3d) %s %s...%s\n" "$i" "$a_file" "${line_no_ws% * *}" "${line_no_ws##* }"
 			$FIND_NEEDLE && [[ ",$needles," == *",$i,"* ]] && printf "${line_no_ws#- }\n"
 			i=$(( $i + 1 ))
 		fi 

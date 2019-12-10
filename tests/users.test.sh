@@ -239,7 +239,7 @@ describe "list-subitem groups" && {
 									"  name: ben"
 		}
 	}
-	ign users ben --delete 
+	ign users ben --delete
 }
 
 context "add password using user interaction" && {

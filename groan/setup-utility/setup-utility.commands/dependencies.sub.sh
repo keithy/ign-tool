@@ -5,13 +5,12 @@
 $DEBUG && echo "${dim}${BASH_SOURCE[0]}${reset}"
 
 command="dependencies"
-description="manually install dependencies"
+description="install dependencies"
 options=\
 "--fcct              # install fcct
---yq            	# install yq
+--yq                # install yq
 --passlib           # install passlib
---expect            # install expect
-"
+--expect            # install expect"
 
 usage=\
 "$breadcrumbs dependencies ~/bin --confirm       # install all dependencies (default)

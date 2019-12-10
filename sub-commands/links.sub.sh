@@ -51,7 +51,7 @@ if $FOUND; then
 			   [[ "$owner" == "user" ]]  && Y[user.name]="${line##*name: }" 
 			   [[ "$owner" == "group" ]] && Y[group.name]="${line##*name: }"
 			;;
-			*:*)
+			*:\ *)
 				Y[${line%:*}]="${line#*: }"
 			;;
 		esac
@@ -93,5 +93,5 @@ $LOUD && echo "${bold}${theFile}${reset}" && grep -v '^#' "$thePath"
 	
 exit 0
 
-#This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
+"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 #Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."

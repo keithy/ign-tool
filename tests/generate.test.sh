@@ -18,7 +18,7 @@ describe "Run generate on empty workspace" && {
 
 	context "ign generate - vanilla" && {
 
-		out=$(ign generate) && should_succeed	 
+		out=$(ign generate --json) && should_succeed	 
 
 		it "should return ignition json" && {
  			expect "$out" to_match "\{.*\"ignition\".*\"version\": \"[0-9]+\.[0-9]+\.[0-9]+\".*"
@@ -50,7 +50,7 @@ describe "Run generate on empty workspace" && {
 		}
 		
 		it "demos variable list" && {
-			expect "$out" to_match ".*vars:${NL}VARIANT${NL}.*"
+			expect "$out" to_match ".*vars required:${NL}VARIANT${NL}.*"
 		}
 		it "variable substitution works" && {
 			expect "$out" to_match "${NL}yaml:${NL}.*${NL}variant: fcos${NL}.*"

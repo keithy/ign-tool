@@ -24,12 +24,12 @@ options=\
 
 usage=\
 "$breadcrumbs                              # --show
-$breadcrumbs $command --list                 # list names
-$breadcrumbs $command --show                 # show files
-$breadcrumbs $command hug --edit             # edit file
-$breadcrumbs $command hug --add              # add record
-$breadcrumbs $command key=value              # add field
-$breadcrumbs $command --help                 # this message"
+$breadcrumbs --list                 # list names
+$breadcrumbs --show                 # show files
+$breadcrumbs hug --edit             # edit file
+$breadcrumbs hug --add              # add record
+$breadcrumbs key=value              # add field
+$breadcrumbs --help                 # this message"
 
 # Pretty print theForm if defined
 if [[ -n "$theForm" ]]; then
@@ -43,20 +43,24 @@ function process_presets () {
 	local theFile
 	local theName
 	presets_info=""
-	for preset in "${g_presets_dir}"/$command/*.yaml
+	for preset in "${g_presets_dir}/$command:"*.yaml
 	do
-		theFile="${preset##*/}"
+		theFile="${preset##*/$command:}"
 		theName="${theFile%.yaml}"
-		presets_info="$presets$theName\n"
-		$USE_PRESET \
+		presets_info="$presets_info$theName\n"
+		${USE_PRESET:-false} \
 			&& [[ "${theName}" == "${a_preset:-}" ]] \
 			&& [[ ! -f "$workspace/$command/${a_name}.yaml" ]] \
 			&& cp "${preset}" "$workspace/$command/${a_name}.yaml"
+		:
 	done
 }
 
 process_presets
-[[ -n "$presets_info" ]] && extra="\n${bold}presets:${reset}\n${presets_info}"
+
+$DEBUG && echo "Presets< ${g_presets_dir}"
+
+[[ -n "$presets_info" ]] && extra="\n${bold}presets:${reset}\n${presets_info}$extra"
 
 # Return - individual commands can add their own metadata/help things
 $METADATAONLY && return
@@ -112,7 +116,7 @@ do
         --edit|-e|-E)
             EDIT_ENTRY=true
         ;;
-        --delete)
+        --delete|--remove|--rm|--del)
         	DELETE_ENTRY=true
         ;;
         --add)
@@ -130,8 +134,9 @@ do
     esac
 done
 
-$SHOW_PRESETS && printf "\n${bold}presets:${reset}\n%s" "${presets_info}"
 process_presets
+
+$SHOW_PRESETS && printf "${bold}presets:${reset}\n${presets_info}\n"
 
 # FIND LIST||SHOW
 FOUND=false	
@@ -150,9 +155,8 @@ do
 	    echo "$content$NL"
 	fi
 	
-	[[ "$theName" == "$a_name" ]] && FOUND=true && break
+	[[ "$theName" == "$a_name" || "$theName" == "${a_name%.yaml}" ]] && FOUND=true && break
 done
-
 
 $SHOW_FORM && printf "$form\n" && exit 0
 $SHOW && [[ -z ${thePath+x} ]] && echo "none defined"
@@ -162,6 +166,7 @@ $FOUND && $DELETE_ENTRY && mv "$thePath" "$trash/$theFile" && echo "Moved $theFi
 $DELETE_ENTRY && echo "not found" && exit 1
 
 if ! $FOUND; then
+	$SHOW_PRESETS && exit 0
 	! $ADD_ENTRY && echo "${a_name} - not found" && exit 1
 	thePath="$workspace/$command/${a_name}.yaml"
 	theFile="${thePath##*/}"

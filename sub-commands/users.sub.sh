@@ -48,12 +48,12 @@ if $FOUND; then
 			ssh_authorized_keys:*)
 				list="keys"
 			;;
-			-*)
+ 			*:\ *)
+				Y[${line%:*}]="${line#*: }"
+			;;
+			-\ *)
 			   [[ "$list" == "groups" ]] && grps["${line#- }"]=1
 			   [[ "$list" == "keys" ]] && keys["${line#- }"]=1
-			;;
- 			*:*)
-				Y[${line%:*}]="${line#*: }"
 			;;
 		esac
 	done < "$thePath"
@@ -75,12 +75,12 @@ do
 	--ssh+=*)
 	   	while IFS=$'\n' read -r key; do
 			keys["$key"]=1
-		done < <(ign ssh "=${arg#--ssh+=}")
+		done < <("$g_file" ssh -q "=${arg#--ssh+=}")
 	;;
 	--ssh-=*)
-	while IFS=$'\n' read -r key; do
-		unset -v "keys['${arg#*-=}']"
-	done < <(ign ssh "=${arg#--ssh-=}")
+		while IFS=$'\n' read -r key; do
+			unset -v "keys['$key']"
+		done < <("$g_file" ssh -q "=${arg#--ssh-=}")
 	;;
     groups+=*)
 	   grps["${arg#*+=}"]=1
@@ -135,5 +135,5 @@ $LOUD && echo "${bold}${theFile}${reset}" && grep -v '^#' "$thePath"
 	
 exit 0
 
-#This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
+"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 
 #Any additional contribution submitted for incorporation into or for distribution with this file shall be presumed subject to the same license."

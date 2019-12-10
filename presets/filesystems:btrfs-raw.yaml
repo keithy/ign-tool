@@ -1,0 +1,6 @@
+storage.filesystems[+]:
+  path: /var
+  device: /dev/disk/by-partlabel/var
+  format: btrfs
+  wipe_filesystem: true
+  label: var

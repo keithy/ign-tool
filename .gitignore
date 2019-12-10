@@ -5,6 +5,3 @@
 /nbproject
 /nbproject/private/
 /tests/sand/*
-/plugs
-!/repos/.*
-/repos/*

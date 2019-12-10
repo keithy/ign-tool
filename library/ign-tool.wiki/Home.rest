@@ -1,0 +1,14 @@
+.. raw:: html
+
+    <img src="https://assets.gitlab-static.net/uploads/-/system/project/avatar/15371798/LogoMakr_5gT8vd.png" height="140" alt="ignition tools - the spark starts here">
+
+__TOC__
+
+This wiki is a repository for **ignition** *"plugs"*, useful snippets, applications and modules packaged such that they can be merged into an `FCOS`_ - `ignition.json`_ file for deployment to a server node at provisioning time.
+
+.. _FCOS: https://getfedora.org/en/coreos/
+.. _getting started: https://docs.fedoraproject.org/en-US/fedora-coreos/getting-started/
+.. _ignition.json: https://github.com/coreos/ignition/blob/master/doc/getting-started.md
+.. _Logomakr.com: http://Logomakr.com
+.. [1] Logo made with `Logomakr.com`_
+

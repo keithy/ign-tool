@@ -109,10 +109,10 @@ r_options=""
 $VERBOSE && r_options="v"
 
 $LOUD && echo "${bold}Creating new project using:${reset} $TEMPLATE"
-$LOUD && echo "rsync -rltO${r_options}" "$templatePath" "$targetPath"
+$LOUD && echo "rsync -rLtO${r_options}" "$templatePath" "$targetPath"
 $DRYRUN && echo "${dim}dryrun:  --confirm required to proceed${reset}"
 
-$CONFIRM && rsync "-rltO${r_options}"  "$templatePath/" "$targetPath"
+$CONFIRM && rsync "-rLtO${r_options}"  "$templatePath/" "$targetPath"
 $CONFIRM && echo "Created $targetPath"
 
 #"This Code is distributed subject to the MIT License, as in http://www.opensource.org/licenses/mit-license.php . 

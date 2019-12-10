@@ -105,7 +105,13 @@ $USETMP && script=$(mktemp) || script="$output.src" && $DDEBUG && echo "script: 
 cp /dev/null "$script"
 
 find "${workspace}" -mindepth 2 -name "*.yaml" -type f -exec grep -v '^##' {} \; -exec echo \; > "$script" 
-$VIEW_SCRIPT && printf "${bold}script:${reset}\n" && cat "$script"
+if $VIEW_SCRIPT; then
+
+	printf "${bold}script:${reset}\n"
+	cat "$script"
+	
+	$VERBOSE || exit 0
+fi
 
 # Generate YAML
 $USETMP && yaml=$(mktemp) || yaml="$output.yaml" && $DDEBUG && echo "yaml: $yaml"
@@ -115,22 +121,67 @@ YQ_HAPPY=false
 echo "$input" | yq w -s "$script" - 2&> /dev/null && YQ_HAPPY=true
 
 if $LIST_VARIABLES; then
+
 	$YQ_HAPPY && echo "$input" | yq w -s "$script" - > "$yaml"
-	printf "${bold}vars:${reset}\n" && envsubst --variables "$(cat "$yaml")"
+	printf "${bold}vars required:${reset}\n" && envsubst --variables "$(cat "$yaml")"
+	
+	printf "${bold}values provided:${reset}\n" 
+	for env in "${g_working_dir}/"*.env; do
+
+  		case "$g_PLATFORM" in
+  			*linux-gnu)
+  				printf "%s\n" $(grep -v '^#' "$env" | xargs -d '\n')
+			;;
+			*darwin*)
+  				printf "%s\n"  $(grep -v '^#' "$env" | xargs -0)
+			;;
+  		esac
+	done
+	$VERBOSE && "$g_file" ssh --export || "$g_file" ssh
+
+	$VERBOSE || exit 0
 fi
 
-$VIEW_YAML && printf "${bold}yaml:${reset}\n"
+case "$g_PLATFORM" in
+*linux-gnu)
+	export $("$g_file" ssh -q --export | xargs -d '\n')
+;;
+*darwin*)
+	export $("$g_file" ssh -q --export | xargs -0)
+;;
+esac
+
+for env in "${g_working_dir}/"*.env; do
+
+  case "$g_PLATFORM" in
+  	*linux-gnu)
+  		export $(grep -v '^#' "$env" | xargs -d '\n')
+	;;
+	*darwin*)
+  		export $(grep -v '^#' "$env" | xargs -0)
+	;;
+  esac
+done
+
 $YQ_HAPPY && echo "$input" | yq w -s "$script" - | envsubst > "$yaml"
 $YQ_HAPPY || echo "$input" | envsubst > "$yaml"
-$VIEW_YAML && cat $yaml
+
+if $VIEW_YAML; then	
+	printf "${bold}yaml:${reset}\n"
+	cat $yaml
+	$VERBOSE || exit 0
+fi
 
 # Generate JSON
 $USETMP && json=$(mktemp) || json="$output.json" && $DDEBUG && echo "json: $json"
 cp /dev/null "$json"
 
-$VIEW_JSON && $VERBOSE && printf "${bold}json:${reset}\n"
 fcct $FCCT_PRETTY $FCCT_STRICT -input "$yaml" -output "$json"
-$CONFIRM || cat "$json"
+
+if $VIEW_JSON; then
+	printf "${bold}json:${reset}\n"
+	cat "$json"
+fi
 
 # Deployment is --confirm(ed)
 $CONFIRM || printf "\nadd ${dim}--confirm${reset} to deploy to: $deploy_target\n" >&2

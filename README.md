@@ -27,23 +27,34 @@ ign generate --confirm
 
 ## Getting Started
 
-Clone this project,  `ign` includes a setup utility command `self-install` that
+Clone `[ign-tool](https://github.com/keithy/ign-tool)`,
+`ign` includes a setup utility command `self-install` that
 links it to somewhere on your path.
 ```
 ./ign-tool/ign setup self-install ~/bin --link --confirm
 ```
-To create a new project `ign` includes a handy template working directory (like rust cargo etc.)
+To create a new project, `ign` includes a handy template working directory (like rust cargo etc.)
 ```
 ign setup new 
 ign setup new my.ign --starter --confirm
 cd my.ign
 nano ign.conf
 ```
-The local configuration file `ign.conf` applies when running `ign` within this working directory.
-The `ign` command creates yaml snippets in `my.ign/inputs` which are merged together by
-`ign generate --yaml` 
+The local configuration file `ign.conf` is applied to all commands when running `ign` within
+this working directory.
+The `ign` command edits a workspace of yaml snippets in `my.ign/inputs` which are merged
+together and output by `ign generate --yaml` 
+
+### The ignition snippets library - spark-"plugs"
+
+A library of useful snippets is published on the [repo wiki](https://github.com/keithy/ign-tool/wiki)
 
 ### dependencies:
+
+built in dependency installer
+```
+ign setup dependencies --confirm
+```
 
 - `bash` >= 4.4
 - `[yq](https://github.com/mikefarah/yq/releases)` # yaml query tool
@@ -54,7 +65,7 @@ The `ign` command creates yaml snippets in `my.ign/inputs` which are merged toge
 ## issues
 
 - https://gitlab.com/keithy/ign-tool
-- not supported
+- ignition features not supported by the tool (plugs can still add them)
     - systemd dropins
     - files append
      

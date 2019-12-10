@@ -70,16 +70,19 @@ describe "adding a filesystem" && {
 		}
 	}
     
+    ## Note in this test device has a dash in it on purpose 
+    ## because previously - options reading/writing would get confused due to the dash
+    
     context "add path device and format" && {
     
 		it "shows updated record" && {
 		
-			out=$(ign filesystems root path=/var/sysroot device=/dev/sda format=ext3) ; should_succeed
+			out=$(ign filesystems root path=/var/sysroot device=/dev/disk/by-partlabel/var format=ext3) ; should_succeed
 		
 			expect "$out" to_be "root.yaml" \
 								"storage.filesystems[+]:" \
 								"  path: /var/sysroot" \
-								"  device: /dev/sda" \
+								"  device: /dev/disk/by-partlabel/var" \
 								"  format: ext3" 
 		}     	 	
 	}
@@ -93,11 +96,27 @@ describe "adding a filesystem" && {
 			expect "$out" to_be "root.yaml" \
 								"storage.filesystems[+]:" \
 								"  path: /var/sysroot" \
-								"  device: /dev/sda" \
+								"  device: /dev/disk/by-partlabel/var" \
 								"  format: ext3" \
 								"  options:" \
 								"  - --option"
-		}     	 	
+		}
+	}
+
+   context "just re-read record" && {
+ 			
+		it "shows same record" && {
+		
+			out=$(ign filesystems root) ; should_succeed
+		
+			expect "$out" to_be "root.yaml" \
+								"storage.filesystems[+]:" \
+								"  path: /var/sysroot" \
+								"  device: /dev/disk/by-partlabel/var" \
+								"  format: ext3" \
+								"  options:" \
+								"  - --option"
+		}     	 	     	 	
 	}
 	
 	context "remove list-item option" && {
@@ -109,7 +128,7 @@ describe "adding a filesystem" && {
 			expect "$out" to_be "root.yaml" \
 								"storage.filesystems[+]:" \
 								"  path: /var/sysroot" \
-								"  device: /dev/sda" \
+								"  device: /dev/disk/by-partlabel/var" \
 								"  format: ext3"
 		}  	 	
 	}
