@@ -41,10 +41,15 @@ function installed_plugs () {
 		else
 			plug_names+=("$plug_name")
 		fi	
-				
-		${EDIT_PLUGS:-false} &&  [[ ",${plugs:-}," == *",$row,"* || ",${plugs:-}," == *",${plug_name},"* ]] && "$EDITOR" "$plug_path"
-		${EDIT_VARS:-false} &&  [[ ",${plugs:-}," == *",$row,"* || ",${plugs:-}," == *",${plug_name},"* ]] && "$EDITOR" "$g_working_dir/$plug_name.env"
-
+		
+		if  [[ ",${plugs:-}," == *",$row,"* || ",${plugs:-}," == *",${plug_name},"* ]]; then	
+			${EDIT_PLUGS:-false} && "$EDITOR" "$plug_path"
+			${SHOW_PLUGS:-false} && echo "${bold}.${plug_path:${#g_working_dir}}${reset}" && cat "$plug_path" && echo \
+				&& [[ -f "$g_working_dir/$plug_name.env" ]] \
+					&& echo "${bold}./${plug_name}.env${reset}" \
+					&& cat "$g_working_dir/$plug_name.env" && echo
+			${EDIT_VARS:-false} && "$EDITOR" "$g_working_dir/$plug_name.env"
+		fi
 		i=$(( $i + 1 ))
 	done
 }
@@ -70,7 +75,9 @@ PULL_PLUGS=false
 ADD_PLUGS=false
 DELETE_PLUGS=false
 EDIT_PLUGS=false
+SHOW_PLUGS=false
 EDIT_VARS=false
+
 for arg in "$@"
 do
     case "$arg" in
@@ -88,6 +95,10 @@ do
         ;;
         --edit)
         	EDIT_PLUGS=true
+        	DEFAULT=false
+        ;;
+        --show|--print)
+        	SHOW_PLUGS=true
         	DEFAULT=false
         ;;
         --vars)
@@ -115,7 +126,7 @@ do
     esac
 done
 
-$LOUD && { FIND_PLUGS=true ; LIST_PLUGS=true ; }
+$DEFAULT && $LOUD && { FIND_PLUGS=true ; LIST_PLUGS=true ; }
 $DELETE_PLUGS && plugs_minus="$plugs_minus,${plugs}"
 $ADD_PLUGS && plugs_add="$plugs_add,${plugs}"
 

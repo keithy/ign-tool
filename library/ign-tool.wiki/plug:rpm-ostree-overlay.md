@@ -11,7 +11,7 @@ OSTREE_OVERLAY_INSTALL_ACTION=ex livefs --i-like-danger
 ```
 
 ## Notes:
-Adding overlays to rpm-ostree is risky due to the push model used for providing server updates. Upstream testing will not have been performed on your specific combination of packages. It is possible to mitigate this risk by having some servers running on the 'next' update stream so you know whats coming.
+Adding overlays to rpm-ostree is risky due to the push model used for providing server updates. Upstream testing will not have been performed on your specific combination of packages.
 
 ### The Plug:
 ```yaml
