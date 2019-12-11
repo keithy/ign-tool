@@ -71,6 +71,6 @@ ign setup dependencies --confirm
      
 ### groan
 
-Ign is assembled using groan, the groan framework is a basis for composing hierarchical CLI interfaces with bash and other languages.
+`ign` is assembled using groan, the groan framework is a basis for composing hierarchical CLI interfaces with bash and other languages.
 
 - http://github.com/keithy/groan

@@ -7,7 +7,7 @@ $DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
 
 command="$s_sub_cmd"
 singular="${command%s}"
-description="manage ignition $command"
+description="edit $command"
 options=\
 "--list              # list installed $command
 --pull              # download available $command

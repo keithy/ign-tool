@@ -17,7 +17,7 @@
 # 2) a g_dispatcher, selecting the sub-sub-command based upon the next argument
 # 3) any other bespoke script or g_dispatcher
 
-$DEBUG && echo "${dim}${BASH_SOURCE}${reset}"
+$DEBUG && echo "${dim}${BASH_SOURCE[0]}${reset}"
 $DEBUG && echo "s_name: ${bold}$s_name${reset}"
 
 g_readLocations "$s_dest_path"

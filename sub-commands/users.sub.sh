@@ -53,13 +53,11 @@ if $FOUND; then
 			;;
 			-\ *)
 			   [[ "$list" == "groups" ]] && grps["${line#- }"]=1
-			   [[ "$list" == "keys" ]] && keys["${line#- }"]=1
+			   [[ "$list" == "keys" ]]   && keys["${line#- }"]=1
 			;;
 		esac
 	done < "$thePath"
 else
- #add entry
-	:
  $ADD_ENTRY && Y[name]="$theName"
 fi
 
@@ -131,7 +129,7 @@ printf "$yaml" > "$thePath"
 
 #DISPLAY
 $VERBOSE && echo "${bold}${theFile}${reset}" && cat "$thePath" && exit 0
-$LOUD && echo "${bold}${theFile}${reset}" && grep -v '^#' "$thePath"
+$LOUD    && echo "${bold}${theFile}${reset}" && grep -v '^#' "$thePath"
 	
 exit 0
 

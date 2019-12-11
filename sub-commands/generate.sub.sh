@@ -139,19 +139,19 @@ fi
 # EXPORT variables so envsubst can use them
 
 case "$g_PLATFORM" in
-*linux-gnu)
-	export $("$g_file" ssh -q --export | xargs -d '\n')
-;;
-*darwin*)
-	export $("$g_file" ssh -q --export | xargs -0)
-;;
+	*linux-gnu)
+		export $("$g_file" ssh -q --export | xargs -0)
+	;;
+	*darwin*)
+		export $("$g_file" ssh -q --export | xargs -0)
+	;;
 esac
 
 for env in "${g_working_dir}/"*.env; do
 
   case "$g_PLATFORM" in
   	*linux-gnu)
-  		export $(grep -v '^#' "$env" | xargs -d '\n')
+  		export $(grep -v '^#' "$env" | xargs -0)
 	;;
 	*darwin*)
   		export $(grep -v '^#' "$env" | xargs -0)

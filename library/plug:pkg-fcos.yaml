@@ -1,8 +1,0 @@
-storage: 
-  files:
-    - path: /opt/inbox/package/core/fcos-tools_v0.1.tar.gz
-      mode: 0644
-      contents:
-        source: https://github.com/keithy/fcos-tools/archive/fcos-tools_v0.1-fedora31-x86_64.tar.gz
-#        verification:
-#          hash: sha512-4b87c023090a5862c0b16aa994eb3778158e199525e3a0e8836e361824238df4fae58b020df91b0131a6fb7ac6dc1ee3eaa153cc50f6232826b55eb5a0903c90
