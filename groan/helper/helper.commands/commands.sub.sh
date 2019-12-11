@@ -29,7 +29,7 @@ function list_sub_cmds()
 			g_parseScriptPath "$s_path"
 			$DEBUG && echo "Parsed[$s_path]: …${s_dir##*/}${dim}/${reset}$s_name (${s_sub_cmd:-no subcommand})" 
 			METADATAONLY=true
-			printf "%-45s" "$crumbs"
+			printf "%-30s" "$crumbs"
 			g_executeScriptPath "$s_path"  
 
 			echo "$description"
@@ -54,7 +54,7 @@ function list_sub_cmds()
         crumbs="$2 $s_sub_cmd"
 
         METADATAONLY=true
-        printf "%-45s" "$crumbs"
+        printf "%-30s" "$crumbs"
         g_executeScriptPath "$s_path"  
 
         echo "$description"
