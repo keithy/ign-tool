@@ -35,7 +35,7 @@ $DEBUG && echo "Command: '$command'"
 command -v fcct >/dev/null 2>&1 || { echo "Missing dependency for generating ignition - fcct" ; exit 1 ; }
 command -v yq >/dev/null 2>&1 || { echo "Missing dependency for composing yaml - yq" ; exit 1 ; } 
 
-$USETMP || output="${output%.json}"
+$USETMP || output_name="${output%.json}"
 
 GENERATE=true
 VIEW_HEADER="$VERBOSE"
@@ -101,30 +101,25 @@ fi
 $VIEW_HEADER && printf "${bold}header:${reset}\n$input\n"
 
 # Collate the input script
-$USETMP && script=$(mktemp) || script="$output.src" && $DDEBUG && echo "script: $script" 
-cp /dev/null "$script"
+$USETMP && script_file=$(mktemp) || script_file="${output_name}.src" && $DDEBUG && echo "script: ${script_file}" 
+cp /dev/null "${script_file}"
 
-find "${workspace}" -mindepth 2 -name "*.yaml" -type f -exec grep -v '^##' {} \; -exec echo \; > "$script" 
+find "${workspace}" -mindepth 2 -name "*.yaml" -type f -exec grep -v '^##' {} \; -exec echo \; > "${script_file}"
+
+script="$(cat "$script_file")"
 if $VIEW_SCRIPT; then
 
-	printf "${bold}script:${reset}\n"
-	cat "$script"
-	
-	$VERBOSE || exit 0
+	printf "${bold}script:${reset}\n%s" "$script"
+ 
 fi
-
-# Generate YAML
-$USETMP && yaml=$(mktemp) || yaml="$output.yaml" && $DDEBUG && echo "yaml: $yaml"
-echo "$input" > "$yaml"
-
-YQ_HAPPY=false
-echo "$input" | yq w -s "$script" - 2&> /dev/null && YQ_HAPPY=true
 
 if $LIST_VARIABLES; then
 
-	$YQ_HAPPY && echo "$input" | yq w -s "$script" - > "$yaml"
-	printf "${bold}vars required:${reset}\n" && envsubst --variables "$(cat "$yaml")"
+	printf "${bold}vars required:${reset}\n"
 	
+	envsubst --variables "$input"
+	envsubst --variables "$(cat "$script_file")" 
+		
 	printf "${bold}values provided:${reset}\n" 
 	for env in "${g_working_dir}/"*.env; do
 
@@ -139,8 +134,9 @@ if $LIST_VARIABLES; then
 	done
 	$VERBOSE && "$g_file" ssh --export || "$g_file" ssh
 
-	$VERBOSE || exit 0
 fi
+
+# EXPORT variables so envsubst can use them
 
 case "$g_PLATFORM" in
 *linux-gnu)
@@ -163,32 +159,39 @@ for env in "${g_working_dir}/"*.env; do
   esac
 done
 
-$YQ_HAPPY && echo "$input" | yq w -s "$script" - | envsubst > "$yaml"
-$YQ_HAPPY || echo "$input" | envsubst > "$yaml"
+# Generate YAML
+$USETMP && yaml_file=$(mktemp) || yaml_file="${output_name}.yaml" && $DDEBUG && echo "yaml: ${yaml_file}"
+cp /dev/null "$yaml_file"
 
+if [[ -z "$script" || "$script" =~ ^\ +$ ]]; then #script is empty
+	echo "$input" | envsubst > "$yaml_file";
+else
+	echo "$input" | yq w -s "$script_file" - | envsubst > "$yaml_file"
+fi
+  
 if $VIEW_YAML; then	
 	printf "${bold}yaml:${reset}\n"
-	cat $yaml
-	$VERBOSE || exit 0
+	cat "$yaml_file"
+
 fi
 
 # Generate JSON
-$USETMP && json=$(mktemp) || json="$output.json" && $DDEBUG && echo "json: $json"
-cp /dev/null "$json"
+$USETMP && json_file=$(mktemp) || json_file="${output_name}.json" && $DDEBUG && echo "json: $json_file"
+cp /dev/null "$json_file"
 
-fcct $FCCT_PRETTY $FCCT_STRICT -input "$yaml" -output "$json"
+fcct $FCCT_PRETTY $FCCT_STRICT -input "$yaml_file" -output "$json_file"
 
 if $VIEW_JSON; then
 	printf "${bold}json:${reset}\n"
-	cat "$json"
+	cat "$json_file"
 fi
 
 # Deployment is --confirm(ed)
 $CONFIRM || printf "\nadd ${dim}--confirm${reset} to deploy to: $deploy_target\n" >&2
 $CONFIRM || exit 0
 
-$LOUD && echo cp $json "$deploy_target"
-cp $json "$deploy_target"
+$LOUD && echo cp "$json_file" "$deploy_target"
+cp "$json_file" "$deploy_target"
 
 exit 0
 

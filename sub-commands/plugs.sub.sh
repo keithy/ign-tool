@@ -9,13 +9,15 @@ command="$s_sub_cmd"
 singular="${command%s}"
 description="manage ignition $command"
 options=\
-"--find              # find available $command
---pull              # download available $command"
+"--list              # list installed $command
+--pull              # download available $command
+--find              # list available $command"
 
 usage=\
 "$breadcrumbs             # --list && --find
-$breadcrumbs             # print first three keys found
-$breadcrumbs             # print first three keys used"
+$breadcrumbs A --show    # show (installed) record
+$breadcrumbs A --edit    # edit (installed) record
+$breadcrumbs A --vars    # edit vars file (if present)"
 
 # default config
 [[ -z ${libraries+x} ]] && libraries=("$c_dir/library" "$g_working_dir/library")

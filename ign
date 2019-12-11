@@ -163,12 +163,14 @@ function g_displayHelp {
   return 0 
 }
 
-function g_checkForMarkdownViewer {
-    # Check for Markdown Viewer
-    [[ -z $(command -v "${g_markdown_viewer%% *}") ]] && g_markdown_viewer="cat"
-    $DEBUG && echo "Markdown viewer: $g_markdown_viewer"
+function g_view { # Check for Markdown Viewer other wise cat
+    if [[ -z $(command -v "${g_markdown_viewer%% *}") ]]; then
+	    $DEBUG && echo "Markdown viewer: $g_markdown_viewer"
     
-    return 0
+		"${g_markdown_viewer%% *}" "${g_markdown_viewer#* }" "$1"
+    else
+    	cat "$1"
+    fi  
 }
 
 # This function should be easy but bash begs to differ: ${args[@]:1}

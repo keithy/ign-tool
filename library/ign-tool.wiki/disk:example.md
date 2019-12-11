@@ -1,7 +1,7 @@
 An example disk as a test
 
 ```yaml
-storage.disks[+]
+storage.disks[+]:
   device: /dev/disk/by-partlabel/var
   wipe_table: true
   partitions:
