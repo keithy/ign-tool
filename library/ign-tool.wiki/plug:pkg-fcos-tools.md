@@ -20,7 +20,7 @@ It is similar in style to `ign-tool`, being built with the **composable** '[groa
 ### The Package:
 ```yaml
 storage.files[+]:
-  - path: /opt/inbox/trusted/core/fcos-tools_v0.1.tar.gz
+    path: /opt/inbox/trusted/core/fcos-tools_v0.1.tar.gz
     mode: 0644
     contents:
       source: https://github.com/keithy/fcos-tools/archive/fcos-tools_v0.1-fedora31-x86_64.tar.gz

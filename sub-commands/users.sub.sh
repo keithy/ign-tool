@@ -93,7 +93,7 @@ do
 	   unset -v "keys['${arg#*-=}']"
 	;;
     *=*)
-	   Y["${arg%=*}"]="${arg#*=}"
+	   Y["${arg%%=*}"]="${arg#*=}"
 	;;
   esac
 done

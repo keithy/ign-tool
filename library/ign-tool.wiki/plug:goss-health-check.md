@@ -48,7 +48,7 @@ storage.files[+]:
         id: 1111
     contents:
         inline: |
-            command="sudo /usr/local/lib/goss/pkg/usr/local/bin/goss -g /etc/goss/goss.yaml validate ${SSH_ORIGINAL_COMMAND:-}" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG7mD9tPBt0F1QViMXdyC5eBlXPg4uTIVanU9a5kCpbT keith@samson.flat
+            command="sudo /usr/local/lib/goss/pkg/usr/local/bin/goss -g /etc/goss/goss.yaml validate $SSH_ORIGINAL_COMMAND" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG7mD9tPBt0F1QViMXdyC5eBlXPg4uTIVanU9a5kCpbT keith@samson.flat
 
 passwd.users[+]:
       #
@@ -57,7 +57,7 @@ passwd.users[+]:
     name: goss # health check
     uid: 111
     ssh_authorized_keys:
-      - command="sudo goss validate ${SSH_ORIGINAL_COMMAND:-}" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG7mD9tPBt0F1QViMXdyC5eBlXPg4uTIVanU9a5kCpbT keith@samson.flat
+      - command="sudo goss validate $SSH_ORIGINAL_COMMAND" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG7mD9tPBt0F1QViMXdyC5eBlXPg4uTIVanU9a5kCpbT keith@samson.flat
     home_dir: /home/goss
     no_create_home: false
     primary_group: mortal
@@ -72,7 +72,7 @@ passwd.users[+]:
     name: goss-homeless # health check
     uid: 1111
     ssh_authorized_keys:
-    - command="sudo /usr/local/lib/goss/pkg/usr/local/bin/goss validate ${SSH_ORIGINAL_COMMAND:-}" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG7mD9tPBt0F1QViMXdyC5eBlXPg4uTIVanU9a5kCpbT keith@samson.flat
+    - command="sudo /usr/local/lib/goss/pkg/usr/local/bin/goss validate $SSH_ORIGINAL_COMMAND" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG7mD9tPBt0F1QViMXdyC5eBlXPg4uTIVanU9a5kCpbT keith@samson.flat
     no_create_home: true
     primary_group: mortal
     groups:

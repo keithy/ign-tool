@@ -113,25 +113,23 @@ if $VIEW_SCRIPT; then
  
 fi
 
+# Filter the inputs looking for env vars that we WILL want to substitute for
+# Restrict to ${} format
+varsH=$(awk '{ for(i=1;i<=NF;i++){ if (match($i,/\${\w+}/,m)) { print m[0] } } }' <(echo "$input") )
+varsS=$(awk '{ for(i=1;i<=NF;i++){ if (match($i,/\${\w+}/,m)) { print m[0] } } }' "$script_file" )
+
 if $LIST_VARIABLES; then
 
 	printf "${bold}vars required:${reset}\n"
 	
-	envsubst --variables "$input"
-	envsubst --variables "$(cat "$script_file")" 
+	printf "$varsH$varsS\n"
 		
-	printf "${bold}values provided:${reset}\n" 
+	printf "${bold}values provided:${reset}\n"
+	 
 	for env in "${g_working_dir}/"*.env; do
-
-  		case "$g_PLATFORM" in
-  			*linux-gnu)
-  				printf "%s\n" $(grep -v '^#' "$env" | xargs -d '\n')
-			;;
-			*darwin*)
-  				printf "%s\n"  $(grep -v '^#' "$env" | xargs -0)
-			;;
-  		esac
+		printf "%s\n"  $(grep -v '^#' "$env")
 	done
+	
 	$VERBOSE && "$g_file" ssh --export || "$g_file" ssh
 
 fi
@@ -164,9 +162,9 @@ $USETMP && yaml_file=$(mktemp) || yaml_file="${output_name}.yaml" && $DDEBUG && 
 cp /dev/null "$yaml_file"
 
 if [[ -z "$script" || "$script" =~ ^\ +$ ]]; then #script is empty
-	echo "$input" | envsubst > "$yaml_file";
+	echo "$input" | envsubst "$varsH$varsS\n" > "$yaml_file";
 else
-	echo "$input" | yq w -s "$script_file" - | envsubst > "$yaml_file"
+	echo "$input" | yq w -s "$script_file" - | envsubst "$varsH$varsS\n" > "$yaml_file"
 fi
   
 if $VIEW_YAML; then	
