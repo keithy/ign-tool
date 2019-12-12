@@ -99,7 +99,17 @@ do
 done
 
 if $ENTER_PASSWORD; then
-	Y[password_hash]=$(python3 -c 'from passlib.hash import sha512_crypt; import getpass ; print(sha512_crypt.hash(getpass.getpass()))')
+
+case "$g_PLATFORM" in
+	*linux-gnu)
+		Y[password_hash]=$(mkpasswd)
+	;;
+	*darwin*)
+		Y[password_hash]=$(python3 -c 'from passlib.hash import sha512_crypt; import getpass ; print(sha512_crypt.hash(getpass.getpass()))')
+	;;
+esac
+
+
 fi
 
 # UPDATE RECORD

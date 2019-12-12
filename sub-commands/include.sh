@@ -20,7 +20,8 @@ options=\
 --show                      # show records
 --form                      # show the record form
 --add                       # add named record
---delete                    # remove named record"
+--delete                    # remove named record
+--use=<preset>              # use preset"
 
 usage=\
 "$breadcrumbs                              # --show

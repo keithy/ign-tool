@@ -33,7 +33,8 @@ function installed_plugs () {
 		row=$(printf "\x$(printf %x $i)")
 		plug_file="${plug_path##*/}"
 		plug_name="${plug_file%.yaml}"
-
+		plug_name="${plug_name#*:}"
+		
 		installed="$installed\n${row}) $plug_name"
 		
 		if [[ ",${plugs_minus:-}," == *",$row,"* || "${plugs_minus:-}," == *",${plug_name},"* ]];
@@ -172,7 +173,8 @@ do
 		&& plug_dir="${plug%/*}" && echo "${bold}available:${reset} ${dim}${g_dir##*/}${reset}${plug_dir:${#g_dir}}" 
 	plug_file="${plug##*/}"
 	plug_name="${plug_file%.*}"
-
+	plug_name="${plug_name#*:}"
+	
 	## dim font for installed plugs
 	$FIND_PLUGS && [[ "$NL${plug_names[*]}$NL" == *"$NL${plug_name}$NL"* ]] && printf "${dim}" 
 
@@ -184,7 +186,7 @@ do
 		case "${plug_file##*.}" in
 			yaml)
 			    if [[ ! -f "${workspace}/${command}/${plug_name}.yaml" ]]; then
-					cp "$plug" "${workspace}/${command}"
+					cp "$plug" "${workspace}/${command}/${plug_name}.yaml"
 				fi
 			;;
 			env)

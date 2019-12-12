@@ -96,10 +96,18 @@ if $ADD_YQ; then
 	&& chmod a+x "$installPath/yq" && echo "yq - available"
 fi
 
-if $ADD_PASSLIB; then
-   command -v pip3 && pip3 install passlib \
-   	&& echo "passlib - available" \
-   	|| echo "Can't install passlib, pip3 not installed" 
+if $ADD_PASSLIB; then	
+   	case "$g_PLATFORM" in
+	*linux-gnu)
+		echo "passlib - using mkpasswd command instead"
+	;;
+	*darwin*)
+	   command -v pip3 && pip3 install passlib \
+   		&& echo "passlib - available" \
+   		|| echo "Can't install passlib, pip3 not installed" 
+	;;
+esac
+   	
 fi
 
 if $ADD_EXPECT; then
