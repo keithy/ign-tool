@@ -22,7 +22,7 @@ $breadcrumbs --list                        # list available templates
 $breadcrumbs --help                        # this message"
 
 # --options
-[[ -z ${g_config_preset_locations+x} ]] && g_config_preset_locations=("$c_dir")
+[[ -z ${g_config_preset_locations+x} ]] && g_config_preset_locations=("$g_dir/templates")
 
 extra="\nAvailable templates:\n"
 for presetDir in "${g_config_preset_locations[@]}" 

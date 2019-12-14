@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
 # The groan framework is implemented by a minimal set of scripts.
-# All top-level "commands" are exactly the same code but with differing names.
-# i.e. `rename-to-your-command-name` and `groan\groan` are identical.
 #
-# This "Command" script - Provides basic features and redirects `groan <cmd>` to `<cmd>.sub.sh`
+# 1) This "Command" script - provides universal features and passes to a command dispatcher
+# 2) commands/_dispatch.sh - selects and executes a given subcommand
+# 3) <name>.sub.<cmd>.<altname>.sub.sh - alias a command delegating to anothers sub-command.
+#
+# Shell commands may be sourced for two purposes, according to the METADATAONLY flag.
+# By convention, variables in CAPITALS direct/select workflow/actions
 
-# our contribution to help
+# Our default metadata contribution to help
 optionsLongForm=\
 "--help    | -h | -?  Usage help for a command
 --quiet   | -q       Quiet mode - say nothing
@@ -20,18 +23,21 @@ commonOptionsLong=\
 "--help --quiet --verbose --debug"
 commonOptionsShort=\
 "-h     -q      -V        -D"
-# STRICT-MODE
 
+# Unofficial Bash Strict Mode
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
 IFS=$'\n\t'
 shopt -s nullglob # make sure globs are empty arrays if nothing is found
 set -o allexport
+
+# Useful
 NL=$'\n'
 
-# FUNCTIONS
+# Standard means for platform determination for use with case match expressions
 g_PLATFORM="${BASH_VERSINFO[5]}" # the simplest to use determinator?
 
+# Utility to verify if sudo is available
 function g_needsSudo() {
     local prompt
     prompt=$(sudo -nv 2>&1)
@@ -47,22 +53,39 @@ function g_needsSudo() {
 
 function g_readLocations # from g_locations file
 {
+  #c_dir c_name globals used within <name>.locations.sh file
   c_file="$1"
   c_dir=$(dirname "$c_file")
-  c_name="${c_file##*/}" # `basename $c_file` 
+  c_name="${c_file##*/}" # `basename $c_file`
 
-  g_locations=("${c_file}.commands") #default
+  # config locations are initialized once
+  if [[ -z ${g_config_options+x} ]]; then
+	g_config_options=("local" "user" "global")
+
+    g_config_file_locations=(
+	  "${g_working_dir}/${c_name}.conf"  	# --local
+	  "$HOME/.${c_name}.conf"       		# --user
+	  "${c_dir}/${c_name}.conf"  			# --global
+    )
+  fi
+  
+  g_locations=(
+	  "${c_dir}/commands"                
+	  "${c_dir}/topics"                  
+  )
+
   g_default_subcommand="_default" #default
   g_default_dispatch="_dispatch.sh"
 
-  #c_dir c_name globals used within <name>.locations.sh file
+  markdownViewerUtility="mdv -t 715.1331"
 
+  # read 
   g_locations_config="${c_file}.locations.sh"
 
-  if [ -f "$g_locations_config" ]; then  
+  if [ -f "$g_locations_config" ]; then 
     $DEBUG && echo "Locations< $g_locations_config"
     source "$g_locations_config"
-  else 
+  else
     $DEBUG && echo "LocationsX $g_locations_config"
   fi
   return 0
@@ -85,17 +108,20 @@ function g_readThemes # from
 {
   local g_theme_file
   bold=$''; dim=$''; bold=$''; reset=$''
-  for g_theme_file in "${g_theme_path[@]:-}"
-    do
-        if [[ -f "$g_theme_file" ]]
-        then
-            $DEBUG && echo "Theme< $g_theme_file"
-            source "$g_theme_file"
-        else
-            $DEBUG && echo "ThemeX $g_theme_file"
-        fi
-    done
 
+  for s_dir in "${g_locations[@]}"
+  do
+  	for g_theme_file in "$s_dir"/theme*.sh
+	do
+		if [[ -f "$g_theme_file" ]]
+		then
+			$DEBUG && echo "Theme< $g_theme_file"
+			source "$g_theme_file"
+		else
+			$DEBUG && echo "ThemeX $g_theme_file"
+		fi
+	done
+  done
   return 0
 }
 
@@ -104,9 +130,18 @@ function g_readThemes # from
 function g_executeScriptPath {
 
   s_path="$1"
+  local s_meta_path="${s_path/.sub.*/.meta.sh}"
 
   local title="Running"
   $METADATAONLY && title="Metadata<"
+
+  if [[ -f "$s_meta_path" ]]; then
+        $DEBUG && echo "Metadata< $s_meta_path"
+        source "$s_meta_path" "${args[@]:+${args[@]}}"
+
+        $SHOWHELP && g_displayHelp
+        $METADATAONLY && return
+  fi
 
   case "${s_path##*.}" in
     sh)
@@ -129,13 +164,7 @@ function g_executeScriptPath {
         return
     ;;
     *)
-        $DEBUG && echo "Metadata< ${s_path/.sub.*/.meta.sh}"
-        source "${s_path/.sub.*/.meta.sh}" "${args[@]:+${args[@]}}"
-
-        $SHOWHELP && g_displayHelp
-        $METADATAONLY && return
-
-        $DEBUG && echo "Eval> $s_path ${args[@]:+${args[@]}}"
+        $DEBUG && echo "$title eval> $s_path ${args[@]:+${args[@]}}"
         eval "$s_path" "${args[@]:+${args[@]}}"
         exit 0
     ;;
@@ -271,13 +300,13 @@ do
     esac
 done
  
-g_readLocations "$c_file"
 
-breadcrumbs="$c_name"
-g_dir="$c_dir"
+g_readLocations "$c_file"  
+
 g_file="$c_file"
+g_dir="$c_dir"
 g_name="$c_name"
-
+breadcrumbs="$c_name"
 
 g_readConfig
 g_readThemes

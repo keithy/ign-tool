@@ -52,7 +52,7 @@ TEST_ENVIRONMENT = PYTHONPATH=$(THIS_FILE_DIR):$$PYTHONPATH PATH=$(THIS_FILE_DIR
 
 define RUN_ONE_TEST
 TARGET_FOR_$(1): $$(FIRST_MAKEFILE_DIR)/$(1)
-	+@export PATH=$$$$(pwd):$$$$PATH; \
+	+@export XXXPATHXXX=$$$$(pwd):$$$$PATH; \
           if [ -e $$(FIRST_MAKEFILE_DIR)/$$(executedTestsName) ]; then \
              echo $$< >> $$(FIRST_MAKEFILE_DIR)/$$(executedTestsName); \
           fi; \

@@ -26,6 +26,7 @@ theForm="passwd.users[+]:
 
 source "$s_dir/include.sh"
 options="$options\n--password                  # enter at prompt"
+options="$options\n--ssh+=<n>                  # add ssh key <n>"
 
 $SHOWHELP && g_displayHelp
 $METADATAONLY && return
@@ -102,7 +103,7 @@ if $ENTER_PASSWORD; then
 
 case "$g_PLATFORM" in
 	*linux-gnu)
-		Y[password_hash]=$(mkpasswd -m sha-512 --rounds=4096)
+		Y[password_hash]=$(mkpasswd -m sha-512 --rounds=656000)
 	;;
 	*darwin*)
 		Y[password_hash]=$(python3 -c 'from passlib.hash import sha512_crypt; import getpass ; print(sha512_crypt.hash(getpass.getpass()))')

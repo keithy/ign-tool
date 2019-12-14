@@ -76,11 +76,12 @@ for user_path in "$HOME/../"*
 do
 	for pub_path in "$user_path"/.ssh/*.pub
 	do
-		if  [[ ",${needles:-$i}," == *",$i,"* ]]; then
-			pub="${pub_path##*/}"
-			name_type="${user_path##*/}_${pub%.pub}"
-			value="$(cat "$pub_path")"
+		pub="${pub_path##*/}"
+		name_type="${user_path##*/}_${pub%.pub}"
+		value="$(cat "$pub_path")"
 			
+		if  [[ ",${needles:-$i}," == *",$i,"* ||  ",${needles:-}," == *",${name_type},"* ]]; then
+				
 			if $EXPORT_VARS; then
 				printf "SSH_%s=%s\n" "$name_type" "$value"
 			else

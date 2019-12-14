@@ -50,7 +50,7 @@ describe "Run generate on empty workspace" && {
 		}
 		
 		it "demos variable list" && {
-			expect "$out" to_match ".*vars required:${NL}VARIANT${NL}.*"
+			expect "$out" to_match "vars required:${NL}${VARIANT}${NL}.*"
 		}
 		it "variable substitution works" && {
 			expect "$out" to_match "${NL}yaml:${NL}.*${NL}variant: fcos${NL}.*"
