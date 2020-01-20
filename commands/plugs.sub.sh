@@ -21,7 +21,7 @@ $breadcrumbs A --vars    # edit vars file (if present)"
 
 # default config
 [[ -z ${libraries+x} ]] && libraries=("$c_dir/library" "$g_working_dir/library")
-[[ -z ${repo_directory+x} ]] && repo_directory="$c_dir/library"
+repo_directory="${repo_directory:-${c_dir}/library}"
 [[ -z ${workspace+x} ]] && workspace="$g_working_dir/input"
 
 function installed_plugs () {
@@ -74,7 +74,6 @@ plug=""
 DEFAULT=true
 FIND_PLUGS=false
 LIST_PLUGS=false
-PULL_PLUGS=false
 ADD_PLUGS=false
 DELETE_PLUGS=false
 EDIT_PLUGS=false
@@ -91,10 +90,6 @@ do
         --find)
             FIND_PLUGS=true
            	DEFAULT=false
-        ;;
-        --download|--down|--pull)
-            PULL_PLUGS=true
-        	DEFAULT=false
         ;;
         --edit)
         	EDIT_PLUGS=true
@@ -135,23 +130,15 @@ $ADD_PLUGS && plugs_add="$plugs_add,${plugs}"
 
 installed_plugs
 
-if $PULL_PLUGS; then
-	for repo in "${repositories[@]}"; do
-		repo_name="${repo##*/}"
-		repo_name="${repo_name%.git}"
-		repo_local="${repo_directory}/${repo_name}"
-		\rm -rf "${repo_local}"
-		git clone "${repo}" "${repo_local}"
-		\rm -rf "${repo_local}/.git"
-	done
-fi
-
 $LIST_PLUGS && printf "${bold}installed:${reset}${installed}\n\n"
 
 # YAML
 
+[[ ! -d "${libraries[0]}" ]] && "$g_file" setup update
+
 plugs=()
 for library in "${libraries[@]}"; do
+	$VERBOSE && echo "library: ${library}"
 	for plug in "${library}/${singular}:"*.yaml; do
 		plugs+=("${plug}")
 	done

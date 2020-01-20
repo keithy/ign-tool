@@ -25,6 +25,7 @@ theForm="passwd.users[+]:
 "
 
 source "$s_dir/include.sh"
+options="$options\ngroups+=wheel               # add group"
 options="$options\n--password                  # enter at prompt"
 options="$options\n--ssh+=<n>                  # add ssh key <n>"
 
@@ -99,18 +100,27 @@ do
   esac
 done
 
+function checkpasswd {
+	local sha siteout
+	read -p 'Try me: ' -s passwd
+	sha=$(echo -n "$passwd" | sha1sum | awk '{ print $1 }')
+	siteout=$(curl -s https://api.pwnedpasswords.com/range/${sha:0:5})
+	if grep -i "${sha: -((${#sha}-5))}" <<< "$siteout"  > /dev/null
+	   then echo 'This password has previously been included in a data breach' ;  exit 1
+	fi
+}
+
 if $ENTER_PASSWORD; then
-
-case "$g_PLATFORM" in
-	*linux-gnu)
-		Y[password_hash]=$(mkpasswd -m sha-512 --rounds=656000)
-	;;
-	*darwin*)
-		Y[password_hash]=$(python3 -c 'from passlib.hash import sha512_crypt; import getpass ; print(sha512_crypt.hash(getpass.getpass()))')
-	;;
-esac
-
-
+	#checkpasswd
+	case "$g_PLATFORM" in
+		*linux-gnu)
+			Y[password_hash]=$(mkpasswd -m sha-512 --rounds=656000 )
+		;;
+		*darwin*)
+			Y[password_hash]=$(python3 -c 'from passlib.hash import sha512_crypt; import getpass ; print(sha512_crypt.hash(getpass.getpass()))' )
+		;;
+	esac
+    unset passwd
 fi
 
 # UPDATE RECORD
