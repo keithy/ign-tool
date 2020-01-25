@@ -143,7 +143,7 @@ if [[ -n "$a_contents" ]]; then
 fi
 
 if $AUTOHASH; then
-	Y[hash]="sha512-$(curl -sSL "${Y[source]}" | shasum -a 512)X"
+	Y[hash]="sha512-$(curl -sSL "${Y[source]}" | shasum -a 512)"
 	Y[hash]="${Y[hash]%%\ *}"
 fi
  

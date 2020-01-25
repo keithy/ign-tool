@@ -72,22 +72,24 @@ fi
 i=1
 $LOUD && echo "${bold}ssh keys:${reset}"
 $VERBOSE && print="-print" || print=""
+
 for user_path in "$HOME/../"*
 do
+	user_name="${user_path##*/}" && [[ "$user_name" == "$USER" ]] && user_name="USER"
 	for pub_path in "$user_path"/.ssh/*.pub
 	do
 		pub="${pub_path##*/}"
-		name_type="${user_path##*/}_${pub%.pub}"
+		name_type="${user_name}_${pub%.pub}"
 		value="$(cat "$pub_path")"
 			
 		if  [[ ",${needles:-$i}," == *",$i,"* ||  ",${needles:-}," == *",${name_type},"* ]]; then
 				
 			if $EXPORT_VARS; then
-				printf "SSH_%s=%s\n" "$name_type" "$value"
+				printf "%s=%s\n" "$name_type" "$value"
 			else
 				$LOUD && printf "  $i) %s " "${value##* }"			
 				$LOUD && printf "${dim}available as:${reset} "
-				printf "%s\n" "\${SSH_$name_type}"
+				printf "%s\n" "\${$name_type}"
 			fi
 		fi
 		i=$(( $i + 1 ))		 

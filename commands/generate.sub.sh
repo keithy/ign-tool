@@ -98,7 +98,9 @@ else #C
 	input=$(cat) #read from stdin
 fi
 
-$VIEW_HEADER && printf "${bold}header:${reset}\n$input\n"
+if $VIEW_HEADER; then
+   printf "${bold}header:${reset}\n$input\n"
+fi
 
 # Collate the input script
 $USETMP && script_file=$(mktemp) || script_file="${output_name}.src" && $DDEBUG && echo "script: ${script_file}" 
@@ -107,33 +109,42 @@ cp /dev/null "${script_file}"
 find "${workspace}" -mindepth 2 -name "*.yaml" -type f -exec grep -v '^##' {} \; -exec echo \; > "${script_file}"
 
 script="$(cat "$script_file")"
-if $VIEW_SCRIPT; then
 
+if $VIEW_SCRIPT; then
 	printf "${bold}script:${reset}\n%s" "$script"
- 
 fi
+
+# EXPORT ssh keys as variables so envsubst can use them
+
+case "$g_PLATFORM" in
+	*linux-gnu)
+		export $("$g_file" ssh -q --export | xargs -0)
+	;;
+	*darwin*)
+		export $("$g_file" ssh -q --export | xargs -0)
+	;;
+esac
 
 # Filter the inputs looking for env vars that we WILL want to substitute for
 # Restrict to ${} format
-varsH=$(awk '{ for(i=1;i<=NF;i++){ if (match($i,/\${\w+}/,m)) { print m[0] } } }' <(echo "$input") )
-varsS=$(awk '{ for(i=1;i<=NF;i++){ if (match($i,/\${\w+}/,m)) { print m[0] } } }' "$script_file" )
+varsEnv=$(awk '{ for(i=1;i<=NF;i++){ if (match($i,/\${\w+}/,m)) { print m[0] } } }' <(grep -hv '^#' "${g_working_dir}/"*.env nada 2> /dev/null) )
+varsHeader=$(awk '{ for(i=1;i<=NF;i++){ if (match($i,/\${\w+}/,m)) { print m[0] } } }' <(echo "$input") )
+varsScript=$(awk '{ for(i=1;i<=NF;i++){ if (match($i,/\${\w+}/,m)) { print m[0] } } }' "$script_file" )
 
 if $LIST_VARIABLES; then
-
 	printf "${bold}vars required:${reset}\n"
 	
-	printf "$varsH$varsS\n"
-		
+	printf "$varsEnv\n$varsHeader\n$varsScript\n"
+
 	printf "${bold}values provided:${reset}\n"
 	 
 	for env in "${g_working_dir}/"*.env; do
-		printf "%s\n"  $(grep -v '^#' "$env")
+		printf "%s\n"  $(grep -v '^#' "$env" | envsubst "$varsEnv")
 	done
 	
 	$VERBOSE && "$g_file" ssh --export || "$g_file" ssh
-
 fi
-
+		
 # EXPORT variables so envsubst can use them
 
 case "$g_PLATFORM" in
@@ -149,10 +160,10 @@ for env in "${g_working_dir}/"*.env; do
 
   case "$g_PLATFORM" in
   	*linux-gnu)
-  		export $(grep -v '^#' "$env" | xargs -0)
+  		export $(grep -v '^#' "$env" | envsubst "$varsEnv\n" | xargs -0)
 	;;
 	*darwin*)
-  		export $(grep -v '^#' "$env" | xargs -0)
+  		export $(grep -v '^#' "$env" | envsubst "$varsEnv\n" |  xargs -0)
 	;;
   esac
 done
@@ -162,15 +173,14 @@ $USETMP && yaml_file=$(mktemp) || yaml_file="${output_name}.yaml" && $DDEBUG && 
 cp /dev/null "$yaml_file"
 
 if [[ -z "$script" || "$script" =~ ^\ +$ ]]; then #script is empty
-	echo "$input" | envsubst "$varsH$varsS\n" > "$yaml_file";
+	echo "$input" | envsubst "$varsHeader\n$varsScript\n" > "$yaml_file";
 else
-	echo "$input" | yq w -s "$script_file" - | envsubst "$varsH$varsS\n" > "$yaml_file"
+	echo "$input" | yq w -s "$script_file" - | envsubst "$varsHeader\n$varsScript\n" > "$yaml_file"
 fi
   
 if $VIEW_YAML; then	
 	printf "${bold}yaml:${reset}\n"
 	cat "$yaml_file"
-
 fi
 
 # Generate JSON
